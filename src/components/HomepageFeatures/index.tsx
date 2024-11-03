@@ -14,9 +14,9 @@ const FeatureList: FeatureItem[] = [
 		Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
 		description: (
 			<>
-				支持各种桌面平台、移动平台和 Web。
+				Rust 编写，支持各种桌面平台、移动平台和 Web。
 				<br />
-				“一次编写，各处运行”。
+				“一次开发，各处运行”。
 			</>
 		),
 	},

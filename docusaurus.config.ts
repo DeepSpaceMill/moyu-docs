@@ -4,7 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: '豆腐 - 视觉小说引擎',
-  tagline: '全端跨平台，现代化的开发定制能力',
+  tagline: '使用 Rust 编写，全端跨平台，现代化的开发定制能力',
   favicon: 'img/favicon.ico',
   // Set the production url of your site here
   url: 'https://doufu.moe',
