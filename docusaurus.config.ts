@@ -80,7 +80,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/Icemic/doufu',
+          href: 'https://github.com/DeepSpaceMill',
           className: 'navbar-icon fa-brands fa-github',
           'aria-label': 'GitHub',
           // label: 'GitHub',
