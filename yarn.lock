@@ -5018,24 +5018,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"doufu-docs@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "doufu-docs@workspace:."
-  dependencies:
-    "@docusaurus/core": "npm:^3.5.2"
-    "@docusaurus/module-type-aliases": "npm:^3.5.2"
-    "@docusaurus/preset-classic": "npm:^3.5.2"
-    "@docusaurus/tsconfig": "npm:^3.5.2"
-    "@docusaurus/types": "npm:3.4.0"
-    "@mdx-js/react": "npm:^3.0.0"
-    clsx: "npm:^2.0.0"
-    prism-react-renderer: "npm:^2.3.0"
-    react: "npm:^18.0.0"
-    react-dom: "npm:^18.0.0"
-    typescript: "npm:~5.2.2"
-  languageName: unknown
-  linkType: soft
-
 "duplexer@npm:^0.1.2":
   version: 0.1.2
   resolution: "duplexer@npm:0.1.2"
@@ -8359,6 +8341,24 @@ __metadata:
   checksum: 10c0/46ea0f3ffa8bc6a5bc0c7081ffc3907777f0ed6516888d40a518c5111f8366d97d2678911ad1a6882bf592fa9de6c784fea32e1687bb94e1f4944170af48a5cf
   languageName: node
   linkType: hard
+
+"moyu-docs@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "moyu-docs@workspace:."
+  dependencies:
+    "@docusaurus/core": "npm:^3.5.2"
+    "@docusaurus/module-type-aliases": "npm:^3.5.2"
+    "@docusaurus/preset-classic": "npm:^3.5.2"
+    "@docusaurus/tsconfig": "npm:^3.5.2"
+    "@docusaurus/types": "npm:3.4.0"
+    "@mdx-js/react": "npm:^3.0.0"
+    clsx: "npm:^2.0.0"
+    prism-react-renderer: "npm:^2.3.0"
+    react: "npm:^18.0.0"
+    react-dom: "npm:^18.0.0"
+    typescript: "npm:~5.2.2"
+  languageName: unknown
+  linkType: soft
 
 "mrmime@npm:^2.0.0":
   version: 2.0.0

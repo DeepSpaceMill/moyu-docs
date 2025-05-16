@@ -3,19 +3,49 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: '豆腐 - 视觉小说引擎',
+  title: '末语 - 视觉小说引擎',
   tagline: '使用 Rust 编写，全端跨平台，现代化的开发定制能力',
   favicon: 'img/favicon.ico',
   // Set the production url of your site here
-  url: 'https://doufu.moe',
+  url: 'https://momoyu.ink',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        href: 'img/icon-64.png',
+        sizes: '64x64',
+        type: 'image/png',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        href: 'img/icon-128.png',
+        sizes: '128x128',
+        type: 'image/png',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        href: 'img/icon-256.png',
+        sizes: '256x256',
+        type: 'image/png',
+      },
+    },
+  ],
+
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'DeepSpaceMill', // Usually your GitHub org/user name.
-  projectName: 'doufu-docs', // Usually your repo name.
+  projectName: 'moyu-docs', // Usually your repo name.
   trailingSlash: false,
 
   onBrokenLinks: 'throw',
@@ -38,8 +68,8 @@ const config: Config = {
         },
         blog: {
           showReadingTime: true,
-          blogTitle: '豆腐 - 视觉小说引擎 - 博客',
-          blogDescription: '记录豆腐视觉小说引擎的开发过程',
+          blogTitle: '末语 - 视觉小说引擎 - 博客',
+          blogDescription: '记录末语视觉小说引擎的开发过程',
           postsPerPage: 'ALL',
         },
         theme: {
@@ -50,12 +80,13 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/doufu.png',
+    image: 'img/icon-256.png',
     navbar: {
-      title: '豆腐 - 视觉小说引擎',
+      // title: '末语 - 视觉小说引擎',
       logo: {
         alt: 'Site Logo',
-        src: 'img/doufu.png',
+        src: 'img/logo.png',
+        srcDark: 'img/logo_dark.png',
       },
       items: [
         {
@@ -73,7 +104,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://discord.gg/KBRKNrmNBb',
+          href: 'https://discord.gg/wmTekCNarG',
           className: 'navbar-icon navbar-icon-discord fa-brands fa-discord',
           'aria-label': 'Discord',
           // label: 'Discord',
@@ -130,7 +161,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/Icemic/hai',
+              href: 'https://github.com/DeepSpaceMill',
             },
           ],
         },

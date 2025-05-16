@@ -29,13 +29,13 @@ sidebar_position: 2
 
 ## 舞台与全局设置
 
-对于一个游戏，我们首先要配置合适的全局配置，这包括前面提到的舞台相关的设置，以及其他一些全局设置，比如游戏的标题、字体等。在豆腐游戏引擎中，我们通常使用工程目录下的 `index.json` 文件来配置他们。
+对于一个游戏，我们首先要配置合适的全局配置，这包括前面提到的舞台相关的设置，以及其他一些全局设置，比如游戏的标题、字体等。在末语游戏引擎中，我们通常使用工程目录下的 `index.json` 文件来配置他们。
 
 下面是一个简单的 `index.json` 文件示例：
 
 ```json title="index.json"
 {
-  "$schema": "https://gist.githubusercontent.com/Icemic/55a8cd86b02c0c310f51833e88f7d083/raw/doufu-config.schema.json",
+  "$schema": "https://gist.githubusercontent.com/Icemic/55a8cd86b02c0c310f51833e88f7d083/raw/moyu-config.schema.json",
   "surface_size": "1280x720",
   "stage_size": "1920x1080",
   "window_title": "My First Game",
@@ -58,7 +58,7 @@ sidebar_position: 2
 | entry                      | string  | `./index.json`      | 重定向游戏入口点，可以是绝对路径或相对路径。这也指定了其他资源（assets）的根路径。通常无需设置。                          |
 | entryFilename              | string  | `index.js`          | 游戏的入口文件名，相对于根路径。除非你知道自己在做什么，否则不要更改此项。                                                |
 | fontFile                   | string  | `fonts/default.otf` | 用于渲染文本的字体文件，必须相对于根路径。支持 .otf 和 .ttf 格式。                                                        |
-| windowTitle                | string  | `Doufu`             | 窗口的标题。                                                                                                              |
+| windowTitle                | string  | `moyu`             | 窗口的标题。                                                                                                              |
 | windowState                | string  | `idle`              | 窗口的初始状态。可能的值：`idle`, `minimized`, `maximized`, `fullscreen`。                                                |
 | windowResizable            | boolean | false               | 窗口是否可调整大小。                                                                                                      |
 | surfaceSize                | string  | `1280x720`          | 表面的尺寸。                                                                                                              |
