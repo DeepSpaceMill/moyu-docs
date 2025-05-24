@@ -6,4 +6,4 @@ sidebar_position: 90
 
 ## Credits
 
-1. 软件及网站所使用的末语图标来自 <a href="https://www.flaticon.com/free-icons/tofu" title="tofu icons">Flaticon</a>
+1. 末语引擎的 Logo / Icon 设计师 [和调品牌工作室](https://www.mihuashi.com/profiles/1470855)
