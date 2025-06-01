@@ -1,4 +1,0 @@
-# 喵
-
-User-agent: *
-Disallow:  
