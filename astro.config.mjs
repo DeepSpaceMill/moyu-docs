@@ -8,13 +8,31 @@ export default defineConfig({
   site: 'https://momoyu.ink',
   integrations: [
     starlight({
-      title: '末语 - 视觉小说引擎',
-      description: '使用 Rust 编写，全端跨平台，现代化的开发定制能力',
+      title: {
+        'zh-CN': '末语 - 视觉小说引擎',
+        ja: '末語 - ノベルゲームエンジン',
+        en: 'MoYu - Visual Novel Engine',
+      },
       favicon: '/favicon.ico',
       logo: {
         dark: './public/logo_dark.png',
         light: './public/logo.png',
         replacesTitle: true,
+      },
+      defaultLocale: 'root',
+      locales: {
+        root: {
+          lang: 'zh-CN',
+          label: '简体中文',
+        },
+        ja: {
+          lang: 'ja',
+          label: '日本語',
+        },
+        en: {
+          lang: 'en',
+          label: 'English',
+        },
       },
       head: [
         {
@@ -71,9 +89,7 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/DeepSpaceMill/moyu-docs/edit/master/',
       },
-      customCss: [
-        './src/styles/custom.css',
-      ],
+      customCss: ['./src/styles/custom.css'],
       components: {
         SocialIcons: './src/components/SocialIcons.astro',
       },
