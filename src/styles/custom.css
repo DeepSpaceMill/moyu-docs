@@ -41,3 +41,8 @@ main code:not(:has(div)) {
   border-radius: 3px;
   color: var(--sl-color-accent-high);
 }
+
+.sidebar-content .top-level li ul li a[aria-current='page'] {
+  color: var(--sl-color-text-accent);
+  background-color: unset;
+}
