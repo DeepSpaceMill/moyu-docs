@@ -64,7 +64,7 @@ export default defineConfig({
         },
       ],
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/DeepSpaceMill' },
         { icon: 'discord', label: 'Discord', href: 'https://discord.gg/wmTekCNarG' },
       ],
       sidebar: [
