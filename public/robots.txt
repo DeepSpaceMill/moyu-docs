@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://momoyu.ink/sitemap-index.xml

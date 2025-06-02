@@ -1,0 +1,41 @@
+---
+title: 末语 - 视觉小说引擎
+head:
+  - tag: title
+    content: 末语 - 视觉小说引擎
+template: splash
+editUrl: false
+lastUpdated: false
+hero:
+  title: 末语引擎
+  tagline: 使用 Rust 编写，全端跨平台，现代化的开发定制能力
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: 即将发布
+      link: "#"
+      icon: star
+    - text: 先行阅读文档
+      link: /start/intro
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 特性
+
+<CardGrid stagger>
+  <Card title="一致的跨平台能力" icon="setting">
+    Rust 编写，支持各种桌面平台、移动平台和 Web。<br />“一次开发，各处运行”。
+  </Card>
+  <Card title="高度自定义的界面" icon="laptop">
+    使用 React 开发你想要的任何界面，对接成熟社区的海量资源和开发人员。
+  </Card>
+  <Card title="渐进式和灵活性" icon="star">
+    对于不同的用户，提供不同的使用方式，从简单的模板到完全自定义。
+  </Card>
+  <Card title="开源且商业友好" icon="github">
+    基于 MPL-2.0 开源协议。<br />免费使用，更可以用于商业用途。
+  </Card>
+</CardGrid>
