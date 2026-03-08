@@ -73,12 +73,20 @@ export default defineConfig({
           autogenerate: { directory: 'start' },
         },
         {
+          label: '使用标准框架',
+          autogenerate: { directory: 'use-framework' },
+        },
+        {
           label: '教程 - 基本',
           autogenerate: { directory: 'tutorial-basics' },
         },
         {
           label: '教程 - 进阶',
           autogenerate: { directory: 'tutorial-advanced' },
+        },
+        {
+          label: '深入引擎设计',
+          autogenerate: { directory: 'deep-into' },
         },
         {
           label: '更多',
