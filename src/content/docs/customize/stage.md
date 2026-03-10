@@ -1,7 +1,7 @@
 ---
-title: 舞台和全局设置
+title: 舞台与全局设置
 sidebar:
-  order: 2
+  order: 3
 ---
 
 ## 了解“舞台”

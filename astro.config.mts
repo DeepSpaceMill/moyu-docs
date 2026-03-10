@@ -74,15 +74,19 @@ export default defineConfig({
           autogenerate: { directory: 'start' },
         },
         {
+          label: '发布与部署',
+          autogenerate: { directory: 'deploy' },
+        },
+        {
           label: '定制框架',
-          autogenerate: { directory: 'tutorial-basics' },
+          autogenerate: { directory: 'customize' },
         },
         {
-          label: '教程 - 进阶',
-          autogenerate: { directory: 'tutorial-advanced' },
+          label: '引擎 API',
+          autogenerate: { directory: 'engine-api' },
         },
         {
-          label: '深入引擎设计',
+          label: '深入引擎',
           autogenerate: { directory: 'deep-into' },
         },
         {
