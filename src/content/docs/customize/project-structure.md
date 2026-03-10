@@ -21,11 +21,11 @@ my-vn-project/
 │   ├── index.tsx           # 应用入口
 │   ├── router.ts           # 路由配置
 │   ├── error.tsx           # 错误边界
-│   ├── actors/             # 演员组件（舞台上的视觉表现）
-│   │   ├── background.tsx  # 背景演员
-│   │   ├── character.tsx   # 角色演员
-│   │   ├── textbox.tsx     # 文本框演员
-│   │   └── bgm.tsx         # BGM 演员（无视觉）
+│   ├── actors/             # 图层组件（舞台上的视觉表现）
+│   │   ├── background.tsx  # 背景图层
+│   │   ├── character.tsx   # 角色图层
+│   │   ├── textbox.tsx     # 文本框图层
+│   │   └── bgm.tsx         # BGM 图层（无视觉）
 │   ├── commands/           # 命令系统
 │   │   ├── commands.ts     # 命令 Schema 定义（Zod）
 │   │   └── handlers.ts     # 命令处理函数
@@ -132,6 +132,6 @@ npm run engine:update
 | **路由** (`router.ts`) | 页面导航和浮层管理 | [路由与页面](/customize/routing) |
 | **状态** (`state/`) | 游戏运行时数据管理 | [状态管理](/customize/state) |
 | **命令** (`commands/`) | 剧本命令的定义和执行 | [命令与剧本引擎](/customize/commands) |
-| **演员** (`actors/`) | 舞台上的视觉元素 | [演员系统](/customize/actors) |
+| **图层** (`actors/`) | 舞台上的视觉元素 | [图层系统](/customize/actors) |
 | **页面** (`pages/`) | 各个界面 | [路由与页面](/customize/routing) |
 | **组件** (`components/`) | 可复用的 UI 控件 | [内置组件](/customize/components) |

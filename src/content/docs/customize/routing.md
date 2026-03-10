@@ -126,7 +126,7 @@ function SaveLoad({ type }: SaveLoadProps) {
 
 ### 游戏舞台 (`stage`)
 
-核心页面，承载所有游戏内容。包含背景、角色、文本框等演员组件，以及命令处理系统。详见[命令与剧本引擎](/customize/commands)和[演员系统](/customize/actors)。
+核心页面，承载所有游戏内容。包含背景、角色、文本框等图层，以及命令处理系统。详见[命令与剧本引擎](/customize/commands)和[图层（Actor）系统](/customize/actors)。
 
 ### 游戏菜单 (`menu`)
 

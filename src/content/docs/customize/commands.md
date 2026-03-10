@@ -4,7 +4,7 @@ sidebar:
   order: 7
 ---
 
-命令系统是连接剧本（`.sixu` 脚本）和游戏表现的核心桥梁。当剧本中执行一条 `@changebg` 或 `@addchar` 命令时，框架需要解析它、更新对应的游戏状态，最终由演员组件渲染出来。
+命令系统是连接剧本（`.sixu` 脚本）和游戏表现的核心桥梁。当剧本中执行一条 `@changebg` 或 `@addchar` 命令时，框架需要解析它、更新对应的游戏状态，最终由 Actor 组件渲染出来。
 
 ## 数据流
 
@@ -140,7 +140,7 @@ stage.registerTextLine(handleTextLine);
 export function Stage() {
   return (
     <StageContextProvider stage={stage}>
-      {/* 演员组件 */}
+      {/*  Actor 组件 */}
     </StageContextProvider>
   );
 }
@@ -230,7 +230,7 @@ stage.registerCommand('shake', handleShake);
 
 ### Skip（快进）
 
-当用户按住 Ctrl 时，框架进入快进模式，快速跳过文本和等待。各演员可以通过 `useSkipCallback` 注册快进回调，在快进时完成未完成的动画：
+当用户按住 Ctrl 时，框架进入快进模式，快速跳过文本和等待。各 Actor 可以通过 `useSkipCallback` 注册快进回调，在快进时完成未完成的动画：
 
 ```typescript
 import { useSkipCallback } from '@momoyu-ink/kit';

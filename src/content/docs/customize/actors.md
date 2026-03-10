@@ -1,24 +1,24 @@
 ---
-title: 演员系统
+title: 图层（Actor）系统
 sidebar:
   order: 8
 ---
 
-**演员（Actor）** 是舞台上的视觉表现单元。每个演员是一个 React 组件，它监听游戏状态的变化，并将其渲染为 UI。
+**图层（Actor）** 是舞台上的视觉表现单元。每个图层（Actor）是一个 React 组件，它监听游戏状态的变化，并将其渲染为 UI。
 
 ## 设计模式
 
-演员遵循一个固定的模式：
+图层（Actor）遵循一个固定的模式：
 
 ```
-命令处理函数修改 gameState → 演员监听状态变化 → 渲染对应的视觉效果
+命令处理函数修改 gameState → 图层（Actor）监听状态变化 → 渲染对应的视觉效果
 ```
 
-这是一个纯粹的**数据驱动**模式——命令处理函数只负责更新数据，演员只负责根据数据渲染。两者之间通过 Valtio 状态自动连接。
+这是一个纯粹的**数据驱动**模式——命令处理函数只负责更新数据，图层（Actor）只负责根据数据渲染。两者之间通过 Valtio 状态自动连接。
 
-## 内置演员
+## 内置图层（Actor）
 
-标准框架提供了四个内置演员：
+标准框架提供了四个内置图层（Actor）：
 
 ### BackgroundActor — 背景
 
@@ -105,7 +105,7 @@ export function CharacterActor() {
 
 ### BGMActor — 背景音乐
 
-一个无视觉渲染的"无头"演员，监听 `gameState.bgm` 的变化并调用音频 API。
+一个无视觉渲染的"无头"图层（Actor），监听 `gameState.bgm` 的变化并调用音频 API。
 
 ```typescript title="src/actors/bgm.tsx"
 export function BGMActor() {
@@ -136,7 +136,7 @@ export function BGMActor() {
 
 ## 在 Stage 中组装
 
-演员组件在 `src/pages/stage.tsx` 中组装：
+图层（Actor）组件在 `src/pages/stage.tsx` 中组装：
 
 ```typescript title="src/pages/stage.tsx"
 export function Stage() {
@@ -155,7 +155,7 @@ export function Stage() {
 组件的渲染顺序决定了视觉层次——后面的组件渲染在上层。因此背景在最底层，文本框在最上层。
 :::
 
-## 创建自定义演员
+## 创建自定义图层（Actor）
 
 假设你想添加一个"屏幕震动"效果：
 
@@ -174,7 +174,7 @@ export const gameState = proxy<GameState>({
 });
 ```
 
-### 2. 创建演员组件
+### 2. 创建图层（Actor）组件
 
 ```typescript title="src/actors/shake.tsx"
 import { useEffect, useState } from 'react';
