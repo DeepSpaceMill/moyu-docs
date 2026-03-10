@@ -46,6 +46,7 @@ onMouseLeave={(e: MouseEvent) => { ... }}
 // 键盘事件
 onKeyDown={(e: KeyboardEvent) => { ... }}
 onKeyUp={(e: KeyboardEvent) => { ... }}
+onKeyPress={(e: KeyboardEvent) => { ... }}
 
 // 触摸事件
 onTouchStart={(e: TouchEvent) => { ... }}
@@ -219,15 +220,15 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 裁剪容器，子元素只在指定范围内可见。
 
 ```tsx
-<clip x={100} y={100} clipWidth={400} clipHeight={300}>
+<clip x={100} y={100} width={400} height={300}>
   <sprite src="large_image.png" />
 </clip>
 ```
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
-| `clipWidth` | `number` | 裁剪区域宽度 |
-| `clipHeight` | `number` | 裁剪区域高度 |
+| `width` | `number` | 裁剪区域宽度 |
+| `height` | `number` | 裁剪区域高度 |
 
 ---
 
@@ -236,14 +237,28 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 对子元素应用视觉滤镜效果。
 
 ```tsx
-<filter blur={4}>
+<filter filters={[{ type: 'blur', radius: 4 }]}>
   <sprite src="bg/photo.png" />
 </filter>
 ```
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
-| `blur` | `number` | 高斯模糊半径 |
+| `filters` | `FilterKind[]` | 滤镜列表（可叠加多个） |
+
+`FilterKind` 是一个联合类型，每种滤镜的结构如下：
+
+| type | 参数 | 说明 |
+|------|------|------|
+| `'blur'` | `radius: number`, `continuous?: boolean` | 高斯模糊 |
+| `'blur-perfect'` | `radius: number` | 精确模糊（质量更高，性能较低） |
+| `'brightness'` | `amount: number` | 亮度（1 为原始值） |
+| `'contrast'` | `amount: number` | 对比度（1 为原始值） |
+| `'saturation'` | `amount: number` | 饱和度（1 为原始值） |
+| `'hue-rotate'` | `degrees: number` | 色相旋转（角度） |
+| `'grayscale'` | `amount: number` | 灰度（0~1） |
+| `'sepia'` | `amount: number` | 复古效果（0~1） |
+| `'invert'` | `amount: number` | 反色（0~1） |
 
 ---
 
@@ -253,17 +268,17 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 
 ```tsx
 <backdrop
-  blur={8}
-  targetWidth={1920}
-  targetHeight={1080}
+  filters={[{ type: 'blur', radius: 8 }]}
+  width={1920}
+  height={1080}
 />
 ```
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
-| `blur` | `number` | 高斯模糊半径 |
-| `targetWidth` | `number` | 区域宽度 |
-| `targetHeight` | `number` | 区域高度 |
+| `filters` | `FilterKind[]` | 滤镜列表，结构同 `<filter>` |
+| `width` | `number` | 区域宽度 |
+| `height` | `number` | 区域高度 |
 
 ---
 
@@ -279,7 +294,7 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 |------|------|------|
 | `src` | `string` | 动画文件路径（APNG 或 WebP） |
 | `area` | `[number, number, number, number]` | 裁剪区域（归一化坐标） |
-| `format` | `"APNG" \| "WEBP"` | 动画格式（通常自动识别） |
+| `format` | `"apng" \| "webp"` | 动画格式 |
 
 ---
 
@@ -292,7 +307,7 @@ function SimpleDialog() {
   return (
     <container label="对话框">
       {/* 模糊背景 */}
-      <backdrop blur={6} targetWidth={1920} targetHeight={1080} />
+      <backdrop filters={[{ type: 'blur', radius: 6 }]} width={1920} height={1080} />
 
       {/* 对话框面板 */}
       <sprite
