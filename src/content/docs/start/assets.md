@@ -1,0 +1,232 @@
+---
+title: 素材和剧本
+sidebar:
+  order: 5
+---
+
+在本章节中，你将了解如何在项目中放置素材文件，以及如何编写剧本。
+
+## 素材放置
+
+所有素材文件都应该放置在项目根目录下的 `assets/` 文件夹中。引擎会自动识别并按需加载该文件夹内的所有资源。
+除剧本目录外，`assets/` 下并没有固定的目录结构，你可以自由创建子文件夹来组织素材，但建议按照以下结构来放置常见的素材类型：
+
+```
+assets/
+├── bg/               # 背景图片
+│   ├── classroom.png
+│   └── street.png
+├── characters/       # 角色立绘
+│   ├── alice/
+│   │   ├── normal.png
+│   │   └── smile.png
+│   └── bob/
+│       └── normal.png
+├── audio/            # 音频文件
+│   ├── bgm/          # 背景音乐
+│   ├── sfx/          # 音效
+│   └── voice/        # 语音
+├── ui/               # 界面素材（文字框、按钮等）
+├── fonts/            # 字体文件
+└── scenario/         # 剧本文件
+    └── start.sixu
+```
+
+### 在剧本中引用素材
+
+在剧本命令中，素材路径相对于 `assets/` 文件夹：
+
+```sixu
+::entry{
+    @changebg src="bg/classroom.png"
+    @addchar name="Alice" src="characters/alice/normal.png"
+    @bgm src="audio/bgm/theme.opus"
+}
+```
+
+:::tip[路径中的斜杠]
+
+在路径中请使用正斜杠 `/`，即使你在 Windows 系统上开发也不要使用反斜杠 `\`，引擎会正确处理这些路径。
+
+:::
+
+### 支持的文件格式
+
+| 类型 | 推荐格式                  | 说明                                         |
+| ---- | ------------------------- | -------------------------------------------- |
+| 图片 | WEBP                      | 支持透明和动画，适合用于立绘和界面元素       |
+| 图片 | PNG / APNG                | 支持动画和透明，适合用于立绘和界面元素       |
+| 图片 | JPG / JPEG                | 体积小，不支持透明，可用于背景               |
+| 图片 | BMP                       | 位图格式，体积很大，不推荐使用               |
+| 音频 | Opus（`.opus` 或 `.ogg`） | 推荐首选                                     |
+| 音频 | Vorbis（`.ogg`）          |                                              |
+| 音频 | MP3（`.mp3`）             | 体积较 opus 或 vorbis 略大，格式陈旧，不推荐 |
+| 音频 | PCM（`.wav`）             | 无压缩音频，文件较大，可用于音效             |
+| 字体 | TTF / OTF                 | 常用字体格式                                 |
+| 剧本 | `.sixu`                   | 末语引擎的剧本格式（思绪）                   |
+
+---
+
+## 剧本编写
+
+末语引擎使用 [**思绪（Sixu）**](https://github.com/Icemic/sixu) 语言来编写剧本。剧本文件存放在 `assets/scenario/` 目录下，扩展名为 `.sixu`。
+
+如果你使用 VSCode 编写剧本，可以安装 [Sixu VSCode 插件](https://github.com/Icemic/sixu/releases) 来获得语法高亮和智能提示。
+
+### 基本结构
+
+剧本由一个或多个**段落（Paragraph）**组成，使用 `::段落名` 声明，内容放在 `{ }` 中。游戏从名为 `entry` 的段落开始执行：
+
+```sixu
+::entry {
+    // 剧本内容写在这里
+}
+
+::chapter2 {
+    // 第二段落
+}
+```
+
+### 对话文本
+
+对话文本是剧本最基本的元素，有以下两种写法：
+
+```sixu
+::entry {
+    // 无说话人的旁白
+    这是一段旁白文字，不会显示角色名称。
+
+    // 带说话人的对话
+    [Alice] "你好，这是 Alice 说的一句话。"
+
+    // 省略引号也是合法的
+    [Kei] 这也是一句对话，效果相同。
+}
+```
+
+文本中支持富文本标签：
+
+```sixu
+::entry {
+    [Alice] "这是<fillColor=#E7931C>橙色文字</fillColor>，这是<bold>加粗文字</bold>，这是<underline>下划线</underline>。"
+}
+```
+
+### 命令
+
+以 `@` 开头的行是命令，用于控制背景、角色、音频等：
+
+#### 背景
+
+```sixu
+::entry {
+    // 切换背景，带渐变效果
+    @changebg src="bg/classroom.png" fadeTime=500
+
+    // 设置背景色调
+    @setBgTint tint="#ffcccc"
+}
+```
+
+#### 角色
+
+```sixu
+::entry {
+    // 添加角色，使用预设位置
+    @addchar name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
+
+    // 添加角色，手动指定坐标和缩放
+    @addchar name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
+
+    // 切换角色立绘或移动角色
+    @charchange name="Alice" src="characters/alice/smile.png" preset="right" fadeTime=300
+
+    // 移除角色
+    @charremove name="Alice" fadeTime=300
+
+    // 清除所有角色
+    @charclear fadeTime=300
+}
+```
+
+#### 音频
+
+```sixu
+::entry {
+    // 播放背景音乐（默认循环）
+    @bgm src="audio/bgm/theme.opus" volume=0.8 fadeTime=1000
+
+    // 停止背景音乐
+    @bgmStop fadeTime=600
+
+    // 播放音效（不循环）
+    @sfx src="audio/sfx/door.opus"
+
+    // 播放角色语音
+    @voice src="audio/voice/alice_001.opus" name="Alice"
+}
+```
+
+#### 流程控制
+
+```sixu
+::entry {
+    // 等待指定时间（毫秒），可跳过
+    @wait time=2000 skippable=true
+
+    // 等待玩家点击
+    @waitclick
+
+    // 跳转到其他剧本段落（如需要在 React 层处理结束）
+    @leaveStage gotoPage="title"
+}
+```
+
+### 注释
+
+以 `//` 开头的行是注释，不会被执行：
+
+```sixu
+::entry {
+    // 这是一行注释
+
+    [Alice] "游戏开始了。"
+}
+```
+
+### 完整示例
+
+以下是一个简单的剧本示例：
+
+```sixu
+::entry {
+    // 显示背景
+    @changebg src="bg/classroom.png" fadeTime=500
+
+    // 添加角色
+    @addchar name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
+
+    // 播放背景音乐
+    @bgm src="audio/bgm/theme.opus"
+
+    // 对话
+    旁白："故事从这里开始……"
+
+    [Alice] "你好！我是Alice。"
+
+    // 切换立绘表情
+    @charchange name="Alice" src="characters/alice/smile.png" fadeTime=200
+
+    [Alice] "很高兴认识你！"
+
+    // 结束
+    @charclear fadeTime=500
+    @bgmStop
+
+    #replace(paragraph="entry")
+}
+```
+
+:::tip
+`#replace(paragraph="entry")` 的作用是将当前段落替换为目标段落并执行，类似于"跳转"，常用于将游戏循环重定向到入口处或其他章节。
+:::
