@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import Icons from 'unplugin-icons/vite';
+import sixuGrammar from './src/sixu.tmLanguage.json';
 
 // https://astro.build/config
 export default defineConfig({
@@ -98,6 +99,11 @@ export default defineConfig({
         baseUrl: 'https://github.com/DeepSpaceMill/moyu-docs/edit/master/',
       },
       customCss: ['./src/styles/custom.css'],
+      expressiveCode: {
+        shiki: {
+          langs: [{ ...(sixuGrammar as any), name: 'sixu' }],
+        },
+      },
       components: {
         SocialIcons: './src/components/SocialIcons.astro',
       },
