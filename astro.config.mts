@@ -74,11 +74,7 @@ export default defineConfig({
           autogenerate: { directory: 'start' },
         },
         {
-          label: '使用标准框架',
-          autogenerate: { directory: 'use-framework' },
-        },
-        {
-          label: '教程 - 基本',
+          label: '定制框架',
           autogenerate: { directory: 'tutorial-basics' },
         },
         {

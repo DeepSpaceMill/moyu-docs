@@ -1,5 +1,5 @@
 ---
-title: 场景和页面
+title: 页面和路由
 sidebar:
   order: 5
 ---
