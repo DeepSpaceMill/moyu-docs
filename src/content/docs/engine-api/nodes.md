@@ -4,29 +4,22 @@ sidebar:
   order: 3
 ---
 
-`executeNodeCommand` 用于向特定的渲染节点发送命令。目前主要用于控制文本（`<text>`）节点。
-
-## 使用方式
-
-通过 React ref 获取节点引用，然后调用 `executeCommand`：
+部分 JSX 元素（`<text>`、`<video>` 等）支持通过节点命令在运行时动态控制行为。推荐通过 React ref 调用 `executeCommand`：
 
 ```tsx
 import { useRef } from 'react';
 import type { Node } from '@momoyu-ink/kit';
 
 function MyComponent() {
-  const textRef = useRef<Node>(null);
-
-  const finishPrinting = () => {
-    textRef.current?.executeCommand({ subCommand: 'finishPrinting' });
-  };
+  const ref = useRef<Node>(null);
 
   return (
     <text
-      ref={textRef}
+      ref={ref}
       text="正在打字中……"
       printMode="typewriter"
       printSpeed={30}
+      onClick={() => ref.current?.executeCommand({ subCommand: 'finishPrinting' })}
     />
   );
 }
@@ -78,6 +71,78 @@ console.log('Cursor at:', pos[0], pos[1]);
 | `[x, y]` | `[number, number]` | 光标位置（节点本地坐标） |
 
 标准框架中用此命令定位打字完成后的闪烁光标动画。
+
+## Video 节点命令
+
+### play / pause / resume / stop
+
+```typescript
+videoRef.current?.executeCommand({ subCommand: 'play' });
+videoRef.current?.executeCommand({ subCommand: 'pause' });
+videoRef.current?.executeCommand({ subCommand: 'resume' });
+videoRef.current?.executeCommand({ subCommand: 'stop' });
+```
+
+### seek — 跳转
+
+```typescript
+videoRef.current?.executeCommand({ subCommand: 'seek', time: 10.5 });
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `time` | `number` | 目标时间点（秒） |
+
+### setVolume — 设置音量
+
+```typescript
+videoRef.current?.executeCommand({ subCommand: 'setVolume', volume: 0.5 });
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `volume` | `number` | 音量（0~1） |
+
+### setMuted — 静音
+
+```typescript
+videoRef.current?.executeCommand({ subCommand: 'setMuted', muted: true });
+```
+
+### setLoop — 设置循环
+
+```typescript
+videoRef.current?.executeCommand({ subCommand: 'setLoop', enabled: true });
+```
+
+### 事件回调
+
+`<video>` 组件支持以下事件回调：
+
+```tsx
+<video
+  src="video/opening.mp4"
+  onEnded={() => console.log('播放完毕')}
+  onStateChange={(state) => console.log('状态变化:', state)}
+/>
+```
+
+| 事件 | 类型 | 说明 |
+|------|------|------|
+| `onEnded` | `() => void` | 视频播放完毕时触发（仅在非循环模式下） |
+| `onStateChange` | `(state: string) => void` | 播放状态变化时触发 |
+
+`onStateChange` 中 `state` 的可能值：
+
+| 值 | 说明 |
+|------|------|
+| `"idle"` | 初始状态 |
+| `"loading"` | 加载中 |
+| `"playing"` | 播放中 |
+| `"paused"` | 已暂停 |
+| `"stopped"` | 已停止 |
+| `"ended"` | 播放完毕 |
+| `"error"` | 出错 |
 
 ## 底层 API
 

@@ -213,6 +213,10 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 <text text="这是<fillColor=#E7931C>橙色文字</fillColor>，<bold>加粗</bold>，<underline>下划线</underline>。" />
 ```
 
+:::tip[命令控制]
+`<text>` 支持通过 `ref.current?.executeCommand()` 发送命令，例如立即完成打印、设置文本、获取光标位置等。详见[节点命令参考](/engine-api/nodes/#text-节点命令)。
+:::
+
 ---
 
 ## `<clip>` — 裁剪
@@ -295,6 +299,51 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | `src` | `string` | 动画文件路径（APNG 或 WebP） |
 | `area` | `[number, number, number, number]` | 裁剪区域（归一化坐标） |
 | `format` | `"apng" \| "webp"` | 动画格式 |
+
+---
+
+## `<video>` — 视频
+
+播放视频文件，支持 VP9（WebM/MP4）和 AV1（MP4）编码格式，支持音视频同步。视频加载完成后默认自动开始播放。
+
+```tsx
+<video src="video/opening.mp4" />
+
+{/* 循环播放背景视频，静音 */}
+<video src="video/bg_loop.webm" loop muted />
+
+{/* 控制音量，不自动播放 */}
+<video src="video/scene.mp4" volume={0.5} autoPlay={false} />
+```
+
+### 专有属性
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `src` | `string` | — | 视频文件路径（相对于 `assets/`） |
+| `loop` | `boolean` | `false` | 是否循环播放 |
+| `autoPlay` | `boolean` | `true` | 加载完成后是否自动开始播放 |
+| `volume` | `number` | `1` | 音量（0~1） |
+| `muted` | `boolean` | `false` | 是否静音 |
+
+### 事件回调
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `onEnded` | `() => void` | 视频播放完毕时触发（仅在非循环模式下） |
+| `onStateChange` | `(state: string) => void` | 播放状态变化时触发，state 为 `"idle"` `"loading"` `"playing"` `"paused"` `"stopped"` `"ended"` `"error"` |
+
+:::tip[命令控制]
+`<video>` 支持通过 `ref.current?.executeCommand()` 控制播放、暂停、跳转等行为。详见[节点命令参考](/engine-api/nodes/#video-节点命令)。
+:::
+
+:::note[外部依赖]
+对于非 Web 平台，视频播放依赖一个外部解码插件，确保你已经从[这里](https://github.com/Icemic/video-decoder/releases)下载了合适的平台版本（通常为最新版）并放置在可执行文件同目录下。
+:::
+
+:::note
+视频播放完毕后（非循环模式），最后一帧会保持在画面上，不会消失。若需要在播放结束后隐藏，可以设置 `visible={false}` 或通过其他逻辑控制。
+:::
 
 ---
 
