@@ -333,6 +333,10 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | `onEnded` | `() => void` | 视频播放完毕时触发（仅在非循环模式下） |
 | `onStateChange` | `(state: string) => void` | 播放状态变化时触发，state 为 `"idle"` `"loading"` `"playing"` `"paused"` `"stopped"` `"ended"` `"error"` |
 
+:::note
+视频播放完毕后（非循环模式），最后一帧会保持在画面上，不会消失。若需要在播放结束后隐藏，可以设置 `visible={false}` 或通过其他逻辑控制。
+:::
+
 :::tip[命令控制]
 `<video>` 支持通过 `ref.current?.executeCommand()` 控制播放、暂停、跳转等行为。详见[节点命令参考](/engine-api/nodes/#video-节点命令)。
 :::
@@ -341,8 +345,9 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 对于非 Web 平台，视频播放依赖一个外部解码插件，确保你已经从[这里](https://github.com/Icemic/video-decoder/releases)下载了合适的平台版本（通常为最新版）并放置在可执行文件同目录下。
 :::
 
-:::note
-视频播放完毕后（非循环模式），最后一帧会保持在画面上，不会消失。若需要在播放结束后隐藏，可以设置 `visible={false}` 或通过其他逻辑控制。
+:::note[浏览器兼容性]
+- 由于 Firefox 浏览器缺少必要的功能，引擎使用了性能更差的方式实现功能，这可能导致在 Firefox 上播放视频的性能较差，出现掉帧、音画不同步等问题。建议在 Chrome/Edge 等 Chromium 内核浏览器上开发和测试以获得最佳性能。
+- 当最小化或切换到其他标签页时，浏览器可能会限制后台标签页的资源使用，导致视频播放性能下降或暂停。这是浏览器的正常行为，无法通过引擎控制。当返回标签页时，视频播放应该会恢复正常。
 :::
 
 ---
