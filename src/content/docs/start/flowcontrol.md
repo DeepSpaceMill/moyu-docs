@@ -14,6 +14,94 @@ sidebar:
 
 此外，思绪还提供了 `#[...]` 形式的**属性**，用于为紧随其后的内容添加条件判断或循环逻辑。
 
+## 高级剧本语法
+
+在正式介绍流程控制指令之前，需要先了解思绪脚本中两种特殊的语法结构：**普通块**和**脚本块**。它们在流程控制中被广泛使用。
+
+### 普通块
+
+用一对花括号 `{...}` 包裹的多行内容称为**普通块**。它将块内的所有内容视为一个整体单元，最常见的用途是配合 `#[if]`、`#[while]`、`#[loop]` 等属性，将多行内容一起纳入条件或循环的控制范围。
+
+```sixu
+// 不使用块：属性只作用于紧随的一行
+#[if("has_key")]
+@changebg src="bg/secret_room.png"   // 仅此行受条件控制
+[Alice] "门开了。"                    // 这行始终会执行
+
+// 使用块：属性作用于整个块
+#[if("has_key")]
+{
+    @changebg src="bg/secret_room.png"
+    [Alice] "门开了。"               // 这行也受条件控制
+}
+```
+
+块也可以单独使用，形成一个局部作用域，配合 `#leave` 可以提前退出：
+
+```sixu
+::entry {
+    {
+        [Alice] "进入内层块。"
+        #leave              // 仅退出这个内层块，不影响外层
+        [Alice] "这行不会执行。"
+    }
+    [Alice] "回到外层了。"  // 这行正常执行
+}
+```
+
+块可以任意嵌套。
+
+---
+
+### 脚本块
+
+**脚本块**用于在思绪脚本中内联执行 JavaScript 代码，适合读写游戏变量、执行逻辑计算等。
+
+**单行脚本**：使用 `@{...}` 或 `## ... ##` 语法，在一行内执行一个 JavaScript 表达式：
+
+```sixu
+// 修改游戏变量
+@{affinity += 10}
+@{route = 'library'}
+## foo = 'bar' ##
+
+// 可以执行任意 JavaScript 表达式
+@{dialogIndex = Math.min(dialogIndex + 1, 5)}
+```
+
+**多行脚本**：使用 `@{...}` 或 `## ... ##` 语法，可以编写多行 JavaScript 代码：
+
+```sixu
+::entry {
+    [Alice] "让我来记录一下今天的进度。"
+
+    ##
+        day += 1;
+        if (day === 1) {
+            route = 'library';
+        }
+        visitedRooms.push('classroom');
+    ##
+
+    // 或
+    @{
+        day += 1;
+        if (day === 1) {
+            route = 'library';
+        }
+        visitedRooms.push('classroom');
+    }
+
+    [Alice] `今天是第 ${day} 天。`
+}
+```
+
+:::note
+脚本块中的变量是全局游戏状态的一部分，在存档读档时会被保存和恢复。单行脚本与多行脚本在功能上完全等价，选择哪种形式取决于代码的复杂程度。
+:::
+
+---
+
 ## 指令一览
 
 ### 跳转与调用
@@ -37,9 +125,9 @@ sidebar:
 
 | 属性 | 说明 |
 | --- | --- |
-| [#\[cond\] / #\[if\]](#condif---条件执行) | 条件为真时才执行 |
-| [#\[while\]](#while---条件循环) | 条件为真时重复执行 |
-| [#\[loop\]](#loop---无条件循环) | 无条件重复执行，需配合 `#break` 退出 |
+| [#\[cond\] / #\[if\]](#condif--条件执行) | 条件为真时才执行 |
+| [#\[while\]](#while--条件循环) | 条件为真时重复执行 |
+| [#\[loop\]](#loop--无条件循环) | 无条件重复执行，需配合 `#break` 退出 |
 
 ---
 
@@ -134,22 +222,29 @@ sidebar:
 
 ```sixu
 ::entry {
-    @changebg src="bg/classroom.png"
-    [Alice] "游戏开始了！"
+    // 用 #call 调用 chapter1，通常 chapter1 结束后会回到这里
+    #call paragraph="chapter1"
 
-    // 替换为 day1，day1 结束后不会回到这里
-    #replace paragraph="day1"
+    // chapter1 内部使用了 #replace，
+    // 所以 chapter2 结束后会直接回到这里，而非先回到 chapter1
+    [Alice] "所有章节结束，回到了 entry！"
 }
 
-::day1 {
-    [Alice] "这是第一天。"
+::chapter1 {
+    [Alice] "第一章开始。"
 
-    // 替换为 day2，day2 结束后也不会回到 day1
-    #replace paragraph="day2"
+    // 使用 #replace 而非 #call：
+    // chapter2 结束后，会返回调用 chapter1 的位置（entry），而非 chapter1
+    // 若此处改用 #call，chapter2 会先回到 chapter1，再从 chapter1 回到 entry
+    #replace paragraph="chapter2"
+
+    // 这一行永远不会被执行
+    [Alice] "这行不会被执行到。"
 }
 
-::day2 {
-    [Alice] "这是第二天。"
+::chapter2 {
+    [Alice] "第二章开始。"
+    // 段落结束，直接返回 entry（而非 chapter1）
 }
 ```
 
@@ -203,22 +298,22 @@ sidebar:
 
 ```sixu
 // 作用于单条命令
-#[if("has_key")]
+#[if("locked")]
 @changebg src="bg/secret_room.png"
 
 // 作用于代码块（块内所有内容作为整体）
-#[if("has_key")]
+#[if("!locked")]
 {
     @changebg src="bg/secret_room.png"
     [Alice] "我们进入了密室。"
 }
 ```
 
-:::caution
-如果同一个元素前有多个属性，仅最后一个生效，其余会被忽略。
+:::note
+1. 如果同一个元素前有多个属性，仅最后一个生效，其余会被忽略。
+2. 条件表达式**必须使用引号包裹**，其内容由引擎在运行时求值，条件表达式使用 JavaScript 语法。
 :::
 
-条件表达式必须使用引号包裹，其内容由运行时引擎的 `eval_condition()` 方法求值，具体支持的语法取决于引擎实现。在末语引擎中，条件表达式使用 JavaScript 语法。
 
 ### #[cond]/#[if] — 条件执行
 
