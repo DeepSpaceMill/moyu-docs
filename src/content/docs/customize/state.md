@@ -246,5 +246,5 @@ function StatusPanel() {
 ```
 
 :::caution[存档兼容]
-自定义状态默认不会包含在存档中。如果需要持久化，你需要在存档/读档逻辑中手动处理，详见[存档系统](/customize/save-load)。
+自定义状态默认不会包含在存档中。如果需要持久化，你需要将其作为 `gameState` 的一部分，或在存档/读档逻辑中手动处理，详见[存档系统](/customize/save-load)。
 :::

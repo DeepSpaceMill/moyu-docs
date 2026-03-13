@@ -47,7 +47,7 @@ export const navigator = createStackNavigator({
 
 export const Navigation = createStaticNavigation(navigator);
 
-// Register types for type-safe navigation
+// Register types for global navigator
 declare module '@momoyu-ink/kit' {
   interface RootNavigatorList extends RegisterNavigator<typeof navigator> {}
 }
@@ -62,12 +62,16 @@ declare module '@momoyu-ink/kit' {
 
 ## 导航 API
 
-在任何组件中，使用 `getNavigator()` 获取导航器实例：
+使用 `getNavigator()` 获取导航器实例。在 React 组件内，也可以使用等价的 `useNavigation()` hook（两者行为相同）：
 
 ```typescript
-import { getNavigator } from '@momoyu-ink/kit';
+import { getNavigator, useNavigation } from '@momoyu-ink/kit';
 
+// 在组件外（如事件处理器、工具函数）使用
 const nav = getNavigator();
+
+// 在组件内使用（推荐）
+const nav = useNavigation();
 ```
 
 ### 页面导航
@@ -78,9 +82,6 @@ nav.navigate('stage');
 
 // 跳转并传递参数
 nav.navigate('stage', { storyName: 'chapter1' });
-
-// 返回上一页
-nav.goBack();
 ```
 
 ### 浮层操作
@@ -95,19 +96,27 @@ nav.pushOverlay('confirm', { message: '确定要退出吗？', onConfirm: () => 
 
 // 关闭最顶层浮层
 nav.popOverlay();
+
+// 关闭所有浮层
+nav.clearOverlays();
 ```
 
 ### 在组件中接收参数
 
-页面和浮层组件通过 props 接收导航参数：
+页面和浮层组件通过 `useNavigationParams<T>()` hook 获取导航参数：
 
 ```typescript
-interface SaveLoadProps {
+import { useNavigationParams } from '@momoyu-ink/kit';
+
+interface SaveLoadParams {
   type: 'save' | 'load';
 }
 
-function SaveLoad({ type }: SaveLoadProps) {
-  // type 来自 nav.pushOverlay('saveload', { type: 'save' })
+function SaveLoad() {
+  // 从 nav.pushOverlay('saveload', { type: 'save' }) 获取参数
+  const params = useNavigationParams<SaveLoadParams>();
+  const type = params?.type ?? 'save';
+
   return (
     <container>
       <text text={type === 'save' ? '保存游戏' : '读取游戏'} />
@@ -115,6 +124,8 @@ function SaveLoad({ type }: SaveLoadProps) {
   );
 }
 ```
+
+在浮层中该 hook 返回浮层参数，在页面中返回页面参数，自动识别上下文。
 
 ## 内置页面
 

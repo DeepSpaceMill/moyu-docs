@@ -36,10 +36,10 @@ sidebar:
 ```json title="index.json"
 {
   "$schema": "https://gist.githubusercontent.com/Icemic/55a8cd86b02c0c310f51833e88f7d083/raw/moyu-config.schema.json",
-  "surface_size": "1280x720",
-  "stage_size": "1920x1080",
-  "window_title": "My First Game",
-  "entry_filename": "index.js"
+  "initialSurfaceSize": "1280x720",
+  "stageSize": "1920x1080",
+  "windowTitle": "My First Game",
+  "entryFilename": "index.js"
 }
 ```
 
@@ -60,10 +60,10 @@ sidebar:
 | fontFile                   | string  | `fonts/default.otf` | 用于渲染文本的字体文件，必须相对于根路径。支持 .otf 和 .ttf 格式。                                                        |
 | windowTitle                | string  | `moyu`              | 窗口的标题。                                                                                                              |
 | windowState                | string  | `idle`              | 窗口的初始状态。可能的值：`idle`, `minimized`, `maximized`, `fullscreen`。                                                |
-| windowResizable            | boolean | false               | 窗口是否可调整大小。                                                                                                      |
-| surfaceSize                | string  | `1280x720`          | 表面的尺寸。                                                                                                              |
+| windowResizable            | boolean | false               | 窗口可否任意调整大小。                                                                                                      |
+| initialSurfaceSize          | string  | `1280x720`          | 表面的初始尺寸。                                                                                                              |
 | stageSize                  | string  | `1280x720`          | 舞台的尺寸。                                                                                                              |
 | presentMode                | string  | `recommended`       | 表面的呈现模式。可能的值：`recommended`, `autovsync`, `autonovsync`。除非你知道自己在做什么，否则不要更改此项。           |
 | backend                    | string  | `auto`              | 用于渲染的后端。可能的值：`auto`, `dx12`, `vulkan`, `gles`, `metal`, `webgpu`。除非你知道自己在做什么，否则不要更改此项。 |
-| desiredMaximumFrameLatency | number  | 2                   | 期望的最大帧延迟。除非你知道自己在做什么，否则不要更改此项。                                                              |
+| <small>desiredMaximumFrameLatency</small> | number  | 2                   | 期望的最大帧延迟。除非你知道自己在做什么，否则不要更改此项。                                                              |
 | showFPS                    | boolean | false               | 是否显示 FPS。通常用于调试，请勿在发布版中设置。                                                                          |

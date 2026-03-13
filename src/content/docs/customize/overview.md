@@ -37,7 +37,7 @@ sidebar:
 └─────────────────────────────────────┘
 ```
 
-**定制框架**意味着在最上层工作——你使用 TypeScript 和 React 编写代码，通过 `@momoyu-ink/kit` SDK 与引擎层交互。你不需要了解 Rust 或底层渲染细节。
+**定制框架**意味着在**最上层**工作——你使用 TypeScript 和 React 编写代码，通过 `@momoyu-ink/kit` SDK 与引擎层交互。你不需要了解 Rust 或底层渲染细节。
 
 ## 前置知识
 
@@ -89,6 +89,10 @@ function Counter() {
 ```
 
 - [Valtio 文档](https://valtio.dev/)
+
+:::caution[重要提示]
+你当然可以将 Valto 与其他状态管理库（如 Redux、MobX、Zustand 等）结合使用，但我们建议在框架层保持一致使用 Valtio，以避免引入不必要的复杂性。
+:::
 
 ## 标准框架 vs 从零开始
 

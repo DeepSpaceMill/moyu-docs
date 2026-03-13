@@ -26,6 +26,10 @@ useEffect(() => {
 }, []);
 ```
 
+:::caution[注意]
+此处的 `addEventListener` 是来自 `@momoyu-ink/kit` 的方法，而非浏览器原生的 `window.addEventListener`。你需要先从 Kit SDK 导入它。
+:::
+
 ### JSX 事件 Props
 
 在元素上直接绑定事件处理函数：
