@@ -47,3 +47,8 @@ Cloudflare Pages 支持通过根目录下的 `_headers` 文件配置自定义响
 
 需要在项目设置的「Embed options」中勾选 **「SharedArrayBuffer support (higher quality audio and video, must be opted in to)」** 选项，itch.io 会为你的游戏页面自动添加所需响应头。
 :::
+
+## 相关链接
+
+- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
+- [itch.io Uploading HTML Games](https://itch.io/docs/creators/html5)
