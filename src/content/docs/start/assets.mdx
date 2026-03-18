@@ -106,24 +106,20 @@ import { FileTree } from '@astrojs/starlight/components';
 对话文本是剧本最基本的元素，有以下两种写法：
 
 ```sixu
-::entry {
-    // 无说话人的旁白
-    这是一段旁白文字，不会显示角色名称。
+// 无说话人的旁白
+这是一段旁白文字，不会显示角色名称。
 
-    // 带说话人的对话
-    [Alice] "你好，这是 Alice 说的一句话。"
+// 带说话人的对话
+[Alice] "你好，这是 Alice 说的一句话。"
 
-    // 省略引号也是合法的
-    [Kei] 这也是一句对话，效果相同。
-}
+// 省略引号也是合法的
+[Kei] 这也是一句对话，效果相同。
 ```
 
 文本中支持富文本标签：
 
 ```sixu
-::entry {
-    [Alice] "这是<fillColor=#E7931C>橙色文字</fillColor>，这是<bold>加粗文字</bold>，这是<underline>下划线</underline>。"
-}
+[Alice] "这是<fillColor=#E7931C>橙色文字</fillColor>，这是<bold>加粗文字</bold>，这是<underline>下划线</underline>。"
 ```
 
 ### 命令
@@ -133,67 +129,59 @@ import { FileTree } from '@astrojs/starlight/components';
 #### 背景
 
 ```sixu
-::entry {
-    // 切换背景，带渐变效果
-    @changebg src="bg/classroom.png" fadeTime=500
+// 切换背景，带渐变效果
+@changebg src="bg/classroom.png" fadeTime=500
 
-    // 设置背景色调
-    @setBgTint tint="#ffcccc"
-}
+// 设置背景色调
+@setBgTint tint="#ffcccc"
 ```
 
 #### 角色
 
 ```sixu
-::entry {
-    // 添加角色，使用预设位置
-    @addchar name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
+// 添加角色，使用预设位置
+@addchar name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
 
-    // 添加角色，手动指定坐标和缩放
-    @addchar name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
+// 添加角色，手动指定坐标和缩放
+@addchar name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
 
-    // 切换角色立绘或移动角色
-    @charchange name="Alice" src="characters/alice/smile.png" preset="right" fadeTime=300
+// 切换角色立绘或移动角色
+@charchange name="Alice" src="characters/alice/smile.png" preset="right" fadeTime=300
 
-    // 移除角色
-    @charremove name="Alice" fadeTime=300
+// 移除角色
+@charremove name="Alice" fadeTime=300
 
-    // 清除所有角色
-    @charclear fadeTime=300
-}
+// 清除所有角色
+@charclear fadeTime=300
 ```
 
 #### 音频
 
 ```sixu
-::entry {
-    // 播放背景音乐（默认循环）
-    @bgm src="audio/bgm/theme.opus" volume=0.8 fadeTime=1000
+// 播放背景音乐（默认循环）
+@bgm src="audio/bgm/theme.opus" volume=0.8 fadeTime=1000
 
-    // 停止背景音乐
-    @bgmStop fadeTime=600
+// 停止背景音乐
+@bgmStop fadeTime=600
 
-    // 播放音效（不循环）
-    @sfx src="audio/sfx/door.opus"
+// 播放音效（不循环）
+@sfx src="audio/sfx/door.opus"
 
-    // 播放角色语音
-    @voice src="audio/voice/alice_001.opus" name="Alice"
-}
+// 播放角色语音
+@voice src="audio/voice/alice_001.opus" name="Alice"
 ```
 
 #### 流程控制
 
 ```sixu
-::entry {
-    // 等待指定时间（毫秒），可跳过
-    @wait time=2000 skippable=true
+// 等待指定时间（毫秒），可跳过
+@wait time=2000 skippable=true
 
-    // 等待玩家点击
-    @waitclick
+// 等待玩家点击
+@waitclick
 
-    // 跳转到其他剧本段落（如需要在 React 层处理结束）
-    @leaveStage gotoPage="title"
-}
+// 跳转到其他剧本段落（如需要在 React 层处理结束）
+@leaveStage gotoPage="title"
 ```
 
 ### 注释
@@ -201,11 +189,8 @@ import { FileTree } from '@astrojs/starlight/components';
 以 `//` 开头的行是注释，不会被执行：
 
 ```sixu
-::entry {
-    // 这是一行注释
-
-    [Alice] "游戏开始了。"
-}
+// 这是一行注释
+[Alice] "游戏开始了。"
 ```
 
 ### 完整示例
