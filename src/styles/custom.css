@@ -11,6 +11,10 @@
   --sl-color-gray-5: #353841;
   --sl-color-gray-6: #24272f;
   --sl-color-black: #17181c;
+
+  --sl-font-mono:
+    SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', 'Microsoft YaHei', 'Source Han Sans',
+    monospace, ui-monospace;
 }
 /* Light mode colors. */
 :root[data-theme='light'] {
