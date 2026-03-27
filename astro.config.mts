@@ -73,10 +73,10 @@ export default defineConfig({
           label: '开始',
           autogenerate: { directory: 'start' },
         },
-        {
-          label: '发布与部署',
-          autogenerate: { directory: 'deploy' },
-        },
+        // {
+        //   label: '发布与部署',
+        //   autogenerate: { directory: 'deploy' },
+        // },
         {
           label: '定制框架',
           autogenerate: { directory: 'customize' },
