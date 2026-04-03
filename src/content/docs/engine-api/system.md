@@ -114,6 +114,14 @@ executePluginCommand('system', {
 
 ## 应用控制
 
+### getParams — 获取自定义参数
+
+```typescript
+const params = executePluginCommand('system', {
+  subCommand: 'getParams',
+});
+```
+
 ### quit — 退出应用
 
 ```typescript
