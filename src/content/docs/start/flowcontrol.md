@@ -1,5 +1,5 @@
 ---
-title: 流程控制指令
+title: 流程控制与变量
 sidebar:
   order: 11
 ---
@@ -16,7 +16,7 @@ sidebar:
 
 ## 高级剧本语法
 
-在正式介绍流程控制指令之前，需要先了解思绪脚本中两种特殊的语法结构：**普通块**和**脚本块**。它们在流程控制中被广泛使用。
+在正式介绍流程控制与变量之前，需要先了解思绪脚本中两种特殊的语法结构：**普通块**和**脚本块**。它们在流程控制和变量操作中被广泛使用。
 
 ### 普通块
 
@@ -60,13 +60,13 @@ sidebar:
 **单行脚本**：使用 `@{...}` 或 `## ... ##` 语法，在一行内执行一个 JavaScript 表达式：
 
 ```sixu
-// 修改游戏变量
-@{affinity += 10}
-@{route = 'library'}
-## foo = 'bar' ##
+// 修改存档变量
+@{ARCHIVE.affinity += 10}
+@{ARCHIVE.route = 'library'}
+## ARCHIVE.foo = 'bar' ##
 
 // 可以执行任意 JavaScript 表达式
-@{dialogIndex = Math.min(dialogIndex + 1, 5)}
+@{ARCHIVE.dialogIndex = Math.min(ARCHIVE.dialogIndex + 1, 5)}
 ```
 
 **多行脚本**：使用 `@{...}` 或 `## ... ##` 语法，可以编写多行 JavaScript 代码：
@@ -76,20 +76,18 @@ sidebar:
     [Alice] "让我来记录一下今天的进度。"
 
     ##
-        day += 1;
-        if (day === 1) {
-            route = 'library';
+        ARCHIVE.day += 1;
+        if (ARCHIVE.day === 1) {
+            ARCHIVE.route = 'library';
         }
-        visitedRooms.push('classroom');
     ##
 
     // 或
     @{
-        day += 1;
-        if (day === 1) {
-            route = 'library';
+        ARCHIVE.day += 1;
+        if (ARCHIVE.day === 1) {
+            ARCHIVE.route = 'library';
         }
-        visitedRooms.push('classroom');
     }
 
     [Alice] `今天是第 ${day} 天。`
@@ -97,8 +95,188 @@ sidebar:
 ```
 
 :::note
-脚本块中的变量是全局游戏状态的一部分，在存档读档时会被保存和恢复。单行脚本与多行脚本在功能上完全等价，选择哪种形式取决于代码的复杂程度。
+单行脚本与多行脚本在功能上完全等价，选择哪种形式取决于代码的复杂程度。脚本块中可以使用完整的 JavaScript 语法，但**脚本块中的局部变量不会在不同脚本块之间共享**。要持久化数据，请使用下文介绍的存档变量（`ARCHIVE`）或全局持久变量（`GLOBAL`）。
 :::
+
+---
+
+## 变量系统
+
+思绪提供了两种持久化变量：**存档变量（ARCHIVE）**和**全局持久变量（GLOBAL）**，用于存储游戏状态和跨存档的永久数据。
+
+### 存档变量（ARCHIVE）
+
+存档变量与当前存档绑定，随存档一起保存和读取。适合存储当前游戏进度中的状态，如好感度、已解锁的剧情标记、选项结果等。
+
+在脚本块中通过 `ARCHIVE` 对象访问：
+
+```sixu
+##
+    // 设置存档变量
+    ARCHIVE.affinity = 50;
+    ARCHIVE.route = 'library';
+    ARCHIVE.met_alice = true;
+
+    // 读取存档变量
+    console.log(ARCHIVE.affinity);  // 50
+
+    // 运算
+    ARCHIVE.affinity += 10;
+##
+```
+
+存档变量在以下情况会被清除：
+- 开始新游戏时
+- 故事执行结束时（`#finish`）
+
+存档变量在读档时会被恢复到存档时的状态。
+
+---
+
+### 全局持久变量（GLOBAL）
+
+全局持久变量**跨存档永久保存**，不随任何单个存档的生命周期变化。适合存储全局性的游戏进度，如已通关的路线、CG 解锁记录、成就等。
+
+在脚本块中通过 `GLOBAL` 对象访问：
+
+```sixu
+##
+    // 标记路线已通关
+    GLOBAL.route_a_cleared = true;
+
+    // 记录通关次数
+    GLOBAL.clear_count = (GLOBAL.clear_count || 0) + 1;
+
+    // 读取全局变量
+    console.log(GLOBAL.route_a_cleared);  // true
+##
+```
+
+与存档变量不同，全局持久变量**不会**因为开始新游戏、读档或故事结束而清除，它们会被持久保存在独立的全局存储中。
+
+---
+
+### 对比
+
+| | 存档变量（ARCHIVE） | 全局持久变量（GLOBAL） |
+| --- | --- | --- |
+| 访问方式 | `ARCHIVE.name` | `GLOBAL.name` |
+| 生命周期 | 跟随当前存档 | 永久保存 |
+| 存档/读档 | 随存档保存和恢复 | 独立于存档，始终保留 |
+| 新游戏时 | 清空 | 保留 |
+| 典型用途 | 好感度、路线标记、剧情状态 | 通关记录、CG 解锁、成就 |
+
+---
+
+### 在文本中引用变量
+
+使用反引号（`` ` ``）包裹文本，即可用 `${变量名}` 语法插入变量值。引擎会依次从存档变量、全局持久变量中查找对应的变量名：
+
+```sixu
+::entry {
+    ##
+        ARCHIVE.player_name = '小明';
+        ARCHIVE.day = 3;
+    ##
+
+    // 使用模板语法引用变量（注意使用反引号）
+    [Alice] `${player_name}，欢迎回来！`
+    `今天是第 ${day} 天。`
+
+    // 也可以在带说话人的文本中使用
+    [Alice] `${player_name}，你今天想去哪里？`
+}
+```
+
+:::note
+模板语法 `${name}` 中的变量名不需要加 `ARCHIVE.` 或 `GLOBAL.` 前缀，引擎会自动从存档变量中查找，找不到时再从全局持久变量中查找。
+:::
+
+普通引号或无引号的文本不支持变量插值，`${...}` 会被原样输出：
+
+```sixu
+// ✅ 使用反引号，变量会被替换
+[Alice] `你好，${player_name}。`
+
+// ❌ 使用双引号，${player_name} 会原样显示
+[Alice] "你好，${player_name}。"
+```
+
+---
+
+### 在命令参数中引用变量
+
+在命令参数中，**不加引号**的标识符会被视为变量引用，引擎会自动将其解析为对应变量的值后再传递给命令处理器：
+
+```sixu
+##
+    ARCHIVE.selected_bg = 'bg/library.png';
+    ARCHIVE.char_name = 'Alice';
+##
+
+// 不加引号 → 引用变量的值
+@changebg src=selected_bg          // 等同于 src="bg/library.png"
+@charname name=char_name displayName="小红"
+
+// 加引号 → 字符串字面量
+@changebg src="bg/library.png"     // 直接使用字符串值
+```
+
+具体规则如下：
+
+| 写法 | 类型 | 示例 |
+| --- | --- | --- |
+| `param="value"` | 字符串字面量 | `src="bg/library.png"` |
+| `param=123` | 数字字面量 | `fadeTime=500` |
+| `param=true` | 布尔字面量 | `visible=true` |
+| `param=[1,2]` | 数组字面量 | `pivot=[0.5,1]` |
+| `param=name` | **变量引用** | `src=selected_bg` |
+
+一个常见的用法是配合选项系统，将玩家的选择结果传递给后续命令：
+
+```sixu
+@selectAdd text="路线A" value="route_a"
+@selectAdd text="路线B" value="route_b"
+@selectShow saveTo="chosen_route"
+
+// chosen_route 现在保存了玩家的选择
+// 在后续命令中直接引用
+@start_route route=chosen_route
+```
+
+---
+
+### 在条件表达式中使用变量
+
+流程控制的条件表达式（`#[if]`、`#[while]` 等）使用 JavaScript 语法求值，可以通过 `ARCHIVE` 和 `GLOBAL` 对象访问变量：
+
+```sixu
+// 检查存档变量
+#[if("ARCHIVE.met_alice")]
+[Alice] "我们又见面了！"
+
+// 比较存档变量的值
+#[cond("ARCHIVE.route === 'library'")]
+{
+    @changebg src="bg/library.png"
+    [Alice] "图书馆到了。"
+}
+
+// 使用全局变量判断是否二周目
+#[if("GLOBAL.route_a_cleared")]
+[Alice] "这次要不要试试别的选择？"
+
+// 组合条件
+#[if("ARCHIVE.affinity > 50 && ARCHIVE.met_alice")]
+[Alice] "谢谢你一直以来的陪伴。"
+
+// 在循环条件中使用
+#[while("ARCHIVE.counter < 3")]
+{
+    [Alice] `这是第 ${counter} 次循环。`
+    @{ARCHIVE.counter += 1}
+}
+```
 
 ---
 
@@ -428,23 +606,34 @@ sidebar:
 
 ## 综合示例
 
-以下示例展示了多种流程控制指令的组合使用：
+以下示例展示了变量系统与流程控制指令的综合使用，模拟了一个简单的多日游戏循环：
 
 ```sixu
 ::entry {
+    // 初始化游戏状态
+    ##
+        ARCHIVE.day = 1;
+        ARCHIVE.affinity = 0;
+        ARCHIVE.route = '';
+    ##
+
     @changebg src="bg/school.png"
     @bgm src="audio/bgm/morning.opus"
 
     [Alice] "新的一天开始了。"
 
+    // 二周目时显示额外对话
+    #[if("GLOBAL.has_cleared")]
+    [Alice] "……总觉得这一切似曾相识。"
+
     // 调用公共的早晨对话
     #call paragraph="morning_routine"
 
-    // 根据条件走不同路线
-    #[if("route === 'library'")]
+    // 根据选择的路线跳转
+    #[if("ARCHIVE.route === 'library'")]
     #goto paragraph="library_scene"
 
-    #[if("route === 'garden'")]
+    #[if("ARCHIVE.route === 'garden'")]
     #goto paragraph="garden_scene"
 
     // 都不满足时的默认路线
@@ -452,22 +641,38 @@ sidebar:
 }
 
 ::morning_routine {
-    [Alice] "早上好！"
+    [Alice] `早上好！今天是第 ${day} 天。`
 
-    #[loop]
-    {
-        // 展示早晨事件直到完成
-        @process_morning_event
+    // 让玩家选择今天的去处
+    @selectAdd text="去图书馆" value="library"
+    @selectAdd text="去花园" value="garden"
+    @selectAdd text="去教室" value="classroom"
+    @selectShow saveTo="route"
 
-        #[if("morning_done")]
-        #break
-    }
-    // 段落结束后自动返回 entry 继续执行
+    `你选择了${route}。`
+
+    // 好感度随天数增长
+    @{ARCHIVE.affinity += ARCHIVE.day * 5}
 }
 
 ::library_scene {
     @changebg src="bg/library.png"
+
+    #[if("ARCHIVE.affinity > 20")]
+    {
+        [Alice] "你经常来图书馆呢，我很开心。"
+        @{ARCHIVE.affinity += 10}
+    }
+
     [Alice] "图书馆真安静。"
+
+    // 标记通关并保存全局记录
+    ##
+        GLOBAL.has_cleared = true;
+        GLOBAL.clear_count = (GLOBAL.clear_count || 0) + 1;
+    ##
+
+    [Alice] "故事到此结束，感谢你的陪伴。"
     #finish
 }
 ```
