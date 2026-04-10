@@ -258,3 +258,85 @@ const saves = executePluginCommand('scenario', {
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `pattern` | `string` | 可选，glob 匹配模式，默认返回所有存档 |
+
+## 历史记录（Backlog）
+
+历史记录系统在运行时记录剧情快照，支持玩家回顾和跳转到之前的任意位置。
+
+### record — 记录快照
+
+记录当前运行时状态（执行栈、变量）用于 backlog。通常在每次文本行和关键命令处理时调用。
+
+```typescript
+const recordId = executePluginCommand('scenario', {
+  subCommand: 'record',
+  meta: {
+    kind: 'text',
+    speaker: '角色名',
+    text: '对话内容',
+  },
+});
+// 返回 string — 记录的唯一 ID
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `meta` | `Record<string, any>` | 记录的元数据，由框架层定义内容 |
+
+引擎最多保留 **50 条**记录，超出时自动移除最旧的记录。
+
+:::tip
+标准框架通过 `GameControl.record()` 方法间接调用此命令，通常不需要直接使用。
+:::
+
+### getRecords — 获取历史记录
+
+按时间倒序返回 backlog 记录列表。
+
+:::note
+这是引擎层原始 API 的返回顺序，即最新记录在前。通常来说在展示前需要将其反转为按时间正序，并在首次打开 backlog 时默认滚动到底部。
+:::
+
+```typescript
+const records = executePluginCommand('scenario', {
+  subCommand: 'getRecords',
+  offset: 0,    // 可选：跳过的记录数
+  limit: 20,    // 可选：返回的最大记录数
+});
+// 返回 BacklogRecord[]
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `offset` | `number` | 可选，从第几条开始（用于分页） |
+| `limit` | `number` | 可选，最多返回几条，默认返回全部 |
+
+返回值结构：
+
+```typescript
+interface BacklogRecord {
+  id: string;        // 唯一标识
+  createdAt: number; // 创建时间戳（毫秒）
+  meta: any;         // 记录时传入的元数据
+}
+```
+
+### jumpToRecord — 跳转到历史记录
+
+跳转到指定记录的位置，恢复当时的执行栈和变量。目标记录之后的所有记录将被截断。
+
+```typescript
+const success = executePluginCommand('scenario', {
+  subCommand: 'jumpToRecord',
+  recordId: 'record-xxxxx-0',
+});
+// 返回 boolean — 是否跳转成功
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `recordId` | `string` | 目标记录的 ID |
+
+:::caution
+跳转后，目标记录之后的历史将被丢弃，且引擎会从该位置重新开始执行。框架层还需要额外恢复前端的游戏状态（背景、立绘等）。
+:::
