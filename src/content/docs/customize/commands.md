@@ -114,6 +114,14 @@ export const handleSetTitle: CommandHandler<{ command: 'setTitle'; text: string 
 - `control.hold()` — 如果未标记 `unskippable()`，自动推进；如果标记了，则停止快进
 - 音效播放会被跳过（避免重叠）
 
+### 自动播放模式下的行为
+
+当用户开启自动播放（Auto）时，框架通过"屏障 + 票据"机制决定何时推进：
+
+- `control.setWaiting(time)` — 打开一个 `wait` 屏障，至少等待 `time` 毫秒后再推进。如果有 Actor 注册了票据，则以两者中较晚的为准
+- `control.hold()` — 打开一个 `hold` 屏障。如果没有 Actor 注册票据，则立即推进（例如 `waitclick` 会被自动跳过）；如果有票据，则等待票据完成
+- 命令处理函数**不需要**为 auto 额外编写逻辑，auto 语义完全由 Stage 内部和 Actor 的票据决定
+
 ## 在 Stage 中注册命令
 
 命令的注册在 `src/pages/stage.tsx` 中完成：
@@ -226,7 +234,7 @@ stage.registerCommand('shake', handleShake);
 [Alice] "好大的地震！"
 ```
 
-## Skip 和 Interrupt 机制
+## Skip、Interrupt 和 Auto 机制
 
 ### Skip（快进）
 
@@ -265,19 +273,92 @@ function TextBoxActor() {
 }
 ```
 
-### Skip Blocker（跳过阻止器）
+### Auto（自动播放）
 
-某些场景不应允许快进（如重要演出、选择分支）。使用 `useSkipBlocker` 注册阻止器：
+自动播放模式让游戏按节奏自动推进。与快进不同，auto 不会跳过动画，而是等待当前内容播放完成后，再经过一段尾延时自动推进。
+
+Auto 的核心抽象是 **屏障 + 票据**：
+
+1. 当命令执行到暂停点（`hold()` 或 `setWaiting()`）时，Stage 内部自动创建一个屏障（`AutoBarrier`）
+2. Actor 在屏障的收集窗口内注册票据（`AutoTicket`），声明自己需要时间来完成某个异步过程
+3. 所有票据完成后，再等待尾延时（`tailMs`），然后自动推进
+
+#### 使用 `useAutoTicket` 参与自动播放
+
+Actor 通过 `useAutoTicket` 告知 Stage 自己需要多长时间完成：
 
 ```typescript
-import { useSkipBlocker } from '@momoyu-ink/kit';
+import { useAutoTicket, useIsAutoing, type AutoTicketHandle } from '@momoyu-ink/kit';
+import { useRef, useLayoutEffect } from 'react';
 
-function ImportantScene() {
-  const blockSkip = useCallback(() => true, []); // 永远阻止快进
-  useSkipBlocker(blockSkip);
-  // ...
+function TextBoxActor() {
+  const autoing = useIsAutoing();
+  const issueAutoTicket = useAutoTicket();
+  const autoTicketRef = useRef<AutoTicketHandle | null>(null);
+
+  // 在确认本次有内容需要打印时，发一张票据
+  useLayoutEffect(() => {
+    if (!autoing || printMode === 'instant') return;
+
+    autoTicketRef.current?.cancel();
+    autoTicketRef.current = issueAutoTicket({ label: 'textbox-printing' });
+  }, [autoing, printMode, issueAutoTicket, text]);
+
+  // 打印完成时，标记票据完成
+  const onFinish = () => {
+    autoTicketRef.current?.done();
+    autoTicketRef.current = null;
+  };
 }
 ```
+
+**关键规则**：
+
+- 票据必须在收集窗口内注册（同一轮 render/effect 中），过晚注册会收到警告
+- `done()` 表示基础工作已完成，Stage 会额外等待 `tailMs` 再推进
+- `cancel()` 用于中止，被取消的票据不再阻塞屏障
+- 不注册票据的 Actor（如 BGM、音效）不会影响自动播放的时序
+
+#### AutoTicket 选项
+
+| 选项 | 类型 | 说明 |
+|------|------|------|
+| `label` | `string` | 调试用标签 |
+| `tailMs` | `number` | 票据完成后的额外等待（毫秒）。省略时继承全局默认值 `setDefaultAutoTailMs()` 设定的值；传 `0` 可绕过默认尾延时 |
+
+#### 配置默认尾延时
+
+`setDefaultAutoTailMs` 是非 React 的顶层函数，用于设置自动播放的全局推进间隔：
+
+```typescript
+import { setDefaultAutoTailMs } from '@momoyu-ink/kit';
+import { subscribeKey } from 'valtio/utils';
+import { settingsState } from './state/settings';
+
+// 初始同步
+setDefaultAutoTailMs(settingsState.auto_interval * 1000);
+
+// 响应用户修改
+subscribeKey(settingsState, 'auto_interval', (value) => {
+  setDefaultAutoTailMs(value * 1000);
+});
+```
+
+### Skip Blocker / Auto Blocker（阻止器）
+
+某些场景不应允许快进或自动播放（如选择分支）。使用 `useSkipBlocker` 和 `useAutoBlocker` 注册阻止器：
+
+```typescript
+import { useSkipBlocker, useAutoBlocker } from '@momoyu-ink/kit';
+
+function SelectionActor() {
+  const blockDuringSelection = useCallback(() => gameState.selection.visible, []);
+  useSkipBlocker(blockDuringSelection);
+  useAutoBlocker(blockDuringSelection);
+}
+```
+
+当阻止器激活时，正在进行的快进或自动播放会被立即停止。
 
 ### BeforeHandleCommand（命令前回调）
 

@@ -162,6 +162,7 @@ interface SettingsData {
 
 - **自动持久化** — 修改 `settingsState` 后，会自动防抖保存（300ms）到引擎的永久变量中
 - **自动应用显示设置** — 修改 `display` 值后，会自动调用系统 API 调整窗口大小或切换全屏
+- **自动同步 Auto 间隔** — 修改 `auto_interval` 值后，会自动同步到 Kit 的 `setDefaultAutoTailMs()`，用于自动播放模式的推进间隔
 - **启动时恢复** — 引擎启动时，自动从永久变量中加载上次保存的设置
 
 ```typescript
