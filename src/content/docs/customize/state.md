@@ -46,6 +46,7 @@ gameState.background   // 背景状态
 gameState.character    // 角色状态
 gameState.textbox      // 文本框状态
 gameState.bgm          // 背景音乐状态
+gameState.voice        // 当前语音状态
 ```
 
 ### story — 故事信息
@@ -126,6 +127,17 @@ interface BGMState {
   fadeTime?: number;  // 渐变时长
 }
 ```
+
+### voice — 语音
+
+```typescript
+interface VoiceState {
+  src: string;          // 语音文件路径；为空时表示当前无语音
+  channelName: string;  // 音频实例名，默认是 'voice'，也可拆为 'voice_{name}'
+  volume?: number;      // 语音音量；未指定时回落到 settingsState.volume_voice
+}
+```
+
 
 ### 重置游戏状态
 

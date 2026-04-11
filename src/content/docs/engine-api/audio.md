@@ -87,6 +87,23 @@ executePluginCommand('audio', {
 |------|------|------|
 | `name` | `string` | 实例名称 |
 | `fadeTime` | `number` | 可选，渐入时长（毫秒） |
+| `waitForEnd` | `boolean` | 可选。为 `true` 时，命令会返回一个在自然播放结束后 resolve 的 Promise |
+
+#### 等待播放结束
+
+如果传入 `waitForEnd: true`，`play` 不只是“开始播放”，还可以被 `await`：
+
+```typescript
+await executePluginCommand('audio', {
+  subCommand: 'play',
+  name: 'voice_alice',
+  waitForEnd: true,
+});
+
+// 这里说明音频已经自然播放完毕
+```
+
+这对自动播放、语音同步，或任何“播完再继续”的逻辑都很有用。标准框架当前就使用这个能力让 `VoiceActor` 在 auto 模式下等待语音自然结束后再结算 auto ticket。
 
 ### stop — 停止
 
@@ -216,7 +233,7 @@ executePluginCommand('audio', {
 |------|-------------|------|
 | BGM | `'bgm'` | 单实例，循环播放，由 BGMActor 管理 |
 | SFX | 生成唯一名称 | 多实例，一次性播放 |
-| Voice | `'voice'` 或 `'voice-${name}'` | 按角色分通道 |
+| Voice | `'voice'` 或 `'voice_{name}'` | 按角色分通道，由 VoiceActor 管理 |
 | Sound | `'sound-${channel}'` | 自定义命名通道 |
 
 你可以根据需要使用任意命名策略来管理音频实例。

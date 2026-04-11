@@ -282,6 +282,8 @@ Auto 的核心抽象是 **屏障 + 票据**：
 1. 当命令执行到暂停点（`hold()` 或 `setWaiting()`）时，Stage 内部自动创建一个屏障（`AutoBarrier`）
 2. Actor 在屏障的收集窗口内注册票据（`AutoTicket`），声明自己需要时间来完成某个异步过程
 3. 所有票据完成后，再等待尾延时（`tailMs`），然后自动推进
+4. 最终推进时间以后完成的那一项为准
+
 
 #### 使用 `useAutoTicket` 参与自动播放
 
@@ -314,10 +316,90 @@ function TextBoxActor() {
 
 **关键规则**：
 
-- 票据必须在收集窗口内注册（同一轮 render/effect 中），过晚注册会收到警告
+- 票据通常在屏障的收集窗口内注册（同一轮 render/effect 中），过晚注册会被忽略
+- 如果注册时尚无屏障（即发起票据的命令自动推进），票据会暂存为**待认领票据（Pending Ticket）**，在下一个屏障打开时自动被认领；若在收集窗口结束前仍未被认领，则自动过期
 - `done()` 表示基础工作已完成，Stage 会额外等待 `tailMs` 再推进
 - `cancel()` 用于中止，被取消的票据不再阻塞屏障
 - 不注册票据的 Actor（如 BGM、音效）不会影响自动播放的时序
+
+#### 跨命令票据（Pending Ticket）
+
+某些命令（如 `@voice`）会自动推进——它不调用 `hold()` 或 `setWaiting()`，因此执行时不会打开屏障。但紧随其后的文本行会调用 `hold()` 创建屏障。
+
+这种情况下，Actor 在 `useLayoutEffect` 中调用 `issueAutoTicket()` 时屏障尚未创建，票据会被暂存为 Pending Ticket。当后续的 `hold()` 打开屏障时，所有 Pending Ticket 会被自动认领到新屏障中。
+
+```sixu
+// 典型的剧本模式：语音命令紧跟文本行
+@voice src="voice/ch01_001.opus"
+[Alice] "你好，欢迎来到这里。"
+```
+
+```typescript
+// VoiceActor 在 @voice 的 effect 中发出票据 —— 此时尚无屏障
+const ticket = issueAutoTicket({ label: `voice:${channelName}` });
+
+// 随后引擎处理文本行，textHandler 调用 control.hold()，打开屏障
+// → Stage 自动将上面的 pending ticket 认领到新屏障
+// → 屏障等待文本打印票据和语音票据都完成后再推进
+```
+
+这一机制对 Actor 是透明的——无论票据注册时屏障是否已存在，`issueAutoTicket()` 的调用方式完全相同。
+
+#### 完整示例：语音 Actor
+
+以下是 VoiceActor 的简化实现。它展示了如何在异步音频播放完成时标记票据完成：
+
+```typescript title="src/actors/voice.tsx"
+import { executePluginCommand, useAutoTicket, type AutoTicketHandle } from '@momoyu-ink/kit';
+import { useLayoutEffect, useRef } from 'react';
+import { useSnapshot } from 'valtio';
+import { gameState } from '../state/game';
+
+export function VoiceActor() {
+  const voiceState = useSnapshot(gameState.voice);
+  const issueAutoTicket = useAutoTicket();
+  const autoTicketRef = useRef<AutoTicketHandle | null>(null);
+
+  useLayoutEffect(() => {
+    const { src, channelName } = gameState.voice;
+
+    autoTicketRef.current?.cancel();
+    autoTicketRef.current = null;
+
+    if (!src) return;
+
+    // Issue a ticket before starting async work — may become a pending ticket.
+    const ticket = issueAutoTicket({ label: `voice:${channelName}` });
+    autoTicketRef.current = ticket;
+
+    void (async () => {
+      try {
+        await executePluginCommand('audio', {
+          subCommand: 'load', name: channelName, src,
+          settings: { autoPlay: false },
+        });
+        await executePluginCommand('audio', {
+          subCommand: 'play', name: channelName,
+          fadeTime: 0, waitForEnd: true,
+        });
+        ticket?.done();
+      } catch {
+        ticket?.cancel();
+      }
+      autoTicketRef.current = null;
+    })();
+
+    return () => {
+      autoTicketRef.current?.cancel();
+      autoTicketRef.current = null;
+    };
+  }, [voiceState.src, voiceState.channelName]);
+
+  return null; // Headless actor
+}
+```
+
+这样，当自动播放模式中同时存在文本打印和语音播放时，屏障会等到**两者都完成**后再推进，确保语音不会被截断。
 
 #### AutoTicket 选项
 
