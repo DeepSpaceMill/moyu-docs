@@ -232,8 +232,8 @@ executePluginCommand('audio', {
 | 通道 | 实例命名规则 | 说明 |
 |------|-------------|------|
 | BGM | `'bgm'` | 单实例，循环播放，由 BGMActor 管理 |
-| SFX | 生成唯一名称 | 多实例，一次性播放 |
+| SFX | `'sfx_{seq}'` | 每次播放创建独立实例，由 SfxActor 管理 |
 | Voice | `'voice'` 或 `'voice_{name}'` | 按角色分通道，由 VoiceActor 管理 |
-| Sound | `'sound-${channel}'` | 自定义命名通道 |
+| Sound | 自定义 `channel` 名 | 命名通道，由 SoundActor 管理 |
 
 你可以根据需要使用任意命名策略来管理音频实例。

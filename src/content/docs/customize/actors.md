@@ -18,7 +18,7 @@ sidebar:
 
 ## 内置图层（Actor）
 
-标准框架提供了四个内置图层（Actor）：
+标准框架提供了以下内置图层（Actor）：
 
 ### BackgroundActor — 背景
 
@@ -134,6 +134,61 @@ export function BGMActor() {
 }
 ```
 
+### VoiceActor — 角色语音
+
+无头图层（Actor），监听 `gameState.voice` 管理语音播放。使用 `play({ waitForEnd: true })` 等待自然播放结束，并在 auto 模式下通过 ticket 参与推进时序。
+
+**关键特性**：
+- 语音命令（`@voice`）只写状态，VoiceActor 负责实际播放
+- 在 auto 模式下发放 ticket，确保语音播完再推进
+- 支持 Pending Ticket：语音票据可以在 barrier 打开前注册（详见[命令与剧本引擎](/customize/commands/#跨命令票据pending-ticket)）
+- 语音切换或停止时自动取消旧 ticket
+
+### SfxActor — 音效
+
+无头图层（Actor），监听 `gameState.sfx` 管理音效播放。每次 `@sfx` 命令会递增 `seq` 触发器，Actor 响应播放。
+
+```typescript title="src/actors/sfx.tsx"
+export function SfxActor() {
+  const sfxState = useSnapshot(gameState.sfx);
+
+  useEffect(() => {
+    if (sfxState.seq === 0) return;
+    if (skipState.active) return; // 快进时不播放
+
+    const { src, loop, volume, fadeTime } = gameState.sfx;
+    if (!src) return;
+
+    executePluginCommand('audio', {
+      subCommand: 'load',
+      name: `sfx_${sfxState.seq}`,
+      src,
+      settings: {
+        autoPlay: true,
+        loopRegion: loop ? [0, -1] : undefined,
+        volume: volume ?? settingsState.volume_se,
+        fadeTime,
+      },
+    });
+  }, [sfxState.seq]);
+
+  // Handle stop...
+  return null;
+}
+```
+
+**行为规则**：
+- **Skip**：快进模式下不播放，避免大量音效重叠
+- **Auto**：正常播放，但不注册 ticket，不参与自动推进等待
+
+### SoundActor — 命名通道音频
+
+无头图层（Actor），监听 `gameState.sound` 管理命名通道的音频播放（如环境音、雨声等）。与 SfxActor 类似使用 `seq` 触发器驱动。
+
+**行为规则**：
+- **Skip**：快进模式下不播放，避免音频重叠
+- **Auto**：正常播放，但不注册 ticket，不参与自动推进等待
+
 ## 在 Stage 中组装
 
 图层（Actor）组件在 `src/pages/stage.tsx` 中组装：
@@ -146,13 +201,16 @@ export function Stage() {
       <CharacterActor />
       <TextBoxActor onButtonClick={handleButtonClick} />
       <BGMActor />
+      <VoiceActor />
+      <SfxActor />
+      <SoundActor />
     </StageContextProvider>
   );
 }
 ```
 
 :::tip[渲染顺序]
-组件的渲染顺序决定了视觉层次——后面的组件渲染在上层。因此背景在最底层，文本框在最上层。
+组件的渲染顺序决定了视觉层次——后面的组件渲染在上层。因此背景在最底层，文本框在最上层。无头图层（如 BGMActor、VoiceActor、SfxActor、SoundActor）没有视觉输出，放在哪里都可以。
 :::
 
 ## 创建自定义图层（Actor）
@@ -228,6 +286,9 @@ export function Stage() {
       </ShakeActor>
       <TextBoxActor onButtonClick={handleButtonClick} />
       <BGMActor />
+      <VoiceActor />
+      <SfxActor />
+      <SoundActor />
     </StageContextProvider>
   );
 }

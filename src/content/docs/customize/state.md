@@ -47,6 +47,8 @@ gameState.character    // 角色状态
 gameState.textbox      // 文本框状态
 gameState.bgm          // 背景音乐状态
 gameState.voice        // 当前语音状态
+gameState.sfx          // 音效状态
+gameState.sound        // 命名通道音频状态
 ```
 
 ### story — 故事信息
@@ -137,6 +139,42 @@ interface VoiceState {
   volume?: number;      // 语音音量；未指定时回落到 settingsState.volume_voice
 }
 ```
+
+`@voice` 命令只负责更新 `gameState.voice`，实际播放和 auto ticket 结算由 `VoiceActor` 管理。
+
+### sfx — 音效
+
+```typescript
+interface SfxState {
+  seq: number;          // 递增触发器，每次 @sfx 命令 +1
+  src: string;          // 音效文件路径
+  loop: boolean;        // 是否循环
+  volume?: number;      // 音量；未指定时回落到 settingsState.volume_se
+  fadeTime?: number;    // 渐入时长
+  stopSeq: number;      // 停止触发器，每次 @sfxStop 命令 +1
+  stopFadeTime?: number; // 停止时的淡出时长
+}
+```
+
+`SfxActor` 通过 `seq` 变化触发播放，每次创建独立音频实例（`sfx_1`, `sfx_2`, ...）。Skip 时不播放，Auto 时正常播放但不参与等待。
+
+### sound — 命名通道音频
+
+```typescript
+interface SoundState {
+  seq: number;          // 递增触发器，每次 @sound 命令 +1
+  channel: string;      // 通道名称
+  src: string;          // 音频文件路径
+  loop: boolean;        // 是否循环
+  volume?: number;      // 音量；未指定时回落到 settingsState.volume_se
+  fadeTime?: number;    // 渐入时长
+  stopSeq: number;      // 停止触发器，每次 @soundStop 命令 +1
+  stopChannel: string;  // 要停止的通道名称
+  stopFadeTime?: number; // 停止时的淡出时长
+}
+```
+
+`SoundActor` 行为与 `SfxActor` 类似，但使用 `channel` 作为音频实例名。同一通道的新音频会替换旧的。Skip 时不播放，Auto 时正常播放但不参与等待。
 
 
 ### 重置游戏状态

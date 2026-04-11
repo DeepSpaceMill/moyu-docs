@@ -112,7 +112,7 @@ export const handleSetTitle: CommandHandler<{ command: 'setTitle'; text: string 
 
 - `control.setWaiting()` — 跳过等待，立刻推进
 - `control.hold()` — 如果未标记 `unskippable()`，自动推进；如果标记了，则停止快进
-- 音效播放会被跳过（避免重叠）
+- 音效（SFX）和命名通道音频（Sound）会被跳过
 
 ### 自动播放模式下的行为
 
