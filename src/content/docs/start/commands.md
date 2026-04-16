@@ -46,7 +46,8 @@ sidebar:
 | [charLeave](#charleave) | 从舞台移除角色 |
 | [charClear](#charclear) | 清除舞台上所有角色 |
 | [charName](#charname) | 修改角色的显示名称 |
-| [charPreset](#charpreset) | 定义或修改角色位置预设 |
+| [charPreset](#charpreset) | 定义或修改角色预设 |
+| [charAutoTint](#charautotint) | 设置非说话角色的自动色调 |
 
 ### 音频
 
@@ -301,11 +302,21 @@ sidebar:
 
 ### bgTint
 
-设置背景的色调叠加。可用于营造氛围变化，如夕阳色调或暗色滤镜。
+设置背景的色调叠加。可用于营造氛围变化，如夕阳色调或暗色滤镜。执行后脚本将等待渐变完成。
+
+:::note
+此命令会阻塞脚本执行，等待 `fadeTime` 结束后才继续。如果 `skippable=true`，玩家可以点击跳过等待。
+:::
 
 ```sixu
 // 添加暖色调
 @bgTint tint="#ffcccc"
+
+// 带自定义渐变时间
+@bgTint tint="#000033" fadeTime=2000
+
+// 允许玩家跳过渐变
+@bgTint tint="#ff9900" fadeTime=1500 skippable=true
 
 // 移除色调
 @bgTint tint="off"
@@ -314,6 +325,8 @@ sidebar:
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `tint` | `string` | *必填* | 色调颜色值，设为 `"off"` 或 `"none"` 取消色调 |
+| `fadeTime` | `number` | `1000` | 渐变过渡时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过渐变 |
 
 ---
 
@@ -321,7 +334,7 @@ sidebar:
 
 角色命令用于管理舞台上的立绘。每个角色通过 `name` 参数标识，同名角色的后续命令会修改已存在的角色而不是创建新的。
 
-角色支持三个内置位置预设：`left`（左侧）、`center`（居中）和 `right`（右侧），也可以通过 `x`/`y` 手动指定坐标。
+角色坐标系以画面底部中心为原点，X 轴向右为正，Y 轴向上为负。角色支持三个内置位置预设：`left`（左侧）、`center`（居中）和 `right`（右侧），也可以通过 `x`/`y` 手动指定坐标。
 
 ### charEnter
 
@@ -335,7 +348,7 @@ sidebar:
 手动指定坐标和缩放：
 
 ```sixu
-@charEnter name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
+@charEnter name="Alice" src="characters/alice/normal.png" x=0 y=0 scale=0.8 pivot=[0.5,1]
 ```
 
 初始不可见，稍后再显示：
@@ -441,17 +454,44 @@ sidebar:
 
 ### charPreset
 
-定义或修改一个角色位置预设。内置预设有 `left`（400, 800）、`center`（960, 800）和 `right`（1520, 800），你可以用此命令覆盖它们或创建新的预设。
+定义或修改一个角色预设。内置预设有 `left`（-560, 0）、`center`（0, 0）和 `right`（560, 0），你可以用此命令覆盖它们或创建新的预设。预设支持设置所有角色属性，不仅仅是位置。
 
 ```sixu
-@charPreset preset="far-left" x=200 y=800
+// 创建一个新预设，包含位置和缩放
+@charPreset preset="far-left" x=-700 y=0 scale=0.8
+
+// 修改已有预设的部分属性（未提供的字段保持不变）
+@charPreset preset="left" scale=0.9 tint="#cccccc"
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `preset` | `string` | *必填* | 预设名称 |
-| `x` | `number` | *必填* | 预设的 X 坐标 |
-| `y` | `number` | *必填* | 预设的 Y 坐标 |
+| `x` | `number` | — | X 坐标 |
+| `y` | `number` | — | Y 坐标 |
+| `scale` | `number` | — | 缩放比例 |
+| `tint` | `string` | — | 着色 |
+| `pivot` | `[number, number]` | — | 锚点 |
+| `visible` | `boolean` | — | 是否可见 |
+| `fadeTime` | `number` | — | 动画过渡时间（毫秒） |
+
+---
+
+### charAutoTint
+
+设置非当前说话角色的自动色调。当有多个角色在舞台上时，非当前说话者的立绘会自动应用此色调，默认为 `#666`。
+
+```sixu
+// 设置更深的变暗效果
+@charAutoTint tint="#555555"
+
+// 设置较浅的变暗效果
+@charAutoTint tint="#aaaaaa"
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `tint` | `string` | *必填* | 非说话角色的色调颜色值 |
 
 ---
 

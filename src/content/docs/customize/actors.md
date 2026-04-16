@@ -89,8 +89,8 @@ export function CharacterActor() {
 
 **关键特性**：
 - 角色的位移、缩放通过 `useSpring` 平滑过渡
-- 当前说话者的立绘保持正常颜色，其他角色变暗（tint 设为 `#333`）
-- 支持位置预设（left/center/right）
+- 当前说话者的立绘保持正常颜色，其他角色自动变暗（通过 `charAutoTint` 命令可配置色调颜色）
+- 支持位置预设（left/center/right），坐标系以画面底部中心为原点
 
 ### TextBoxActor — 文本框
 

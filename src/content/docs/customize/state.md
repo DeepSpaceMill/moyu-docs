@@ -73,10 +73,21 @@ interface BackgroundState {
 ### character — 角色
 
 ```typescript
+interface CharacterPreset {
+  x?: number;                             // X 坐标
+  y?: number;                             // Y 坐标
+  scale?: number;                         // 缩放
+  tint?: string;                          // 着色
+  visible?: boolean;                      // 是否可见
+  pivot?: [number, number];               // 锚点
+  fadeTime?: number;                      // 动画时长
+}
+
 interface CharacterState {
-  presets: Record<string, { x: number; y: number }>;  // 位置预设
+  presets: Record<string, CharacterPreset>;  // 角色预设
   characters: Character[];    // 当前舞台上的角色列表
   currentSpeaker?: string;    // 当前说话者的名字
+  autoTint: string;           // 非说话角色的自动色调（默认 '#666'）
 }
 
 interface Character {
