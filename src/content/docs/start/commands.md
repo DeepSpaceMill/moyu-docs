@@ -13,7 +13,7 @@ sidebar:
 字符串值需要用引号包裹，数字和布尔值直接书写，数组使用方括号：
 
 ```sixu
-@addchar name="Alice" src="characters/alice.png" scale=0.8 pivot=[0.5,1]
+@charEnter name="Alice" src="characters/alice.png" scale=0.8 pivot=[0.5,1]
 ```
 
 未提供的可选参数将使用默认值，仅设置你需要更改的字段即可。
@@ -34,19 +34,19 @@ sidebar:
 
 | 命令 | 说明 |
 | --- | --- |
-| [changebg](#changebg) | 切换背景图片 |
-| [setBgTint](#setbgtint) | 设置背景色调 |
+| [bg](#bg) | 切换背景图片 |
+| [bgTint](#bgtint) | 设置背景色调 |
 
 ### 角色
 
 | 命令 | 说明 |
 | --- | --- |
-| [addchar](#addchar) | 添加角色到舞台 |
-| [charchange](#charchange) | 修改舞台上角色的属性 |
-| [charremove](#charremove) | 从舞台移除角色 |
-| [charclear](#charclear) | 清除舞台上所有角色 |
-| [charname](#charname) | 修改角色的显示名称 |
-| [charpreset](#charpreset) | 定义或修改角色位置预设 |
+| [charEnter](#charenter) | 添加角色到舞台 |
+| [charAction](#charaction) | 修改舞台上角色的属性 |
+| [charLeave](#charleave) | 从舞台移除角色 |
+| [charClear](#charclear) | 清除舞台上所有角色 |
+| [charName](#charname) | 修改角色的显示名称 |
+| [charPreset](#charpreset) | 定义或修改角色位置预设 |
 
 ### 音频
 
@@ -66,14 +66,14 @@ sidebar:
 | 命令 | 说明 |
 | --- | --- |
 | [wait](#wait) | 等待指定时间 |
-| [waitclick](#waitclick) | 等待玩家点击 |
+| [waitClick](#waitclick) | 等待玩家点击 |
 | [leaveStage](#leavestage) | 离开舞台并跳转页面 |
 
 ### 其他
 
 | 命令 | 说明 |
 | --- | --- |
-| [setTitle](#settitle) | 设置故事标题 |
+| [title](#title) | 设置故事标题 |
 
 ---
 
@@ -267,7 +267,7 @@ sidebar:
 
 ## 背景
 
-### changebg
+### bg
 
 切换背景图片，支持渐变过渡效果。执行后脚本将等待渐变完成。
 
@@ -276,19 +276,19 @@ sidebar:
 :::
 
 ```sixu
-@changebg src="bg/classroom.png"
+@bg src="bg/classroom.png"
 ```
 
 带自定义渐变时间：
 
 ```sixu
-@changebg src="bg/sunset.png" fadeTime=2000
+@bg src="bg/sunset.png" fadeTime=2000
 ```
 
 允许玩家跳过渐变：
 
 ```sixu
-@changebg src="bg/night.png" fadeTime=1500 skippable=true
+@bg src="bg/night.png" fadeTime=1500 skippable=true
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -299,16 +299,16 @@ sidebar:
 
 ---
 
-### setBgTint
+### bgTint
 
 设置背景的色调叠加。可用于营造氛围变化，如夕阳色调或暗色滤镜。
 
 ```sixu
 // 添加暖色调
-@setBgTint tint="#ffcccc"
+@bgTint tint="#ffcccc"
 
 // 移除色调
-@setBgTint tint="off"
+@bgTint tint="off"
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -323,26 +323,26 @@ sidebar:
 
 角色支持三个内置位置预设：`left`（左侧）、`center`（居中）和 `right`（右侧），也可以通过 `x`/`y` 手动指定坐标。
 
-### addchar
+### charEnter
 
 添加一个角色到舞台。如果同名角色已存在，则更新其属性。
 
 ```sixu
 // 使用位置预设
-@addchar name="Alice" src="characters/alice/normal.png" preset="center" fadeTime=500
+@charEnter name="Alice" src="characters/alice/normal.png" preset="center" fadeTime=500
 ```
 
 手动指定坐标和缩放：
 
 ```sixu
-@addchar name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
+@charEnter name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
 ```
 
 初始不可见，稍后再显示：
 
 ```sixu
-@addchar name="Alice" src="characters/alice/normal.png" preset="left" visible=false
-@charchange name="Alice" visible=true fadeTime=300
+@charEnter name="Alice" src="characters/alice/normal.png" preset="left" visible=false
+@charAction name="Alice" visible=true fadeTime=300
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -360,20 +360,20 @@ sidebar:
 
 ---
 
-### charchange
+### charAction
 
 修改舞台上已有角色的属性。仅更新显式提供的字段，可用于切换立绘、移动位置、改变色调等。
 
 切换立绘：
 
 ```sixu
-@charchange name="Alice" src="characters/alice/smile.png"
+@charAction name="Alice" src="characters/alice/smile.png"
 ```
 
 移动到新位置并改变色调：
 
 ```sixu
-@charchange name="Alice" preset="right" tint="#999" fadeTime=300
+@charAction name="Alice" preset="right" tint="#999" fadeTime=300
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -391,12 +391,12 @@ sidebar:
 
 ---
 
-### charremove
+### charLeave
 
 从舞台移除指定角色。
 
 ```sixu
-@charremove name="Alice" fadeTime=300
+@charLeave name="Alice" fadeTime=300
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -406,12 +406,12 @@ sidebar:
 
 ---
 
-### charclear
+### charClear
 
 清除舞台上的所有角色。
 
 ```sixu
-@charclear fadeTime=500
+@charClear fadeTime=500
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -420,7 +420,7 @@ sidebar:
 
 ---
 
-### charname
+### charName
 
 :::caution[尚未实现]
 此命令已定义但尚未实现，调用后不会产生实际效果。
@@ -429,7 +429,7 @@ sidebar:
 修改角色的显示名称。可以将角色的内部标识名映射为另一个显示名。
 
 ```sixu
-@charname name="Alice" to="爱丽丝"
+@charName name="Alice" to="爱丽丝"
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -439,12 +439,12 @@ sidebar:
 
 ---
 
-### charpreset
+### charPreset
 
 定义或修改一个角色位置预设。内置预设有 `left`（400, 800）、`center`（960, 800）和 `right`（1520, 800），你可以用此命令覆盖它们或创建新的预设。
 
 ```sixu
-@charpreset preset="far-left" x=200 y=800
+@charPreset preset="far-left" x=200 y=800
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -666,7 +666,7 @@ sidebar:
 
 ---
 
-### waitclick
+### waitClick
 
 暂停脚本执行，等待玩家点击后继续。
 
@@ -675,11 +675,11 @@ sidebar:
 :::
 
 :::tip
-在自动播放模式下，`waitclick` 默认会被直接越过，因为它只打开一个 `hold` 屏障而没有额外票据参与。
+在自动播放模式下，`waitClick` 默认会被直接越过，因为它只打开一个 `hold` 屏障而没有额外票据参与。
 :::
 
 ```sixu
-@waitclick
+@waitClick
 ```
 
 此命令没有参数。
@@ -706,12 +706,12 @@ sidebar:
 
 ## 其他
 
-### setTitle
+### title
 
 设置当前故事的标题。通常在剧本开头使用，用于在存档等界面显示当前章节名。
 
 ```sixu
-@setTitle text="第一章 相遇"
+@title text="第一章 相遇"
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |

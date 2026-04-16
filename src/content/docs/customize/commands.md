@@ -4,12 +4,12 @@ sidebar:
   order: 7
 ---
 
-命令系统是连接剧本（`.sixu` 脚本）和游戏表现的核心桥梁。当剧本中执行一条 `@changebg` 或 `@addchar` 命令时，框架需要解析它、更新对应的游戏状态，最终由 Actor 组件渲染出来。
+命令系统是连接剧本（`.sixu` 脚本）和游戏表现的核心桥梁。当剧本中执行一条 `@bg` 或 `@charEnter` 命令时，框架需要解析它、更新对应的游戏状态，最终由 Actor 组件渲染出来。
 
 ## 数据流
 
 ```
-剧本 @changebg src="bg/classroom.png"
+剧本 @bg src="bg/classroom.png"
          ↓
    引擎解析并发出事件
          ↓
@@ -31,8 +31,8 @@ sidebar:
 ```typescript title="src/commands/commands.ts"
 import z from 'zod';
 
-const ChangeBgCommandSchema = z.object({
-  command: z.literal('changebg'),
+const BgCommandSchema = z.object({
+  command: z.literal('bg'),
   src: z.string(),
   fadeTime: z.number().optional().default(1000),
   skippable: z.boolean().optional().default(false),
@@ -48,7 +48,7 @@ const WaitCommandSchema = z.object({
 
 // 所有命令的联合类型
 export const ScenarioCommandSchema = z.discriminatedUnion('command', [
-  ChangeBgCommandSchema,
+  BgCommandSchema,
   WaitCommandSchema,
   // ... 所有命令 Schema ...
 ]);
@@ -65,8 +65,8 @@ import type { CommandHandler } from '@momoyu-ink/kit';
 import { gameState } from '../state/game';
 
 // 切换背景
-export const handleChangeBg: CommandHandler<{
-  command: 'changebg';
+export const handleBg: CommandHandler<{
+  command: 'bg';
   src: string;
   fadeTime: number;
   skippable: boolean;
@@ -95,12 +95,12 @@ export const handleChangeBg: CommandHandler<{
 
 ```typescript
 // 示例：等待用户点击
-export const handleWaitClick: CommandHandler<{ command: 'waitclick' }> = (_cmd, control) => {
+export const handleWaitClick: CommandHandler<{ command: 'waitClick' }> = (_cmd, control) => {
   control.hold();  // 阻塞，直到用户点击
 };
 
 // 示例：自动推进（不调用 control）
-export const handleSetTitle: CommandHandler<{ command: 'setTitle'; text: string }> = (cmd) => {
+export const handleTitle: CommandHandler<{ command: 'title'; text: string }> = (cmd) => {
   gameState.story.title = cmd.text;
   // 没有调用 control → 自动推进
 };
@@ -119,7 +119,7 @@ export const handleSetTitle: CommandHandler<{ command: 'setTitle'; text: string 
 当用户开启自动播放（Auto）时，框架通过"屏障 + 票据"机制决定何时推进：
 
 - `control.setWaiting(time)` — 打开一个 `wait` 屏障，至少等待 `time` 毫秒后再推进。如果有 Actor 注册了票据，则以两者中较晚的为准
-- `control.hold()` — 打开一个 `hold` 屏障。如果没有 Actor 注册票据，则立即推进（例如 `waitclick` 会被自动跳过）；如果有票据，则等待票据完成
+- `control.hold()` — 打开一个 `hold` 屏障。如果没有 Actor 注册票据，则立即推进（例如 `waitClick` 会被自动跳过）；如果有票据，则等待票据完成
 - 命令处理函数**不需要**为 auto 额外编写逻辑，auto 语义完全由 Stage 内部和 Actor 的票据决定
 
 ## 在 Stage 中注册命令
@@ -129,7 +129,7 @@ export const handleSetTitle: CommandHandler<{ command: 'setTitle'; text: string 
 ```typescript title="src/pages/stage.tsx"
 import { createStage, StageContextProvider } from '@momoyu-ink/kit';
 import { ScenarioCommandSchema } from '../commands/commands';
-import { handleChangeBg, handleAddChar, handleText } from '../commands/handlers';
+import { handleBg, handleCharEnter, handleText } from '../commands/handlers';
 
 // 创建模块级单例
 const stage = createStage();
@@ -138,9 +138,9 @@ const stage = createStage();
 stage.registerCommandSchema(ScenarioCommandSchema);
 
 // 注册命令处理函数
-stage.registerCommand('changebg', handleChangeBg);
-stage.registerCommand('addchar', handleAddChar);
-stage.registerCommand(['charchange', 'charremove', 'charclear'], handleCharChange);
+stage.registerCommand('bg', handleBg);
+stage.registerCommand('charEnter', handleCharEnter);
+stage.registerCommand(['charAction', 'charLeave', 'charClear'], handleCharAction);
 
 // 注册文本行处理
 stage.registerTextLine(handleTextLine);

@@ -63,7 +63,7 @@ export const handleTextLine: TextLineHandler = (e, control) => {
 选择项显示时，记录所有选项文本：
 
 ```typescript
-export const handleSelectShow: CommandHandler = (cmd, control) => {
+export const handleOptionShow: CommandHandler = (cmd, control) => {
   // ...显示选择...
 
   recordBacklog(control, {

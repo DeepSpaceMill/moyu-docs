@@ -25,13 +25,13 @@ sidebar:
 ```sixu
 // 不使用块：属性只作用于紧随的一行
 #[if("has_key")]
-@changebg src="bg/secret_room.png"   // 仅此行受条件控制
+@bg src="bg/secret_room.png"   // 仅此行受条件控制
 [Alice] "门开了。"                    // 这行始终会执行
 
 // 使用块：属性作用于整个块
 #[if("has_key")]
 {
-    @changebg src="bg/secret_room.png"
+    @bg src="bg/secret_room.png"
     [Alice] "门开了。"               // 这行也受条件控制
 }
 ```
@@ -215,11 +215,11 @@ sidebar:
 ##
 
 // 不加引号 → 引用变量的值
-@changebg src=selected_bg          // 等同于 src="bg/library.png"
-@charname name=char_name displayName="小红"
+@bg src=selected_bg          // 等同于 src="bg/library.png"
+@charName name=char_name displayName="小红"
 
 // 加引号 → 字符串字面量
-@changebg src="bg/library.png"     // 直接使用字符串值
+@bg src="bg/library.png"     // 直接使用字符串值
 ```
 
 具体规则如下：
@@ -235,9 +235,9 @@ sidebar:
 一个常见的用法是配合选项系统，将玩家的选择结果传递给后续命令：
 
 ```sixu
-@selectAdd text="路线A" value="route_a"
-@selectAdd text="路线B" value="route_b"
-@selectShow saveTo="chosen_route"
+@optionAdd text="路线A" value="route_a"
+@optionAdd text="路线B" value="route_b"
+@optionShow saveTo="chosen_route"
 
 // chosen_route 现在保存了玩家的选择
 // 在后续命令中直接引用
@@ -258,7 +258,7 @@ sidebar:
 // 比较存档变量的值
 #[cond("ARCHIVE.route === 'library'")]
 {
-    @changebg src="bg/library.png"
+    @bg src="bg/library.png"
     [Alice] "图书馆到了。"
 }
 
@@ -477,12 +477,12 @@ sidebar:
 ```sixu
 // 作用于单条命令
 #[if("locked")]
-@changebg src="bg/secret_room.png"
+@bg src="bg/secret_room.png"
 
 // 作用于代码块（块内所有内容作为整体）
 #[if("!locked")]
 {
-    @changebg src="bg/secret_room.png"
+    @bg src="bg/secret_room.png"
     [Alice] "我们进入了密室。"
 }
 ```
@@ -507,7 +507,7 @@ sidebar:
     #[cond("route === 'A'")]
     {
         [Alice] "你选择了 A 路线。"
-        @changebg src="bg/route_a.png"
+        @bg src="bg/route_a.png"
     }
 
     // 也可以用单引号包裹条件
@@ -617,7 +617,7 @@ sidebar:
         ARCHIVE.route = '';
     ##
 
-    @changebg src="bg/school.png"
+    @bg src="bg/school.png"
     @bgm src="audio/bgm/morning.opus"
 
     [Alice] "新的一天开始了。"
@@ -644,10 +644,10 @@ sidebar:
     [Alice] `早上好！今天是第 ${day} 天。`
 
     // 让玩家选择今天的去处
-    @selectAdd text="去图书馆" value="library"
-    @selectAdd text="去花园" value="garden"
-    @selectAdd text="去教室" value="classroom"
-    @selectShow saveTo="route"
+    @optionAdd text="去图书馆" value="library"
+    @optionAdd text="去花园" value="garden"
+    @optionAdd text="去教室" value="classroom"
+    @optionShow saveTo="route"
 
     `你选择了${route}。`
 
@@ -656,7 +656,7 @@ sidebar:
 }
 
 ::library_scene {
-    @changebg src="bg/library.png"
+    @bg src="bg/library.png"
 
     #[if("ARCHIVE.affinity > 20")]
     {

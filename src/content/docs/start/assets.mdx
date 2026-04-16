@@ -42,8 +42,8 @@ import { FileTree } from '@astrojs/starlight/components';
 
 ```sixu
 ::entry{
-    @changebg src="bg/classroom.png"
-    @addchar name="Alice" src="characters/alice/normal.png"
+    @bg src="bg/classroom.png"
+    @charEnter name="Alice" src="characters/alice/normal.png"
     @bgm src="audio/bgm/theme.opus"
 }
 ```
@@ -130,29 +130,29 @@ import { FileTree } from '@astrojs/starlight/components';
 
 ```sixu
 // 切换背景，带渐变效果
-@changebg src="bg/classroom.png" fadeTime=500
+@bg src="bg/classroom.png" fadeTime=500
 
 // 设置背景色调
-@setBgTint tint="#ffcccc"
+@bgTint tint="#ffcccc"
 ```
 
 #### 角色
 
 ```sixu
 // 添加角色，使用预设位置
-@addchar name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
+@charEnter name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
 
 // 添加角色，手动指定坐标和缩放
-@addchar name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
+@charEnter name="Alice" src="characters/alice/normal.png" x=960 y=1080 scale=0.8 pivot=[0.5,1]
 
 // 切换角色立绘或移动角色
-@charchange name="Alice" src="characters/alice/smile.png" preset="right" fadeTime=300
+@charAction name="Alice" src="characters/alice/smile.png" preset="right" fadeTime=300
 
 // 移除角色
-@charremove name="Alice" fadeTime=300
+@charLeave name="Alice" fadeTime=300
 
 // 清除所有角色
-@charclear fadeTime=300
+@charClear fadeTime=300
 ```
 
 #### 音频
@@ -178,7 +178,7 @@ import { FileTree } from '@astrojs/starlight/components';
 @wait time=2000 skippable=true
 
 // 等待玩家点击
-@waitclick
+@waitClick
 
 // 跳转到其他剧本段落（如需要在 React 层处理结束）
 @leaveStage gotoPage="title"
@@ -200,10 +200,10 @@ import { FileTree } from '@astrojs/starlight/components';
 ```sixu
 ::entry {
     // 显示背景
-    @changebg src="bg/classroom.png" fadeTime=500
+    @bg src="bg/classroom.png" fadeTime=500
 
     // 添加角色
-    @addchar name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
+    @charEnter name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
 
     // 播放背景音乐
     @bgm src="audio/bgm/theme.opus"
@@ -214,12 +214,12 @@ import { FileTree } from '@astrojs/starlight/components';
     [Alice] "你好！我是Alice。"
 
     // 切换立绘表情
-    @charchange name="Alice" src="characters/alice/smile.png" fadeTime=200
+    @charAction name="Alice" src="characters/alice/smile.png" fadeTime=200
 
     [Alice] "很高兴认识你！"
 
     // 结束
-    @charclear fadeTime=500
+    @charClear fadeTime=500
     @bgmStop
 
     #replace(paragraph="entry")
