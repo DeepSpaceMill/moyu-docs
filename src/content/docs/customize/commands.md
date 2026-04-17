@@ -36,6 +36,7 @@ const BgCommandSchema = z.object({
   src: z.string(),
   fadeTime: z.number().optional().default(1000),
   skippable: z.boolean().optional().default(false),
+  noWait: z.boolean().optional().default(false),
 });
 
 const WaitCommandSchema = z.object({
@@ -70,13 +71,16 @@ export const handleBg: CommandHandler<{
   src: string;
   fadeTime: number;
   skippable: boolean;
+  noWait: boolean;
 }> = (cmd, control) => {
   gameState.background.src = cmd.src;
   gameState.background.fadeTime = cmd.fadeTime;
   gameState.background.skippable = cmd.skippable;
 
-  // 等待渐变完成
-  control.setWaiting(cmd.fadeTime, cmd.skippable);
+  // noWait 为 false 时等待渐变完成，为 true 时立即推进
+  if (!cmd.noWait) {
+    control.setWaiting(cmd.fadeTime, cmd.skippable);
+  }
 };
 ```
 
@@ -92,6 +96,10 @@ export const handleBg: CommandHandler<{
 | `control.unskippable()` | 标记当前命令不可跳过 | 不允许快进跳过的重要演出 |
 
 **默认行为**：如果处理函数不调用任何 `control` 方法，命令会**自动推进**到下一条。
+
+:::tip[noWait 参数]
+包含 `fadeTime` 的命令通常还应定义 `noWait` 参数。当 `noWait` 为 `false` 时调用 `control.setWaiting()` 阻塞推进；当 `noWait` 为 `true` 时跳过等待，允许后续命令并行执行。所有内置定时命令都遵循这一模式。
+:::
 
 ```typescript
 // 示例：等待用户点击
@@ -195,6 +203,7 @@ const ShakeCommandSchema = z.object({
   command: z.literal('shake'),
   intensity: z.number().optional().default(10),
   duration: z.number().optional().default(500),
+  noWait: z.boolean().optional().default(false),
 });
 
 // 添加到联合类型
@@ -211,13 +220,16 @@ export const handleShake: CommandHandler<{
   command: 'shake';
   intensity: number;
   duration: number;
+  noWait: boolean;
 }> = (cmd, control) => {
   // 修改你的自定义状态来触发震动效果
   shakeState.active = true;
   shakeState.intensity = cmd.intensity;
 
-  // 等待震动结束
-  control.setWaiting(cmd.duration, true);
+  // noWait 为 false 时等待震动结束
+  if (!cmd.noWait) {
+    control.setWaiting(cmd.duration, true);
+  }
 };
 ```
 

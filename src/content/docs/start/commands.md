@@ -273,7 +273,7 @@ sidebar:
 切换背景图片，支持渐变过渡效果。执行后脚本将等待渐变完成。
 
 :::note
-此命令会阻塞脚本执行，等待 `fadeTime` 结束后才继续。如果 `skippable=true`，玩家可以点击跳过等待。
+此命令默认会阻塞脚本执行，等待 `fadeTime` 结束后才继续。设置 `noWait=true` 可以跳过等待，实现与后续命令并行执行。如果 `skippable=true`，玩家可以点击跳过等待。
 :::
 
 ```sixu
@@ -292,11 +292,18 @@ sidebar:
 @bg src="bg/night.png" fadeTime=1500 skippable=true
 ```
 
+不等待渐变完成，立即执行后续命令：
+
+```sixu
+@bg src="bg/night.png" fadeTime=1500 noWait=true
+```
+
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `src` | `string` | *必填* | 背景图片的素材路径（相对于 `assets/`） |
 | `fadeTime` | `number` | `1000` | 渐变过渡时间（毫秒） |
 | `skippable` | `boolean` | `false` | 是否允许玩家点击跳过渐变 |
+| `noWait` | `boolean` | `false` | 是否跳过等待过渡完成，设为 `true` 可与后续命令并行执行 |
 
 ---
 
@@ -305,7 +312,7 @@ sidebar:
 设置背景的色调叠加。可用于营造氛围变化，如夕阳色调或暗色滤镜。执行后脚本将等待渐变完成。
 
 :::note
-此命令会阻塞脚本执行，等待 `fadeTime` 结束后才继续。如果 `skippable=true`，玩家可以点击跳过等待。
+此命令默认会阻塞脚本执行，等待 `fadeTime` 结束后才继续。设置 `noWait=true` 可以跳过等待，实现与后续命令并行执行。如果 `skippable=true`，玩家可以点击跳过等待。
 :::
 
 ```sixu
@@ -327,6 +334,7 @@ sidebar:
 | `tint` | `string` | *必填* | 色调颜色值，设为 `"off"` 或 `"none"` 取消色调 |
 | `fadeTime` | `number` | `1000` | 渐变过渡时间（毫秒） |
 | `skippable` | `boolean` | `false` | 是否允许玩家点击跳过渐变 |
+| `noWait` | `boolean` | `false` | 是否跳过等待过渡完成，设为 `true` 可与后续命令并行执行 |
 
 ---
 
@@ -358,6 +366,12 @@ sidebar:
 @charAction name="Alice" visible=true fadeTime=300
 ```
 
+等待淡入完成后才继续：
+
+```sixu
+@charEnter name="Alice" src="characters/alice/normal.png" preset="center" noWait=false
+```
+
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `src` | `string` | *必填* | 角色立绘的素材路径 |
@@ -370,6 +384,8 @@ sidebar:
 | `pivot` | `[number, number]` | `[0.5, 1]` | 旋转和定位的锚点 |
 | `visible` | `boolean` | `true` | 是否可见 |
 | `fadeTime` | `number` | `500` | 淡入动画时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过动画等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待动画完成，设为 `false` 可等待淡入结束 |
 
 ---
 
@@ -400,7 +416,9 @@ sidebar:
 | `tint` | `string` | — | 着色 |
 | `pivot` | `[number, number]` | — | 锚点 |
 | `visible` | `boolean` | — | 是否可见 |
-| `fadeTime` | `number` | — | 动画过渡时间（毫秒） |
+| `fadeTime` | `number` | `500` | 动画过渡时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过动画等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待动画完成，设为 `false` 可等待过渡结束 |
 
 ---
 
@@ -415,7 +433,9 @@ sidebar:
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `name` | `string` | — | 要移除的角色标识名称 |
-| `fadeTime` | `number` | — | 淡出动画时间（毫秒） |
+| `fadeTime` | `number` | `500` | 淡出动画时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过动画等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待动画完成，设为 `false` 可等待淡出结束 |
 
 ---
 
@@ -429,7 +449,9 @@ sidebar:
 
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `fadeTime` | `number` | — | 淡出动画时间（毫秒） |
+| `fadeTime` | `number` | `500` | 淡出动画时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过动画等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待动画完成，设为 `false` 可等待淡出结束 |
 
 ---
 
@@ -532,6 +554,8 @@ sidebar:
 | `loop` | `boolean` | `true` | 是否循环播放 |
 | `volume` | `number` | `1` | 音量，范围 0 ~ 1 |
 | `fadeTime` | `number` | `600` | 渐入时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待渐入结束 |
 
 ---
 
@@ -552,6 +576,8 @@ sidebar:
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `fadeTime` | `number` | `600` | 淡出时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待淡出结束 |
 
 ---
 
@@ -579,6 +605,8 @@ sidebar:
 | `loop` | `boolean` | `false` | 是否循环播放 |
 | `volume` | `number` | `1` | 音量，范围 0 ~ 1 |
 | `fadeTime` | `number` | `600` | 渐入时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待渐入结束 |
 
 ---
 
@@ -593,6 +621,8 @@ sidebar:
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `fadeTime` | `number` | `600` | 淡出时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待淡出结束 |
 
 ---
 
@@ -659,6 +689,8 @@ sidebar:
 | `loop` | `boolean` | `false` | 是否循环播放 |
 | `volume` | `number` | `1` | 音量，范围 0 ~ 1 |
 | `fadeTime` | `number` | `600` | 渐入时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待渐入结束 |
 
 ---
 
@@ -674,6 +706,8 @@ sidebar:
 | --- | --- | --- | --- |
 | `channel` | `string` | *必填* | 要停止的通道名称 |
 | `fadeTime` | `number` | `600` | 淡出时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待淡出结束 |
 
 ---
 
