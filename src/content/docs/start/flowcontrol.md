@@ -618,7 +618,7 @@ sidebar:
     ##
 
     @bg src="bg/school.png"
-    @bgm src="audio/bgm/morning.opus"
+    @bgm src="bgm/morning.opus"
 
     [Alice] "新的一天开始了。"
 

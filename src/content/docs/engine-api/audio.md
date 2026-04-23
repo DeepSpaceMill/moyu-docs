@@ -15,7 +15,7 @@ import { executePluginCommand } from '@momoyu-ink/kit';
 executePluginCommand('audio', {
   subCommand: 'load',
   name: 'bgm',
-  src: 'audio/bgm/theme.opus',
+  src: 'bgm/theme.opus',
   settings: { loop: true, volume: 0.8 },
 });
 
@@ -44,7 +44,7 @@ executePluginCommand('audio', {
 executePluginCommand('audio', {
   subCommand: 'load',
   name: 'bgm',               // 实例名（唯一标识）
-  src: 'audio/bgm/theme.opus', // 文件路径
+  src: 'bgm/theme.opus', // 文件路径
   settings: {                 // 可选：初始设置
     loop: true,
     volume: 0.8,

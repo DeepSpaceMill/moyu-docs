@@ -44,7 +44,7 @@ import { FileTree } from '@astrojs/starlight/components';
 ::entry{
     @bg src="bg/classroom.png"
     @charEnter name="Alice" src="characters/alice/normal.png"
-    @bgm src="audio/bgm/theme.opus"
+    @bgm src="bgm/theme.opus"
 }
 ```
 
@@ -159,16 +159,16 @@ import { FileTree } from '@astrojs/starlight/components';
 
 ```sixu
 // 播放背景音乐（默认循环）
-@bgm src="audio/bgm/theme.opus" volume=0.8 fadeTime=1000
+@bgm src="bgm/theme.opus" volume=0.8 fadeTime=1000
 
 // 停止背景音乐
 @bgmStop fadeTime=600
 
 // 播放音效（不循环）
-@sfx src="audio/sfx/door.opus"
+@sfx src="sfx/door.opus"
 
 // 播放角色语音
-@voice src="audio/voice/alice_001.opus" name="Alice"
+@voice src="voice/alice_001.opus" name="Alice"
 ```
 
 #### 流程控制
@@ -206,10 +206,10 @@ import { FileTree } from '@astrojs/starlight/components';
     @charEnter name="Alice" src="characters/alice/normal.png" preset="left" fadeTime=500
 
     // 播放背景音乐
-    @bgm src="audio/bgm/theme.opus"
+    @bgm src="bgm/theme.opus"
 
-    // 对话
-    旁白："故事从这里开始……"
+    // 旁白
+    "故事从这里开始……"
 
     [Alice] "你好！我是Alice。"
 

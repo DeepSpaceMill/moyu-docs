@@ -533,19 +533,19 @@ sidebar:
 播放背景音乐。同一时间只能有一首背景音乐，调用新的 `bgm` 会替换当前播放的。
 
 ```sixu
-@bgm src="audio/bgm/theme.opus"
+@bgm src="bgm/theme.opus"
 ```
 
 自定义音量和渐入时间：
 
 ```sixu
-@bgm src="audio/bgm/battle.opus" volume=0.8 fadeTime=1000
+@bgm src="bgm/battle.opus" volume=0.8 fadeTime=1000
 ```
 
 不循环播放：
 
 ```sixu
-@bgm src="audio/bgm/ending.opus" loop=false
+@bgm src="bgm/ending.opus" loop=false
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -590,13 +590,13 @@ sidebar:
 :::
 
 ```sixu
-@sfx src="audio/sfx/door_open.opus"
+@sfx src="sfx/door_open.opus"
 ```
 
 循环音效：
 
 ```sixu
-@sfx src="audio/sfx/rain.opus" loop=true volume=0.5
+@sfx src="sfx/rain.opus" loop=true volume=0.5
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -635,13 +635,13 @@ sidebar:
 :::
 
 ```sixu
-@voice src="audio/voice/alice_001.opus" name="Alice"
+@voice src="voice/alice_001.opus" name="Alice"
 ```
 
 不指定角色名（使用默认通道）：
 
 ```sixu
-@voice src="audio/voice/narrator_001.opus"
+@voice src="voice/narrator_001.opus"
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -679,7 +679,7 @@ sidebar:
 :::
 
 ```sixu
-@sound channel="rain" src="audio/sfx/rain_loop.opus" loop=true volume=0.3
+@sound channel="rain" src="sfx/rain_loop.opus" loop=true volume=0.3
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |

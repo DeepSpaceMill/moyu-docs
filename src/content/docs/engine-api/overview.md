@@ -61,7 +61,7 @@ import { executePluginCommand } from '@momoyu-ink/kit';
 const result = executePluginCommand('audio', {
   subCommand: 'load',
   name: 'bgm',
-  src: 'audio/bgm/theme.opus',
+  src: 'bgm/theme.opus',
 });
 ```
 
