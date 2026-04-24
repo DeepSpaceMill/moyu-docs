@@ -37,6 +37,12 @@ sidebar:
 | [bg](#bg) | 切换背景图片 |
 | [bgTint](#bgtint) | 设置背景色调 |
 
+### 镜头
+
+| 命令 | 说明 |
+| --- | --- |
+| [camera](#camera) | 设置镜头焦点、推近、景深和背景模糊 |
+
 ### 角色
 
 | 命令 | 说明 |
@@ -335,6 +341,61 @@ sidebar:
 | `fadeTime` | `number` | `1000` | 渐变过渡时间（毫秒） |
 | `skippable` | `boolean` | `false` | 是否允许玩家点击跳过渐变 |
 | `noWait` | `boolean` | `false` | 是否跳过等待过渡完成，设为 `true` 可与后续命令并行执行 |
+
+---
+
+## 镜头
+
+### camera
+
+设置景深镜头。该命令用于控制镜头焦点、推近程度、背景视差和背景模糊。默认情况下，脚本会等待镜头过渡完成后再继续执行。
+
+:::note
+此命令默认会阻塞脚本执行，等待 `fadeTime` 结束后才继续。设置 `noWait=true` 可以跳过等待，实现与后续命令并行执行。如果 `skippable=true`，玩家可以点击跳过等待。
+:::
+
+使用预设：
+
+```sixu
+@camera preset="close-right"
+```
+
+显式指定镜头参数：
+
+```sixu
+@camera x=180 y=-60 zoom=1.16 depth=0.5 blur=3 fadeTime=700
+```
+
+重置镜头：
+
+```sixu
+@camera preset="reset"
+```
+
+不等待镜头过渡完成：
+
+```sixu
+@camera preset="dramatic-center" fadeTime=900 noWait=true
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `preset` | `"reset" \| "close-center" \| "close-left" \| "close-right" \| "dramatic-center"` | — | 内建镜头预设 |
+| `x` | `number` | `0` | 焦点 X，坐标系以画面中心为原点，向右为正 |
+| `y` | `number` | `0` | 焦点 Y，坐标系以画面中心为原点，向下为正 |
+| `zoom` | `number` | `1` | 镜头推近倍数 |
+| `depth` | `number` | `0` | 背景相对角色层的落后程度 |
+| `blur` | `number` | `0` | 背景模糊半径 |
+| `fadeTime` | `number` | `600` | 镜头过渡时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过镜头等待 |
+| `noWait` | `boolean` | `false` | 是否跳过等待过渡完成，设为 `true` 可与后续命令并行执行 |
+
+解析规则如下：
+
+- 指定 `preset` 时，先展开预设值，再用显式字段覆写。
+- 未填写的字段回落到预设值或中性默认值，不沿用当前镜头状态。
+
+当前内建预设为 `reset`、`close-center`、`close-left`、`close-right` 和 `dramatic-center`。关于镜头层的运行时结构和两层视差计算，见 [景深镜头](/customize/camera/)。
 
 ---
 

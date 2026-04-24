@@ -20,6 +20,34 @@ sidebar:
 
 标准框架提供了以下内置图层（Actor）：
 
+### CameraActor / BackgroundPlane / CharacterPlane — 镜头层
+
+景深镜头采用组合式装配，而不是让镜头层直接拥有背景或角色 Actor。
+
+```typescript title="src/pages/stage.tsx"
+export function Stage() {
+  return (
+    <StageContextProvider stage={stage}>
+      <CameraActor>
+        <BackgroundPlane>
+          <BackgroundActor />
+        </BackgroundPlane>
+        <CharacterPlane>
+          <CharacterActor />
+        </CharacterPlane>
+      </CameraActor>
+      <TextBoxActor onButtonClick={handleButtonClick} />
+      <BGMActor />
+      <VoiceActor />
+      <SfxActor />
+      <SoundActor />
+    </StageContextProvider>
+  );
+}
+```
+
+`CameraActor` 监听 `gameState.camera`，维护镜头过渡所需的 spring 运行时；`BackgroundPlane` 和 `CharacterPlane` 读取同一份运行时，但使用不同的位移与缩放参数。`BackgroundActor` 和 `CharacterActor` 仍然只负责自身内容渲染，不感知镜头命令的细节。
+
 ### BackgroundActor — 背景
 
 监听 `gameState.background`，使用 react-spring 的 `useTransition` 实现背景切换的淡入淡出动画。
@@ -197,8 +225,14 @@ export function SfxActor() {
 export function Stage() {
   return (
     <StageContextProvider stage={stage}>
-      <BackgroundActor />
-      <CharacterActor />
+      <CameraActor>
+        <BackgroundPlane>
+          <BackgroundActor />
+        </BackgroundPlane>
+        <CharacterPlane>
+          <CharacterActor />
+        </CharacterPlane>
+      </CameraActor>
       <TextBoxActor onButtonClick={handleButtonClick} />
       <BGMActor />
       <VoiceActor />
@@ -281,8 +315,14 @@ export function Stage() {
   return (
     <StageContextProvider stage={stage}>
       <ShakeActor>
-        <BackgroundActor />
-        <CharacterActor />
+        <CameraActor>
+          <BackgroundPlane>
+            <BackgroundActor />
+          </BackgroundPlane>
+          <CharacterPlane>
+            <CharacterActor />
+          </CharacterPlane>
+        </CameraActor>
       </ShakeActor>
       <TextBoxActor onButtonClick={handleButtonClick} />
       <BGMActor />
@@ -294,4 +334,4 @@ export function Stage() {
 }
 ```
 
-现在 `ShakeActor` 包裹了背景和角色——震动时，这两个层会一起移动，而文本框保持不动。
+现在 `ShakeActor` 包裹的是镜头层本身。震动会同时作用于背景平面和角色平面，而文本框保持不动。

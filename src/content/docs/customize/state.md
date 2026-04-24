@@ -43,6 +43,7 @@ import { gameState } from '../state/game';
 ```typescript
 gameState.story        // 故事信息
 gameState.background   // 背景状态
+gameState.camera       // 镜头状态
 gameState.character    // 角色状态
 gameState.textbox      // 文本框状态
 gameState.bgm          // 背景音乐状态
@@ -67,6 +68,19 @@ interface BackgroundState {
   fadeTime: number;     // 渐变时长（毫秒）
   tint?: string;        // 着色（CSS 颜色值）
   skippable: boolean;   // 渐变是否可跳过
+}
+```
+
+### camera — 镜头
+
+```typescript
+interface CameraState {
+  x: number;          // 焦点 X，坐标系以画面中心为原点
+  y: number;          // 焦点 Y，坐标系以画面中心为原点
+  zoom: number;       // 角色平面的缩放倍数
+  depth: number;      // 背景层相对角色层的跟随程度
+  blur: number;       // 背景模糊半径
+  fadeTime: number;   // 镜头过渡时长
 }
 ```
 
