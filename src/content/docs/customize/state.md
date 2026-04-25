@@ -229,7 +229,7 @@ interface SettingsData {
   volume_voice: number;   // 语音音量（0~1）
   text_speed: number;     // 文字速度（倍率）
   auto_interval: number;  // 自动播放间隔（秒）
-  skip_voice: boolean;    // 快进时是否跳过语音
+  skip_voice: boolean;    // 手动翻页时是否停止当前语音
 }
 ```
 
@@ -237,7 +237,9 @@ interface SettingsData {
 
 - **自动持久化** — 修改 `settingsState` 后，会自动防抖保存（300ms）到引擎的永久变量中
 - **自动应用显示设置** — 修改 `display` 值后，会自动调用系统 API 调整窗口大小或切换全屏
+- **自动同步文字速度** — 修改 `text_speed` 值后，会作为倍率作用到文本框打印速度和设置页预览
 - **自动同步 Auto 间隔** — 修改 `auto_interval` 值后，会自动同步到 Kit 的 `setDefaultAutoTailMs()`，用于自动播放模式的推进间隔
+- **翻页时可选停止语音** — 启用 `skip_voice` 后，手动翻页会停止当前行尚未播放完的语音；关闭时语音会继续播放，直到自然结束或被下一条语音覆盖
 - **启动时恢复** — 引擎启动时，自动从永久变量中加载上次保存的设置
 
 ```typescript
