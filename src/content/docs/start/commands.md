@@ -284,6 +284,8 @@ sidebar:
 
 切换背景图片，支持渐变过渡效果。执行后脚本将等待渐变完成。
 
+当 `src` 的后缀为 `.mp4` 或 `.webm` 时，背景会以**循环播放的视频**形式显示，并且静音播放。视频背景同样支持 `fadeTime` 渐变和 `bgTint` 色调叠加。
+
 :::note
 此命令默认会阻塞脚本执行，等待 `fadeTime` 结束后才继续。设置 `noWait=true` 可以跳过等待，实现与后续命令并行执行。如果 `skippable=true`，玩家可以点击跳过等待。
 :::
@@ -310,9 +312,15 @@ sidebar:
 @bg src="bg/night.png" fadeTime=1500 noWait=true
 ```
 
+使用循环视频作为背景：
+
+```sixu
+@bg src="bg/rain.webm"
+```
+
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `src` | `string` | *必填* | 背景图片的素材路径（相对于 `assets/`） |
+| `src` | `string` | *必填* | 背景的素材路径（相对于 `assets/`）；后缀为 `.mp4` 或 `.webm` 时以循环静音视频显示，其他情况按图片处理 |
 | `fadeTime` | `number` | `1000` | 渐变过渡时间（毫秒） |
 | `skippable` | `boolean` | `false` | 是否允许玩家点击跳过渐变 |
 | `noWait` | `boolean` | `false` | 是否跳过等待过渡完成，设为 `true` 可与后续命令并行执行 |
