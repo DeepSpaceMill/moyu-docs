@@ -11,7 +11,7 @@ sidebar:
 使用 `engine:pack` 命令完成从构建到打包的全流程：
 
 ```bash
-npm run engine:pack -- --target=<平台> [--compress] [--output=<路径>]
+yarn run engine:pack -- --target=<平台> [--compress] [--output=<路径>]
 ```
 
 | 参数 | 说明 |
@@ -27,18 +27,18 @@ npm run engine:pack -- --target=<平台> [--compress] [--output=<路径>]
 3. 输出到目标目录，或压缩为 `game.zip`
 
 :::note
-打包前需要先通过 `npm run engine:update` 下载引擎文件。
+打包前需要先通过 `yarn run engine:update` 下载引擎文件。
 :::
 
 ## Windows / Linux
 
 ```bash
 # 输出到 .moyu/release/<时间戳>/game/
-npm run engine:pack -- --target=windows
-npm run engine:pack -- --target=linux
+yarn run engine:pack -- --target=windows
+yarn run engine:pack -- --target=linux
 
 # 压缩为 .moyu/release/<时间戳>/game.zip
-npm run engine:pack -- --target=windows --compress
+yarn run engine:pack -- --target=windows --compress
 ```
 
 打包产物包含：
@@ -54,10 +54,10 @@ npm run engine:pack -- --target=windows --compress
 
 ```bash
 # 输出到 .moyu/release/<时间戳>/game/
-npm run engine:pack -- --target=web
+yarn run engine:pack -- --target=web
 
 # 压缩为 .moyu/release/<时间戳>/game.zip
-npm run engine:pack -- --target=web --compress
+yarn run engine:pack -- --target=web --compress
 ```
 
 打包产物包含：

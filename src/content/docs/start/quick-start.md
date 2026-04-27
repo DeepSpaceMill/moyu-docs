@@ -31,7 +31,7 @@ git clone https://github.com/DeepSpaceMill/framework.git my-vn-project
 
 ```bash
 cd my-vn-project
-npm install
+yarn install
 ```
 
 ## 安装和更新引擎本体
@@ -40,7 +40,7 @@ npm install
 你可以通过以下命令来安装引擎：
 
 ```bash
-npm run engine:update
+yarn run engine:update
 ```
 
 这一命令用于从远端服务器获取最新的引擎版本，并将其安装到你的项目中。请确保在运行此命令之前已经连接到互联网。
@@ -50,7 +50,7 @@ npm run engine:update
 安装完成后，你可以通过以下命令启动开发服务器：
 
 ```bash
-npm run dev
+yarn run dev
 ```
 
 之后，开启一个**新的控制台窗口**：
@@ -58,13 +58,13 @@ npm run dev
 如果你想要使用本地程序来预览你的视觉小说，可以运行以下命令：
 
 ```bash
-npm run engine:native
+yarn run engine:native
 ```
 
 如果你更喜欢在浏览器中预览，可以运行：
 
 ```bash
-npm run engine:web
+yarn run engine:web
 ```
 
 二者均支持热更新，这意味着你在编辑代码时，预览窗口会自动无刷新更新以显示最新的更改。

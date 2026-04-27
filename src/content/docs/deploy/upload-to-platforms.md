@@ -6,7 +6,7 @@ sidebar:
 
 Web 版游戏可以发布到支持静态文件托管的平台，如 Cloudflare Pages、GitHub Pages、Netlify、Vercel 等，或专门的 HTML5 游戏平台如 itch.io。
 
-在阅读以下指南前，请确保已经使用 `npm run engine:pack -- --target=web --compress` 命令打包了 Web 版本游戏。
+在阅读以下指南前，请确保已经使用 `yarn run engine:pack -- --target=web --compress` 命令打包了 Web 版本游戏。
 
 ## 发布到 Cloudflare Pages
 
@@ -14,7 +14,7 @@ Web 版游戏可以发布到支持静态文件托管的平台，如 Cloudflare P
 2. 连接你的 Git 仓库，或选择「直接上传」
 3. 若使用直接上传，将 `game/` 目录中的全部文件或单个压缩包上传即可
 4. 若通过 Git 集成，在构建设置中填写：
-   - **构建命令**：`npm run engine:pack -- --target=web --output=./out`
+   - **构建命令**：`yarn run engine:pack -- --target=web --output=./out`
    - **输出目录**：`out/game`
 
 :::caution

@@ -102,27 +102,27 @@ addEventListener('ready', () => {
 
 ```bash
 # 开发模式（启动开发服务器，支持热更新）
-npm run dev
+yarn run dev
 
 # 构建生产版本
-npm run build
+yarn run build
 
 # 使用引擎预览（原生窗口）
-npm run engine:native
+yarn run engine:native
 
 # 使用引擎预览（浏览器）
-npm run engine:web
+yarn run engine:web
 
 # 更新引擎版本
-npm run engine:update
+yarn run engine:update
 ```
 
 ### 开发流程
 
 推荐的开发流程：
 
-1. 在一个终端运行 `npm run dev` 启动开发服务器
-2. 在另一个终端运行 `npm run engine:native`（或 `engine:web`）启动引擎
+1. 在一个终端运行 `yarn run dev` 启动开发服务器
+2. 在另一个终端运行 `yarn run engine:native`（或 `engine:web`）启动引擎
 3. 修改代码后，引擎会自动热更新
 
 ## 核心模块速览
