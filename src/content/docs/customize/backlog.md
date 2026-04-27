@@ -42,15 +42,25 @@ useEffect(() => {
 
 ### 文本行
 
-每次剧本引擎输出文本行时，自动记录说话人和对话内容：
+每次剧本引擎输出文本行时，自动记录说话人、语音文件名和对话内容。
+标准框架支持在前导内容中用 `|` 同时指定说话人和语音，例如 `[Alice|alice_001]`，此时 `voice` 字段会自动写入记录：
 
 ```typescript
 export const handleTextLine: TextLineHandler = (e, control) => {
+  // Parse leading: "Alice|alice_001" → { speaker: 'Alice', voice: 'alice_001' }
+  const { speaker, voice } = parseTextLeading(e.leading);
+
+  // If a voice file is specified, play it before printing
+  if (voice) {
+    handleVoice({ command: 'voice', src: `voice/${voice}.opus`, name: speaker, volume: 1 }, control);
+  }
+
   // ...处理文本显示...
 
   recordBacklog(control, {
     kind: 'text',
-    speaker: e.leading || '',
+    speaker,
+    voice,   // empty string when no voice
     text: e.text || '',
   });
 
@@ -143,7 +153,8 @@ function BacklogPage() {
 export type BacklogMeta =
   | {
       kind: 'text';
-      speaker: string;  // 说话人名称
+      speaker: string;   // 说话人名称
+      voice?: string;    // 语音文件名（不含路径和扩展名）
       text: string;      // 对话内容
     }
   | {
@@ -153,8 +164,8 @@ export type BacklogMeta =
 
 export interface BacklogRecord {
   id: string;           // 唯一标识（格式：record-{timestamp}-{serial}）
-  createdAt: number;     // 创建时间戳（毫秒）
-  meta: BacklogMeta;     // 元数据
+  createdAt: number;    // 创建时间戳（毫秒）
+  meta: BacklogMeta;    // 元数据
 }
 ```
 
@@ -191,42 +202,60 @@ const jumpToRecord = async (recordId: string) => {
 跳转后，目标记录之后的所有历史会被丢弃。玩家无法再回到跳转前的位置。这与存档/读档行为一致。
 :::
 
-## 自定义记录元数据
+## 语音重播
 
-你可以扩展 `BacklogMeta` 类型来记录额外的信息。例如，添加语音记录：
+标准框架已内置语音重播功能。当历史记录中存在 `voice` 字段时，Backlog 页面会在说话人名称前显示一个语音图标按钮，点击后可重新播放对应语音。实现示例：
 
-```tsx
-// 1. 扩展元数据类型
-export type BacklogMeta =
-  | { kind: 'text'; speaker: string; text: string; voice?: string }
-  | { kind: 'selection'; options: string[] };
+```typescript
+// src/pages/backlog.tsx
+async function replayBacklogVoice(speaker: string, voice: string) {
+  const channelName = speaker
+    ? `voice:backlog:${speaker}`
+    : 'voice:backlog:default';
 
-// 2. 在命令处理器中传入额外数据
-export const handleTextLine: TextLineHandler = (e, control) => {
-  // ...
-
-  recordBacklog(control, {
-    kind: 'text',
-    speaker: e.leading || '',
-    text: e.text || '',
-    voice: currentVoice, // 自定义字段
+  await executePluginCommand('audio', {
+    subCommand: 'load',
+    name: channelName,
+    src: `voice/${voice}.opus`,
+    settings: { autoPlay: false, volume: 1 },
   });
 
-  control.hold();
-};
+  await executePluginCommand('audio', {
+    subCommand: 'play',
+    name: channelName,
+    fadeTime: 0,
+  });
+}
+```
 
-// 3. 在 BacklogRow 中展示
-function BacklogRow({ record }: { record: BacklogRecord }) {
+图标使用 `ui/backlog_voice.png`（28×28）。有语音的条目中，说话人文字会向右偏移，为图标留出空间：
+
+```tsx
+function BacklogRow({ record, y, onJump }: BacklogRowProps) {
+  const voice = record.meta.kind === 'text' ? (record.meta.voice || '') : '';
+  const titleX = voice ? 44 : 0;
+
   return (
-    <container>
-      <text text={record.meta.text} />
-      {record.meta.kind === 'text' && record.meta.voice && (
-        <Button text="🔊" onClick={() => playVoice(record.meta.voice)} />
-      )}
+    <container y={y}>
+      {voice ? (
+        <Button
+          fileNames={['ui/backlog_voice.png', 'ui/backlog_voice.png', 'ui/backlog_voice.png']}
+          onClick={(event) => {
+            event.stopPropagation();
+            void replayBacklogVoice(title, voice);
+          }}
+        />
+      ) : null}
+      <text text={title} x={titleX} />
+      <text text={content} x={140} />
     </container>
   );
 }
 ```
+
+## 自定义记录元数据
+
+你可以进一步扩展 `BacklogMeta` 类型来记录更多自定义信息，方法与上面的 `voice` 字段完全相同：在 `BacklogMeta` 中添加可选字段，在 `handleTextLine` 的 `recordBacklog` 调用中写入，在 `BacklogRow` 中读取渲染即可。
 
 ## 自定义 Backlog 页面
 
