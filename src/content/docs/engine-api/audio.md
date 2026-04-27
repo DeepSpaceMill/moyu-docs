@@ -6,6 +6,15 @@ sidebar:
 
 音频系统通过 `executePluginCommand('audio', ...)` 进行控制。引擎提供了灵活的音频实例管理，每个音频由一个唯一的 `name` 标识。
 
+除 `load` 之外，大多数命令的 `name` 都支持两种形式：
+
+- 具体实例名：例如 `bgm`、`voice_alice`
+- wildcard 模式：例如 `voice:*`
+
+当 `name` 是 wildcard 模式时，命令会批量作用到所有匹配的实例；若一个也没匹配到，则会报错。`load` 是例外，它必须使用具体实例名，不能用 wildcard 创建实例。
+
+当前 wildcard 语法只支持 `*`，不支持 `?`、`[]`、`{}` 等更复杂的 glob 语法。
+
 ## 基本用法
 
 ```typescript
@@ -16,7 +25,7 @@ executePluginCommand('audio', {
   subCommand: 'load',
   name: 'bgm',
   src: 'bgm/theme.opus',
-  settings: { loop: true, volume: 0.8 },
+  settings: { loopRegion: [0, -1], volume: 0.8 },
 });
 
 // 播放
@@ -40,13 +49,15 @@ executePluginCommand('audio', {
 
 加载音频文件并创建一个音频实例。如果同名实例已存在，会先释放旧实例。
 
+`load` 的 `name` 必须是具体实例名，不能是 wildcard 模式。
+
 ```typescript
 executePluginCommand('audio', {
   subCommand: 'load',
   name: 'bgm',               // 实例名（唯一标识）
   src: 'bgm/theme.opus', // 文件路径
   settings: {                 // 可选：初始设置
-    loop: true,
+    loopRegion: [0, -1],
     volume: 0.8,
   },
 });
@@ -62,14 +73,13 @@ executePluginCommand('audio', {
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `volume` | `number` | `1` | 音量（0~1） |
-| `loop` | `boolean` | `false` | 是否循环 |
+| `volume` | `number` | `1` | 音量（通常为 0~1，允许大于 1 用于放大） |
 | `loopRegion` | `[number, number]` | — | 循环区间（秒），`-1` 表示到末尾 |
 | `playbackRate` | `number` | `1` | 播放速率 |
 | `panning` | `number` | `0` | 声像（-1 左 ~ 0 中 ~ 1 右） |
 | `startPosition` | `number` | `0` | 起始播放位置（秒） |
 | `reverse` | `boolean` | `false` | 是否倒放 |
-| `delayTime` | `number` | — | 延迟播放时长（毫秒） |
+| `delayTime` | `number` | — | 延迟播放时长（秒） |
 | `fadeTime` | `number` | — | 渐入时长（毫秒） |
 | `autoPlay` | `boolean` | `false` | 加载后自动播放 |
 
@@ -85,7 +95,7 @@ executePluginCommand('audio', {
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `name` | `string` | 实例名称 |
+| `name` | `string` | 实例名称；支持具体实例名或 wildcard 模式 |
 | `fadeTime` | `number` | 可选，渐入时长（毫秒） |
 | `waitForEnd` | `boolean` | 可选。为 `true` 时，命令会返回一个在自然播放结束后 resolve 的 Promise |
 
@@ -170,6 +180,34 @@ executePluginCommand('audio', {
 | `volume` | `number` | 目标音量（0~1） |
 | `fadeTime` | `number` | 可选，渐变时长 |
 
+> `setVolume` 设置的是这个实例自己的局部音量。若该 `name` 还配置了
+> `setGlobalVolume`，最终输出音量会是 `audio.volume × globalVolume(name)`。
+
+### setGlobalVolume — 设置全局音量缩放
+
+```typescript
+executePluginCommand('audio', {
+  subCommand: 'setGlobalVolume',
+  name: 'bgm',
+  volume: 0.5,
+});
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `name` | `string` | 规则名称；支持具体实例名或 wildcard 模式 |
+| `volume` | `number` | 全局缩放系数（0~1） |
+
+说明：
+
+- `name` 为具体实例名时，保存一条精确规则。
+- `name` 为 wildcard 模式时，保存一条 wildcard 规则，并立即重算当前已命中的实例。
+- 最终输出音量 = 该实例的局部音量 `audio.volume × globalVolume(name)`。
+- 若当前没有匹配到实例，规则仍会保留，后续新创建的实例也会按最新规则解析全局音量。
+- 精确规则优先于 wildcard 规则。
+- 同时命中多个 wildcard 规则时，最后写入的规则优先。
+- 未显式设置过的 `name` 默认按 `1.0` 计算。
+
 ### seekTo — 跳转到指定时间
 
 ```typescript
@@ -232,8 +270,17 @@ executePluginCommand('audio', {
 | 通道 | 实例命名规则 | 说明 |
 |------|-------------|------|
 | BGM | `'bgm'` | 单实例，循环播放，由 BGMActor 管理 |
-| SFX | `'sfx_{seq}'` | 每次播放创建独立实例，由 SfxActor 管理 |
-| Voice | `'voice'` 或 `'voice_{name}'` | 按角色分通道，由 VoiceActor 管理 |
-| Sound | 自定义 `channel` 名 | 命名通道，由 SoundActor 管理 |
+| SFX | `'sfx'` | 单实例，由 SfxActor 用 `seq` 触发播放 |
+| Voice | `'voice'` 或 `'voice:${name}'` | 按角色分通道，由 VoiceActor 管理 |
+| Sound | `'sound:${channel}'` | 命名通道，由 SoundActor 管理 |
 
 你可以根据需要使用任意命名策略来管理音频实例。
+
+标准框架在启动和设置变更时，会把 `volume_bgm`、`volume_se`、`volume_voice`
+同步到 framework 自己约定的音频 name 上：
+
+- `volume_bgm -> 'bgm'`
+- `volume_se -> 'sfx'` 与 `'sound:*'`
+- `volume_voice -> 'voice'` 与 `'voice:*'`
+
+因此，标准框架中的语音子通道和命名 sound 通道都会自动继承设置界面的全局音量。
