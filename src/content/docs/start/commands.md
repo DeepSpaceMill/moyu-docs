@@ -641,6 +641,7 @@ sidebar:
 | `src` | `string` | *必填* | 音频文件的素材路径 |
 | `loop` | `boolean` | `true` | 是否循环播放 |
 | `volume` | `number` | `1` | 音量，范围 0 ~ 1 |
+| `waitForEnd` | `boolean` | `false` | 是否阻塞剧情直到音频自然播放完毕 |
 | `fadeTime` | `number` | `600` | 渐入时间（毫秒） |
 | `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
 | `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待渐入结束 |
@@ -692,6 +693,7 @@ sidebar:
 | `src` | `string` | *必填* | 音频文件的素材路径 |
 | `loop` | `boolean` | `false` | 是否循环播放 |
 | `volume` | `number` | `1` | 音量，范围 0 ~ 1 |
+| `waitForEnd` | `boolean` | `false` | 是否阻塞剧情直到音频自然播放完毕 |
 | `fadeTime` | `number` | `600` | 渐入时间（毫秒） |
 | `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
 | `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待渐入结束 |
@@ -745,6 +747,7 @@ sidebar:
 | `src` | `string` | *必填* | 语音文件的素材路径 |
 | `name` | `string` | — | 角色名称，用于标识语音通道 |
 | `volume` | `number` | `1` | 音量，范围 0 ~ 1 |
+| `waitForEnd` | `boolean` | `false` | 是否阻塞剧情直到语音自然播放完毕（与自动播放模式的等待相互独立） |
 
 ---
 
@@ -784,6 +787,7 @@ sidebar:
 | `src` | `string` | *必填* | 音频文件的素材路径 |
 | `loop` | `boolean` | `false` | 是否循环播放 |
 | `volume` | `number` | `1` | 音量，范围 0 ~ 1 |
+| `waitForEnd` | `boolean` | `false` | 是否阻塞剧情直到音频自然播放完毕 |
 | `fadeTime` | `number` | `600` | 渐入时间（毫秒） |
 | `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
 | `noWait` | `boolean` | `true` | 是否跳过等待过渡完成，设为 `false` 可等待渐入结束 |
