@@ -469,3 +469,31 @@ function TextBoxActor() {
   });
 }
 ```
+
+### Seek（快速定位）
+
+Seek 是程序触发的快速推进机制，与用户按 Ctrl 的 Skip 不同，仅用于外部调试工具。Seek 有两种形态：
+
+- **`'fast-forward'`**：快速推进。`hold()` 和 `setWaiting()` 立即调用 `nextLine()` 完成当前步骤。
+- **`'warp'`**：极速跳转。`hold()` 和 `setWaiting()` 均为空操作（no-op），命令被逐条派发但流程控制完全被绕过。比 fast-forward 速度更快，剧本将无感知地跳到对应位置。
+
+Actor 可通过以下两个 API 感知当前是否处于 Seek 状态，从而跳过不适合在快进中执行的副作用（如音效播放、长时动画）：
+
+```typescript
+import { useIsSeeking, getSeekingType } from '@momoyu-ink/kit';
+
+function MyActor() {
+  // Reactive hook: returns true whenever any seek is active.
+  // Use inside React components.
+  const isSeeking = useIsSeeking();
+
+  // Non-reactive function: returns the current seek type.
+  // Use inside callbacks or effects where a hook cannot be called.
+  const type = getSeekingType(); // 'fast-forward' | 'warp' | null
+}
+```
+
+| API | 类型 | 说明 |
+|-----|------|------|
+| `useIsSeeking()` | React Hook | 响应式读取 seek 激活状态。fast-forward 和 warp 均返回 `true`，无 seek 时返回 `false` |
+| `getSeekingType()` | 普通函数 | 返回当前 seek 类型：`'fast-forward'`、`'warp'` 或 `null`（无 seek）。适合在事件回调或 ref 中使用 |
