@@ -24,19 +24,19 @@ sidebar:
 
 ```sixu
 // 不使用块：属性只作用于紧随的一行
-#[if("has_key")]
+#[if("ARCHIVE.has_key")]
 @bg src="bg/secret_room.png"   // 仅此行受条件控制
 [Alice] "门开了。"                    // 这行始终会执行
 
 // 使用块：属性作用于整个块
-#[if("has_key")]
+#[if("ARCHIVE.has_key")]
 {
     @bg src="bg/secret_room.png"
     [Alice] "门开了。"               // 这行也受条件控制
 }
 ```
 
-块也可以单独使用，形成一个局部作用域，配合 `#leave` 可以提前退出：
+块也可以单独使用，形成一个控制流边界，配合 `#leave` 可以提前退出：
 
 ```sixu
 ::entry {
@@ -49,6 +49,10 @@ sidebar:
 }
 ```
 
+:::note
+普通块本身**不会创建新的变量作用域**。段落局部变量会在内外层块之间共享；块的作用主要是把多行内容组合成一个整体，并提供 `#leave` 这样的控制流边界。
+:::
+
 块可以任意嵌套。
 
 ---
@@ -57,13 +61,23 @@ sidebar:
 
 **脚本块**用于在思绪脚本中内联执行 JavaScript 代码，适合读写游戏变量、执行逻辑计算等。
 
+在 Moyu 运行时中，脚本块与条件表达式共享同一套受控环境。读取或写入剧情变量时，需要显式通过以下对象访问：
+
+- `LOCAL`：当前段落的局部变量，适合存放只在这一段流程中短暂有效的数据
+- `ARCHIVE`：当前存档变量
+- `GLOBAL`：跨存档的全局持久变量
+
 **单行脚本**：使用 `@{...}` 或 `## ... ##` 语法，在一行内执行一个 JavaScript 表达式：
 
 ```sixu
+// 修改当前段落的局部变量
+@{LOCAL.affinity_delta = (LOCAL.affinity_delta ?? 0) + 10}
+
 // 修改存档变量
-@{ARCHIVE.affinity += 10}
 @{ARCHIVE.route = 'library'}
-## ARCHIVE.foo = 'bar' ##
+
+// 修改全局变量
+## GLOBAL.foo = 'bar' ##
 
 // 可以执行任意 JavaScript 表达式
 @{ARCHIVE.dialogIndex = Math.min(ARCHIVE.dialogIndex + 1, 5)}
@@ -76,16 +90,16 @@ sidebar:
     [Alice] "让我来记录一下今天的进度。"
 
     ##
-        ARCHIVE.day += 1;
-        if (ARCHIVE.day === 1) {
+        LOCAL.day = (LOCAL.day ?? 0) + 1;
+        if (LOCAL.day === 1) {
             ARCHIVE.route = 'library';
         }
     ##
 
     // 或
     @{
-        ARCHIVE.day += 1;
-        if (ARCHIVE.day === 1) {
+        LOCAL.day = (LOCAL.day ?? 0) + 1;
+        if (LOCAL.day === 1) {
             ARCHIVE.route = 'library';
         }
     }
@@ -95,14 +109,53 @@ sidebar:
 ```
 
 :::note
-单行脚本与多行脚本在功能上完全等价，选择哪种形式取决于代码的复杂程度。脚本块中可以使用完整的 JavaScript 语法，但**脚本块中的局部变量不会在不同脚本块之间共享**。要持久化数据，请使用下文介绍的存档变量（`ARCHIVE`）或全局持久变量（`GLOBAL`）。
+单行脚本与多行脚本在功能上完全等价，选择哪种形式取决于代码的复杂程度。脚本块中可以使用完整的 JavaScript 语法，但有两个边界需要注意：
+
+1. 使用 `let` / `const` / `var` 声明的 **JavaScript 变量** 不会在不同脚本块之间共享。
+2. 变量必须显式使用 `LOCAL.xxx` / `ARCHIVE.xxx` / `GLOBAL.xxx` 读写。
+
+如果要在当前段落内暂存数据，请使用 `LOCAL`；如果要跟随存档保存，请使用 `ARCHIVE`；如果要跨存档永久保留，请使用 `GLOBAL`。
 :::
 
 ---
 
 ## 变量系统
 
-思绪提供了两种持久化变量：**存档变量（ARCHIVE）**和**全局持久变量（GLOBAL）**，用于存储游戏状态和跨存档的永久数据。
+运行时提供三类常用变量空间：**段落局部变量（LOCAL）**、**存档变量（ARCHIVE）**和**全局持久变量（GLOBAL）**。其中 `ARCHIVE` 和 `GLOBAL` 是持久化变量，`LOCAL` 则绑定到当前段落调用。
+
+### 段落局部变量（LOCAL）
+
+每次进入段落时，都会创建一组段落局部变量。它们适合存放只在当前段落中短暂有效的数据，例如：
+
+- 段落参数
+- 选项结果
+- 当前分支里的临时状态
+
+在脚本块和条件表达式中，通过 `LOCAL` 对象访问：
+
+```sixu
+::entry(name) {
+    @optionAdd text="去图书馆" value="library"
+    @optionAdd text="去花园" value="garden"
+    @optionShow saveTo="chosen_route"
+
+    `你好，${name}。`
+    `你刚刚选择了 ${chosen_route}。`
+
+    @{
+        if (LOCAL.chosen_route === 'library') {
+            ARCHIVE.route = LOCAL.chosen_route;
+        }
+    }
+}
+```
+
+段落局部变量的特点：
+
+- 进入段落时创建
+- 同一段落内的嵌套块共享同一份局部变量
+- 离开段落后自动销毁
+- 在读档、回溯或恢复到当前执行位置时，会随当前运行态一起恢复
 
 ### 存档变量（ARCHIVE）
 
@@ -158,24 +211,30 @@ sidebar:
 
 ### 对比
 
-| | 存档变量（ARCHIVE） | 全局持久变量（GLOBAL） |
-| --- | --- | --- |
-| 访问方式 | `ARCHIVE.name` | `GLOBAL.name` |
-| 生命周期 | 跟随当前存档 | 永久保存 |
-| 存档/读档 | 随存档保存和恢复 | 独立于存档，始终保留 |
-| 新游戏时 | 清空 | 保留 |
-| 典型用途 | 好感度、路线标记、剧情状态 | 通关记录、CG 解锁、成就 |
+| | 段落局部变量（LOCAL） | 存档变量（ARCHIVE） | 全局持久变量（GLOBAL） |
+| --- | --- | --- | --- |
+| 访问方式 | `LOCAL.name` | `ARCHIVE.name` | `GLOBAL.name` |
+| 生命周期 | 段落内 | 当前存档 | 永久保存 |
+| 跨段落 | 不保留 | 保留 | 保留 |
+| 存档/读档 | 跟随当前运行位置恢复 | 随存档保存和恢复 | 独立于存档，始终保留 |
+| 新游戏时 | 清空 | 清空 | 保留 |
+| 典型用途 | 段落参数、临时选择结果、当前分支状态 | 好感度、路线标记、剧情状态 | 通关记录、CG 解锁、成就 |
 
 ---
 
 ### 在文本中引用变量
 
-使用反引号（`` ` ``）包裹文本，即可用 `${变量名}` 语法插入变量值。引擎会依次从存档变量、全局持久变量中查找对应的变量名：
+使用反引号（`` ` ``）包裹文本，即可用 `${变量名}` 语法插入变量值。引擎会按以下顺序查找同名变量：
+
+```text
+LOCAL（当前段落） > ARCHIVE（当前存档） > GLOBAL（全局持久）
+```
+
+例如：
 
 ```sixu
-::entry {
+::welcome(player_name) {
     ##
-        ARCHIVE.player_name = '小明';
         ARCHIVE.day = 3;
     ##
 
@@ -189,7 +248,7 @@ sidebar:
 ```
 
 :::note
-模板语法 `${name}` 中的变量名不需要加 `ARCHIVE.` 或 `GLOBAL.` 前缀，引擎会自动从存档变量中查找，找不到时再从全局持久变量中查找。
+模板语法 `${name}` 中的变量名可以不加 `LOCAL.` / `ARCHIVE.` / `GLOBAL.` 前缀。默认运行时会先查当前段落局部变量，再查存档变量，最后查全局持久变量。
 :::
 
 普通引号或无引号的文本不支持变量插值，`${...}` 会被原样输出：
@@ -206,7 +265,7 @@ sidebar:
 
 ### 在命令参数中引用变量
 
-在命令参数中，**不加引号**的标识符会被视为变量引用，引擎会自动将其解析为对应变量的值后再传递给命令处理器：
+在命令参数中，**不加引号**的标识符会被视为变量引用，引擎会自动将其解析为对应变量的值后再传递给命令处理器。默认解析顺序与模板字符串相同：`LOCAL > ARCHIVE > GLOBAL`。
 
 ```sixu
 ##
@@ -239,24 +298,31 @@ sidebar:
 @optionAdd text="路线B" value="route_b"
 @optionShow saveTo="chosen_route"
 
-// chosen_route 现在保存了玩家的选择
-// 在后续命令中直接引用
+// chosen_route 现在保存在 LOCAL.chosen_route 中
+// 在同一段落后续命令中可以直接引用
 @start_route route=chosen_route
+
+// 如果要在脚本块或条件表达式中访问，请显式使用 LOCAL
+@{ARCHIVE.route = LOCAL.chosen_route}
 ```
 
 ---
 
 ### 在条件表达式中使用变量
 
-流程控制的条件表达式（`#[if]`、`#[while]` 等）使用 JavaScript 语法求值，可以通过 `ARCHIVE` 和 `GLOBAL` 对象访问变量：
+流程控制的条件表达式（`#[if]`、`#[while]` 等）使用 JavaScript 语法求值，可以通过 `LOCAL`、`ARCHIVE` 和 `GLOBAL` 对象访问变量：
+
+:::note
+条件表达式属于 JavaScript 沙箱环境，不支持裸变量名自动解析。要读取剧情变量，请显式写成 `LOCAL.xxx`、`ARCHIVE.xxx` 或 `GLOBAL.xxx`。
+:::
 
 ```sixu
-// 检查存档变量
-#[if("ARCHIVE.met_alice")]
+// 检查当前段落局部变量
+#[if("LOCAL.met_alice")]
 [Alice] "我们又见面了！"
 
-// 比较存档变量的值
-#[cond("ARCHIVE.route === 'library'")]
+// 比较当前段落局部变量的值
+#[cond("LOCAL.route === 'library'")]
 {
     @bg src="bg/library.png"
     [Alice] "图书馆到了。"
@@ -271,10 +337,11 @@ sidebar:
 [Alice] "谢谢你一直以来的陪伴。"
 
 // 在循环条件中使用
-#[while("ARCHIVE.counter < 3")]
+@{LOCAL.counter = 0}
+#[while("LOCAL.counter < 3")]
 {
     [Alice] `这是第 ${counter} 次循环。`
-    @{ARCHIVE.counter += 1}
+    @{LOCAL.counter += 1}
 }
 ```
 
@@ -318,6 +385,12 @@ sidebar:
 | `#goto` | 清空整个执行栈 | 继续执行目标故事的下一个段落 |
 | `#call` | 在栈顶压入新状态 | 返回到调用处，继续执行后续内容 |
 | `#replace` | 替换当前段落的栈状态 | 返回到调用当前段落的位置 |
+
+除了 `paragraph` 和 `story` 这两个保留参数外，`#goto` / `#call` / `#replace` 的其他命名参数，都会按目标段落的参数声明进行绑定：
+
+- 缺少必填参数时会报错
+- 有默认值的参数会自动补默认值
+- 未声明的额外参数会记录警告日志并忽略
 
 :::tip
 如果你熟悉编程概念：`#goto` 类似于 `goto`，`#call` 类似于函数调用，`#replace` 类似于尾调用优化。
@@ -476,11 +549,11 @@ sidebar:
 
 ```sixu
 // 作用于单条命令
-#[if("locked")]
+#[if("ARCHIVE.locked")]
 @bg src="bg/secret_room.png"
 
 // 作用于代码块（块内所有内容作为整体）
-#[if("!locked")]
+#[if("!ARCHIVE.locked")]
 {
     @bg src="bg/secret_room.png"
     [Alice] "我们进入了密室。"
@@ -490,6 +563,7 @@ sidebar:
 :::note
 1. 如果同一个元素前有多个属性，仅最后一个生效，其余会被忽略。
 2. 条件表达式**必须使用引号包裹**，其内容由引擎在运行时求值，条件表达式使用 JavaScript 语法。
+3. 在条件表达式中访问剧情变量时，请显式使用 `LOCAL.xxx`、`ARCHIVE.xxx` 或 `GLOBAL.xxx`。
 :::
 
 
@@ -500,18 +574,18 @@ sidebar:
 ```sixu
 ::entry {
     // 如果变量 met_alice 为真，则显示这行对话
-    #[if("met_alice")]
+    #[if("ARCHIVE.met_alice")]
     [Alice] "我们又见面了！"
 
     // cond 和 if 完全等价
-    #[cond("route === 'A'")]
+    #[cond("LOCAL.route === 'A'")]
     {
         [Alice] "你选择了 A 路线。"
         @bg src="bg/route_a.png"
     }
 
     // 也可以用单引号包裹条件
-    #[if('affinity > 50')]
+    #[if('ARCHIVE.affinity > 50')]
     [Alice] "谢谢你一直以来的陪伴。"
 }
 ```
@@ -524,10 +598,12 @@ sidebar:
 
 ```sixu
 ::entry {
-    #[while("dialogIndex < 3")]
+    @{LOCAL.dialogIndex = 0}
+
+    #[while("LOCAL.dialogIndex < 3")]
     {
         @show_next_dialogue
-        @{dialogIndex += 1}
+        @{LOCAL.dialogIndex += 1}
     }
 
     [Alice] "所有对话都展示完了。"
@@ -548,7 +624,7 @@ sidebar:
     {
         @process_event
 
-        #[if("should_exit")]
+        #[if("LOCAL.should_exit")]
         #break
     }
 }
@@ -569,7 +645,7 @@ sidebar:
 {
     [Alice] "你想继续吗？"
 
-    #[if("player_said_no")]
+    #[if("LOCAL.player_said_no")]
     #break
 
     [Alice] "好的，那我们继续。"
@@ -588,12 +664,14 @@ sidebar:
 跳过当前迭代的剩余内容，立即开始下一轮循环（对于 `#[while]` 循环，会重新求值条件）。
 
 ```sixu
-#[while("index < 10")]
+@{LOCAL.index = 0}
+
+#[while("LOCAL.index < 10")]
 {
-    @{index += 1}
+    @{LOCAL.index += 1}
 
     // 偶数时跳过
-    #[if("index % 2 === 0")]
+    #[if("LOCAL.index % 2 === 0")]
     #continue
 
     [Alice] `当前是第${index}项`
@@ -627,7 +705,7 @@ sidebar:
     [Alice] "……总觉得这一切似曾相识。"
 
     // 调用公共的早晨对话
-    #call paragraph="morning_routine"
+    #call paragraph="morning_routine" day=ARCHIVE.day
 
     // 根据选择的路线跳转
     #[if("ARCHIVE.route === 'library'")]
@@ -640,7 +718,7 @@ sidebar:
     #replace paragraph="classroom_scene"
 }
 
-::morning_routine {
+::morning_routine(day) {
     [Alice] `早上好！今天是第 ${day} 天。`
 
     // 让玩家选择今天的去处
@@ -651,8 +729,11 @@ sidebar:
 
     `你选择了${route}。`
 
-    // 好感度随天数增长
-    @{ARCHIVE.affinity += ARCHIVE.day * 5}
+    // route 是当前段落的 LOCAL.route，需要显式复制到存档变量里
+    @{
+        ARCHIVE.route = LOCAL.route;
+        ARCHIVE.affinity += LOCAL.day * 5;
+    }
 }
 
 ::library_scene {

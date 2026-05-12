@@ -116,9 +116,62 @@ nextLine() → 引擎执行脚本
 
 ## 变量系统
 
-### 会话变量
+### 段落局部变量（LOCAL）
 
-会话变量仅在当前游戏会话有效，随存档保存和恢复。
+每次进入段落时，都会创建一组局部变量，适合保存：
+
+- 段落参数
+- 当前段落内的选项结果
+- 只在当前分支临时有效的状态
+
+在脚本块与条件表达式中，它们通常通过 `LOCAL.xxx` 暴露；在插件层则可以直接使用以下命令：
+
+```typescript
+// 设置单个局部变量
+executePluginCommand('scenario', {
+  subCommand: 'setLocalVariable',
+  name: 'chosen_route',
+  value: 'library',
+});
+
+// 获取单个局部变量
+const route = executePluginCommand('scenario', {
+  subCommand: 'getLocalVariable',
+  name: 'chosen_route',
+});
+
+// 批量合并写入当前段落局部变量
+executePluginCommand('scenario', {
+  subCommand: 'setLocalVariables',
+  variables: {
+    day: 3,
+    chosen_route: 'library',
+  },
+});
+
+// 获取当前段落的全部局部变量
+const localVariables = executePluginCommand('scenario', {
+  subCommand: 'getLocalVariables',
+});
+// 返回 Record<string, any> | null
+```
+
+:::note
+- `getLocalVariable` 在变量不存在时返回 `null`
+- `getLocalVariables` 在当前没有活动段落作用域时返回 `null`
+- `setLocalVariable` / `setLocalVariables` 需要当前存在可写的局部作用域，否则会报错
+- `setLocalVariables` 的行为是**合并写入**，不会先清空已有局部变量
+:::
+
+段落局部变量会随以下运行态能力一起恢复：
+
+- `saveGame` / `loadGame`
+- backlog `record` / `jumpToRecord`
+- checkpoint 恢复
+
+### 存档变量
+
+存档变量仅在当前游戏存档有效，随存档保存和恢复。
 
 ```typescript
 // 设置单个变量
