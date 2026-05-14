@@ -6,14 +6,14 @@ sidebar:
 
 音频系统通过 `executePluginCommand('audio', ...)` 进行控制。引擎提供了灵活的音频实例管理，每个音频由一个唯一的 `name` 标识。
 
-除 `load` 之外，大多数命令的 `name` 都支持两种形式：
+除 `load` 和 `loadAndPlay` 之外，大多数命令的 `name` 都支持两种形式：
 
 - 具体实例名：例如 `bgm`、`voice_alice`
 - wildcard 模式：例如 `voice:*`
 
-当 `name` 是 wildcard 模式时，命令会批量作用到所有匹配的实例；若一个也没匹配到，则会报错。`load` 是例外，它必须使用具体实例名，不能用 wildcard 创建实例。
+当 `name` 是 wildcard 模式时，命令会批量作用到所有匹配的实例。当前实现里，若一个也没匹配到，绝大多数命令会直接 no-op 返回；真正的错误通常来自“实例存在但当前不在可操作状态”，例如对尚未播放的实例执行 `pause`、`resume`、`seekTo` 等。`load` 和 `loadAndPlay` 是例外，它们都必须使用具体实例名，不能用 wildcard 创建实例。
 
-当前 wildcard 语法只支持 `*`，不支持 `?`、`[]`、`{}` 等更复杂的 glob 语法。
+当前 wildcard 语法只支持 `*`，不支持 `?`、`[]`、`{}` 等更复杂的 glob 语法。`*` 可以出现在任意位置，也可以出现多次，例如 `voice:*`、`voice:*:line`、`*:battle:*`。
 
 ## 基本用法
 
@@ -47,9 +47,11 @@ executePluginCommand('audio', {
 
 ### load — 加载音频
 
-加载音频文件并创建一个音频实例。如果同名实例已存在，会先释放旧实例。
+加载音频文件并创建一个音频实例。如果同名实例已存在，会先立即停止旧实例并替换它。
 
 `load` 的 `name` 必须是具体实例名，不能是 wildcard 模式。
+
+`load` 会异步读取并解码文件，因此返回值是一个 `Promise<void>`。它本身不会自动开始播放，除非 `settings.autoPlay` 为 `true`。
 
 ```typescript
 executePluginCommand('audio', {
@@ -83,6 +85,36 @@ executePluginCommand('audio', {
 | `fadeTime` | `number` | — | 渐入时长（毫秒） |
 | `autoPlay` | `boolean` | `false` | 加载后自动播放 |
 
+### loadAndPlay — 加载并立即播放
+
+如果实例尚未创建，`loadAndPlay` 会先异步加载，再在加载完成后立即开始播放；如果实例已经存在，则会复用已加载的数据并直接重播。
+
+和 `load` 一样，`loadAndPlay` 的 `name` 必须是具体实例名，不能是 wildcard 模式。
+
+```typescript
+await executePluginCommand('audio', {
+  subCommand: 'loadAndPlay',
+  name: 'bgm',
+  src: 'bgm/theme.opus',
+  settings: {
+    loopRegion: [0, -1],
+    volume: 0.8,
+    fadeTime: 600,
+  },
+});
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `name` | `string` | 音频实例名称 |
+| `src` | `string` | 音频文件路径（相对于 `assets/`） |
+| `settings` | `AudioSettings` | 可选，加载与首播配置 |
+
+补充说明：
+
+- 若实例不存在：返回一个 `Promise<void>`，在文件加载完成并已触发播放后 resolve。
+- 若实例已经存在：不会重新从 `src` 读取文件，而是停止当前播放并立刻重播现有实例。
+
 ### play — 播放
 
 ```typescript
@@ -98,6 +130,8 @@ executePluginCommand('audio', {
 | `name` | `string` | 实例名称；支持具体实例名或 wildcard 模式 |
 | `fadeTime` | `number` | 可选，渐入时长（毫秒） |
 | `waitForEnd` | `boolean` | 可选。为 `true` 时，命令会返回一个在自然播放结束后 resolve 的 Promise |
+
+当 `name` 是 wildcard 且 `waitForEnd: true` 时，返回的 Promise 会等待所有匹配实例都自然播放结束后再 resolve。
 
 #### 等待播放结束
 
@@ -160,8 +194,15 @@ executePluginCommand('audio', {
   subCommand: 'release',
   name: 'bgm',
   fadeTime: 1000,       // 可选：渐出时长
+  silentFail: true,     // 可选：兼容保留参数
 });
 ```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `name` | `string` | 实例名称；支持具体实例名或 wildcard 模式 |
+| `fadeTime` | `number` | 可选，停止时的淡出时长（毫秒） |
+| `silentFail` | `boolean` | 可选，兼容保留参数；当前实现即使没有匹配实例也通常会直接返回 |
 
 ### setVolume — 设置音量
 
