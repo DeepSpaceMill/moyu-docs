@@ -112,6 +112,35 @@ executePluginCommand('system', {
 | `height` | `number` | 可选，截图高度 |
 | `keepAspectRatio` | `boolean` | 可选，是否保持宽高比 |
 
+## 文件读取
+
+### readFile — 读取文件
+
+读取指定路径的文件内容，以 `Promise<string | ArrayBuffer>` 形式返回。路径使用 URL 格式，仅允许以下三种 scheme：
+
+| scheme | 对应目录 |
+|--------|----------|
+| `assets:` | 游戏资源目录（`assets/`） |
+| `saves:` | 存档目录 |
+| `data:` | 应用数据目录 |
+
+```typescript
+const text = await executePluginCommand('system', {
+  subCommand: 'readFile',
+  path: 'assets:///data/config.json',
+  format: 'text',   // 可选，默认 'text'
+});
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `path` | `string` | 文件 URL，格式为 `scheme:///path/to/file` |
+| `format` | `'text' \| 'binary'` | 可选，文件格式，默认 `'text'` |
+
+:::caution
+`format: 'binary'` 暂不支持，传入后会返回错误。
+:::
+
 ## 应用控制
 
 ### getParams — 获取自定义参数
