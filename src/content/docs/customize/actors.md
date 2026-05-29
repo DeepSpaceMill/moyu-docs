@@ -117,7 +117,7 @@ export function CharacterActor() {
 
 **关键特性**：
 - 角色的位移、缩放通过 `useSpring` 平滑过渡
-- 当前说话者的立绘保持正常颜色，其他角色自动变暗（通过 `charAutoTint` 命令可配置色调颜色）
+- 当前说话者的立绘保持正常颜色，其他角色自动变暗（通过 `charAutoTint` 命令可配置色调颜色，详见[文本前导与对话表现](../text-leading/#立绘自动变暗)）
 - 支持位置预设（left/center/right），坐标系以画面底部中心为原点
 
 ### TextBoxActor — 文本框
@@ -130,6 +130,7 @@ export function CharacterActor() {
 - 注册 `useBeforeHandleCommandCallback` 在新命令前清除文本
 - 悬停时显示工具栏按钮（快存、快读、设置等）
 - 打印完成后显示闪烁光标
+- 渲染文本框头像，并根据头像可见性让文本区 / 姓名框退让（详见[文本前导与对话表现](../text-leading/#文本框头像)）
 
 ### BGMActor — 背景音乐
 

@@ -101,6 +101,7 @@ interface CharacterState {
   presets: Record<string, CharacterPreset>;  // 角色预设
   characters: Character[];    // 当前舞台上的角色列表
   currentSpeaker?: string;    // 当前说话者的名字
+  autoTintEnabled: boolean;   // 是否启用非说话角色自动变暗（默认 true）
   autoTint: string;           // 非说话角色的自动色调（默认 '#666'）
 }
 
@@ -122,6 +123,7 @@ interface Character {
 interface TextBoxState {
   name: string;              // 说话者名字
   text: string;              // 文本内容
+  avatarName: string;        // 当前行的头像变体名（来自文本前导第三槽位）
   visible: boolean;          // 文本框是否可见
   shouldClear?: boolean;     // 下次显示文本前是否清空
   shouldAddNewline?: boolean; // 是否添加换行
@@ -141,8 +143,14 @@ interface TextBoxState {
   shadowOffsetY: number;
   shadowBlur: number;
   shadowWidth: number;
+
+  // 文本框头像配置（通过 @avatar / @avatarFor 命令设置）
+  avatar: TextBoxAvatarConfig;          // 全局默认头像
+  avatarFor: TextBoxAvatarForConfig[];  // 按角色 / 变体配置的头像列表
 }
 ```
+
+文本框头像的解析规则、`@avatar` / `@avatarFor` 命令及前导第三槽位详见[文本前导与对话表现](../text-leading/)。
 
 ### bgm — 背景音乐
 
