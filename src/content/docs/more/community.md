@@ -6,7 +6,8 @@ sidebar:
 
 ## 社区支持
 
-- [GitHub](https://github.com/DeepSpaceMill)
+- [GitHub](https://github.com/Icemic/moyu)
+- [GitHub Community](https://github.com/DeepSpaceMill)
 - [Discord](https://discord.gg/wmTekCNarG)
 - [Telegram](https://t.me/+tItb491Qzs04NTBl)
 - [QQ（闲聊群）](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=dcB58s03NbyIENYYtp0IHa8aTcUzlBF4&authKey=cgKWlgzqOhczlLbJbGo%2F1wLiUzH%2FMXNSTxz%2BNhDjMufuw0egSin7eqZKoRD7vF4l&noverify=0&group_code=293602841)

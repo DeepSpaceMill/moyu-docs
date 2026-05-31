@@ -65,7 +65,7 @@ export default defineConfig({
         },
       ],
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/DeepSpaceMill' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/Icemic/moyu' },
         { icon: 'discord', label: 'Discord', href: 'https://discord.gg/wmTekCNarG' },
       ],
       sidebar: [
