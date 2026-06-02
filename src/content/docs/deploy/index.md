@@ -16,7 +16,7 @@ yarn run engine:pack -- --target=<平台> [--compress] [--output=<路径>]
 
 | 参数 | 说明 |
 |------|------|
-| `--target` | 目标平台，可选值：`windows`、`linux`、`web` |
+| `--target` | 目标平台，如 `windows-amd64`、`linux-amd64`、`web-universal`、`android-aarch64` |
 | `--compress` | 压缩为 zip 文件（文件名使用 UTF-8 编码） |
 | `--output` | 输出目录，默认为 `.moyu/release/<时间>` |
 
@@ -34,11 +34,11 @@ yarn run engine:pack -- --target=<平台> [--compress] [--output=<路径>]
 
 ```bash
 # 输出到 .moyu/release/<时间戳>/game/
-yarn run engine:pack -- --target=windows
-yarn run engine:pack -- --target=linux
+yarn run engine:pack -- --target=windows-amd64
+yarn run engine:pack -- --target=linux-amd64
 
 # 压缩为 .moyu/release/<时间戳>/game.zip
-yarn run engine:pack -- --target=windows --compress
+yarn run engine:pack -- --target=windows-amd64 --compress
 ```
 
 打包产物包含：
@@ -54,10 +54,10 @@ yarn run engine:pack -- --target=windows --compress
 
 ```bash
 # 输出到 .moyu/release/<时间戳>/game/
-yarn run engine:pack -- --target=web
+yarn run engine:pack -- --target=web-universal
 
 # 压缩为 .moyu/release/<时间戳>/game.zip
-yarn run engine:pack -- --target=web --compress
+yarn run engine:pack -- --target=web-universal --compress
 ```
 
 打包产物包含：
@@ -69,3 +69,13 @@ yarn run engine:pack -- --target=web --compress
 - `assets/`（游戏资源）
 
 将 `game/` 目录部署到任意静态文件托管服务即可，或者[发布到 itch.io 等游戏平台](./upload-to-platforms)。
+
+## Android
+
+Android 打包需要额外安装 Android SDK 和 OpenJDK。支持输出 Debug APK、Release APK、Release AAB 和 Android Studio 工程：
+
+```bash
+yarn run engine:pack -- --target=android-aarch64 --android-format=debug-apk
+```
+
+Android 目标不支持 `--compress`。完整的环境配置、签名和设备调试步骤见 [Android 打包](./android)。
