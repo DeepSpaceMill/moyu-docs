@@ -94,6 +94,17 @@ nav.pushOverlay('settings');
 nav.pushOverlay('saveload', { type: 'save' });
 nav.pushOverlay('confirm', { message: '确定要退出吗？', onConfirm: () => { ... } });
 
+// 用自定义 ID 打开浮层，便于后续检查某个具体浮层实例是否存在
+nav.pushOverlay('confirm', { message: '自动存档完成' }, 'autosave-confirm');
+
+// 检查某类浮层是否已经打开
+if (!nav.hasActiveOverlay('settings')) {
+  nav.pushOverlay('settings');
+}
+
+// 检查指定 ID 的浮层实例是否已经打开
+const hasAutosaveConfirm = nav.hasActiveOverlay('confirm', 'autosave-confirm');
+
 // 关闭最顶层浮层
 nav.popOverlay();
 
