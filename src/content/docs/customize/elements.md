@@ -286,6 +286,47 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 
 ---
 
+## `<shader>` — 着色器容器
+
+用于把一个或多个输入通道交给 shader 处理。它既可以承载内建的转场效果，也可以直接运行自定义 WGSL 片元着色器。
+
+```tsx
+<shader
+  shader={{ type: 'builtin', name: 'crossfade' }}
+  timeControl="transition"
+  displayChannel={1}
+/>
+```
+
+`<shader>` 通常与 `<shader-slot>` 配合使用，由各个 slot 提供输入纹理。完整的 props、命令、事件和 WGSL 约定见[着色器 API](/engine-api/shader)。
+
+---
+
+## `<shader-slot>` — 着色器输入槽位
+
+用于为 `<shader>` 提供输入通道。你可以把子节点渲染进某个 channel，也可以声明一个空 channel 供 shader 按需读取。
+
+```tsx
+<shader>
+  <shader-slot channel={0}>
+    <sprite src="bg/day.png" />
+  </shader-slot>
+  <shader-slot channel={1}>
+    <sprite src="bg/night.png" />
+  </shader-slot>
+</shader>
+```
+
+常见用法还包括：
+
+- 设置 `static={true}`，把明确不会变化的输入当作静态纹理使用。
+- 设置 `space="shader"`，让子节点以 slot 左上角为原点参与采样，适合遮罩规则图这类局部输入。
+- 设置 `empty={true}` 并提供 `width` / `height`，声明一个没有子内容的空通道。
+
+未占用的 channel 会自动使用 dummy texture 填充。详细说明见[着色器 API](/engine-api/shader)。
+
+---
+
 ## `<animation>` — 动画
 
 播放序列帧动画（APNG 或 WebP 动画格式）。

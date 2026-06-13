@@ -1,7 +1,7 @@
 ---
 title: 音频 API
 sidebar:
-  order: 4
+  order: 5
 ---
 
 音频系统通过 `executePluginCommand('audio', ...)` 进行控制。引擎提供了灵活的音频实例管理，每个音频由一个唯一的 `name` 标识。

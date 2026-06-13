@@ -172,6 +172,38 @@ import { Dialog } from '../components/dialog';
 
 ---
 
+## TransitionBoundary — 转场边界
+
+基于 `<shader>` / `<shader-slot>` 封装的转场容器。标准框架内部的场景转场、背景切换和立绘切换都使用它实现。
+
+```tsx
+import { TransitionBoundary } from '../components/transitionBoundary';
+
+<TransitionBoundary
+  transitionKey={currentSceneKey}
+  effect={{ type: 'builtin', name: 'wipe', direction: 'left', softness: 0.08 }}
+  duration={800}
+>
+  {children}
+</TransitionBoundary>
+```
+
+### 属性
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `transitionKey` | `string` | — | 当前显示内容的键值；变化时会建立一次新的 from/to 边界 |
+| `retain` | `"static" \| "live"` | `"static"` | 旧内容保留方式；`live` 会在真正开始转场前继续保持实时更新 |
+| `effect` | `object` | — | 转场效果对象，结构与 `@transPerform` 的 `effect` 参数一致 |
+| `duration` | `number` | — | 转场时长（毫秒） |
+| `performKey` | `string \| number \| null` | `transitionKey` | 用于区分同一内容键值下的不同执行轮次；通常无需手动指定 |
+| `label` | `string` | `"Transition Boundary"` | 调试标签 |
+| `onFinished` | `() => void` | — | 转场完成时触发 |
+
+典型场景是：用 `transitionKey` 标识当前内容版本，用 `effect` 和 `duration` 描述这次过渡，而具体的 from/to 画面管理交给组件内部处理。底层 shader 命令与通道模型见[着色器 API](/engine-api/shader)。
+
+---
+
 ## Notification — 通知
 
 全局通知组件，在 `Main` 组件中已挂载。通过 `uiActions.notify()` 触发。

@@ -1,7 +1,7 @@
 ---
 title: 剧情 API
 sidebar:
-  order: 5
+  order: 6
 ---
 
 剧情系统通过 `executePluginCommand('scenario', ...)` 进行控制，管理故事加载、流程控制、变量和存档。

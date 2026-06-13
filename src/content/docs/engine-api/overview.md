@@ -109,6 +109,7 @@ const { width, height, scaleFactor } = getStageSize();
 
 - [事件系统](/engine-api/events) — 完整的事件类型和监听方式
 - [节点操作](/engine-api/nodes) — `executeNodeCommand` 详解
+- [着色器 API](/engine-api/shader) — `shader` / `shader-slot`、命令与自定义 WGSL
 - [音频 API](/engine-api/audio) — 音频插件完整参考
 - [剧本引擎 API](/engine-api/scenario) — 剧本和变量管理
 - [系统 API](/engine-api/system) — 窗口和系统控制

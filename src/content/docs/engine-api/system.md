@@ -1,7 +1,7 @@
 ---
 title: 系统 API
 sidebar:
-  order: 6
+  order: 7
 ---
 
 系统 API 通过 `executePluginCommand('system', ...)` 调用，提供窗口管理、截图和应用控制等能力。

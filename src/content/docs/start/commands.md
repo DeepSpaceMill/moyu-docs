@@ -38,12 +38,20 @@ sidebar:
 | --- | --- |
 | [bg](#bg) | 切换背景图片 |
 | [bgTint](#bgtint) | 设置背景色调 |
+| [bgTransEffect](#bgtranseffect) | 设置背景切换使用的转场效果 |
 
 ### 镜头
 
 | 命令 | 说明 |
 | --- | --- |
 | [camera](#camera) | 设置镜头焦点、推近、景深和背景模糊 |
+
+### 场景转场
+
+| 命令 | 说明 |
+| --- | --- |
+| [transPrepare](#transprepare) | 准备一次全画面转场 |
+| [transPerform](#transperform) | 执行一次已准备好的全画面转场 |
 
 ### 角色
 
@@ -56,6 +64,7 @@ sidebar:
 | [charName](#charname) | 修改角色的显示名称 |
 | [charPreset](#charpreset) | 定义或修改角色预设 |
 | [charAutoTint](#charautotint) | 设置非说话角色的自动色调 |
+| [charTransEffect](#chartranseffect) | 设置立绘切换使用的转场效果 |
 
 ### 音频
 
@@ -445,6 +454,28 @@ sidebar:
 
 ---
 
+### bgTransEffect
+
+设置后续背景切换使用的转场效果。它会影响之后的 [`bg`](#bg) 命令，但不会影响 [`bgTint`](#bgtint) 的色调渐变。默认效果为 `crossfade`。
+
+```sixu
+@bgTransEffect effect="wipe" direction="left" softness=0.08
+```
+
+使用 fade 效果：
+
+```sixu
+@bgTransEffect effect="fade" out=0.25 hold=0.5 in=0.25 color="#000"
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `effect` | `string` | `crossfade` | 转场效果名称 |
+
+其余参数随 `effect` 而变化，含义与 [`transPerform`](#transperform) 完全一致，但这里不包含 `fadeTime`、`skippable` 和 `noWait`。
+
+---
+
 ## 镜头
 
 ### camera
@@ -497,6 +528,64 @@ sidebar:
 - 未填写的字段回落到预设值或中性默认值，不沿用当前镜头状态。
 
 当前内建预设为 `reset`、`close-center`、`close-left`、`close-right` 和 `dramatic-center`。关于镜头层的运行时结构和两层视差计算，见 [景深镜头](/customize/camera/)。
+
+---
+
+## 场景转场
+
+场景转场用于在整个舞台层级之间执行一次统一过渡。标准流程分为两步：先用 `transPrepare` 固定旧画面与新画面的输入，再用 `transPerform` 选择效果并开始播放。
+
+### transPrepare
+
+准备一次全画面转场，但不会立刻开始播放。通常在更新下一帧场景内容前调用一次，随后修改背景、角色或其他舞台状态，最后再执行 `transPerform`。
+
+```sixu
+@transPrepare retain="static"
+@bg src="bg/night.png" noWait=true
+@charClear
+@charEnter src="characters/alice.png" name="Alice" preset="center"
+@transPerform effect="crossfade" fadeTime=1000
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `retain` | `"static" \| "live"` | `static` | 旧画面的保留方式。`static` 会在准备时固定一张快照；`live` 会让旧画面在真正开始转场前继续保持实时更新 |
+
+### transPerform
+
+执行一次已准备好的全画面转场。默认会等待 `fadeTime` 结束后再继续脚本；如果设置了 `noWait=true`，则会立即执行后续命令。
+
+```sixu
+@transPerform effect="wipe" direction="left" softness=0.08 fadeTime=900
+```
+
+使用遮罩转场：
+
+```sixu
+@transPerform effect="mask" rule="non-free/MVNLines1.png" softness=0.0625 fadeTime=1200
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `effect` | `string` | `crossfade` | 转场效果名称 |
+| `fadeTime` | `number` | `1000` | 转场播放时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `false` | 是否跳过等待转场完成，设为 `true` 可与后续命令并行执行 |
+
+#### 内建效果参数
+
+| `effect` | 额外参数 |
+| --- | --- |
+| `crossfade` | 无 |
+| `wipe` | `direction` 擦除方向，默认 `left`；`softness` 边缘羽化程度，范围 `0~1`，默认 `0` |
+| `push` | `direction` 推入方向，默认 `left` |
+| `slideaway` | `direction` 旧画面滑走方向，默认 `left` |
+| `fade` | `out`、`hold`、`in` 为三个阶段的时长占比，预期都在 `0~1` 且总和必须为 `1`；`color` 为中间纯色，默认 `#000` |
+| `zoom` | `startScale` 起始缩放，默认 `0`；`endScale` 结束缩放，默认 `1`；`origin` 为按屏幕归一化的缩放原点，默认 `[0.5, 0.5]` |
+| `pixellate` | `steps` 为像素块大小的 2 次幂指数，默认 `4`，即 `16x16` 像素块 |
+| `mask` | `rule` 为遮罩规则图资源；`softness` 边缘羽化程度，范围 `0~1`，默认 `0.0625`；`reverse` 是否反转黑白出现顺序，默认 `false` |
+
+其中 `mask` 会读取规则图的红色通道值，按“黑色先出现，白色后出现”的顺序从旧画面过渡到新画面。与 Kirikiri2 的规则一致而与 Ren'py 的规则相反。你可以通过 `reverse=true` 来反转出现顺序，或直接在规则图中反转黑白来达到同样效果。
 
 ---
 
@@ -680,6 +769,28 @@ sidebar:
 | --- | --- | --- | --- |
 | `enabled` | `boolean` | — | 是否启用自动变暗；省略时保持当前值 |
 | `tint` | `string` | — | 非说话角色的色调颜色值；省略时保持当前值 |
+
+---
+
+### charTransEffect
+
+设置后续立绘切换使用的转场效果。它会影响角色的入场、退场、清空，以及更换立绘图片时的切换方式；单纯的位置移动、缩放或色调变化仍然沿用原有动画。默认效果为 `crossfade`。
+
+```sixu
+@charTransEffect effect="push" direction="right"
+```
+
+使用放大切换：
+
+```sixu
+@charTransEffect effect="zoom" startScale=0.6 endScale=1 origin=[0.5,0.8]
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `effect` | `string` | `crossfade` | 转场效果名称 |
+
+其余参数随 `effect` 而变化，含义与 [`transPerform`](#transperform) 完全一致，但这里不包含 `fadeTime`、`skippable` 和 `noWait`。
 
 ---
 
