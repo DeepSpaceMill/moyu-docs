@@ -28,6 +28,7 @@ sidebar:
 | `shader` | `ShaderSource` | `{ type: 'builtin', name: 'crossfade' }` | 着色器来源，可以是内建效果，也可以是自定义 raw WGSL |
 | `timeControl` | `"auto" \| "manual" \| "transition"` | `"auto"` | 时间推进方式 |
 | `displayChannel` | `number \| null` | `null` | 稳定状态下直接显示的 channel；做转场时通常设为目标 channel |
+| `onPrepared` | `() => void` | — | `transition` 模式下，`prepare` 完成捕获并进入可执行状态时触发 |
 | `onFinished` | `() => void` | — | `transition` 模式完成时触发 |
 
 `timeControl` 的含义如下：
@@ -98,38 +99,51 @@ raw 模式要求传入**完整的片元 WGSL 模块**，而不是单个函数片
 
 ## Raw WGSL 约定
 
-引擎会提供顶点着色器，因此你只需要编写片元模块，并导出 `fs_main`：
+引擎会提供顶点着色器，因此你只需要编写片元模块，并导出 `fs_main`。raw shader 的运行时符号分为两部分：一部分由引擎自动注入，另一部分需要你自己声明。
 
-| binding | 内容 |
-|------|------|
-| `@group(1) @binding(0)` | `render_uniform` |
-| `@group(1) @binding(1)` | `builtins` |
-| `@group(1) @binding(2)` | `params` |
-| `@group(1) @binding(3)` | `texture_sampler` |
-| `@group(1) @binding(4)` | `channel0` |
-| `@group(1) @binding(5)` | `channel1` |
-| `@group(1) @binding(6)` | `channel2` |
-| `@group(1) @binding(7)` | `channel3` |
+### 引擎自动注入的内容
 
-推荐直接沿用下面这组声明：
+以下类型、全局变量和 helper 会在运行时自动注入到你的 WGSL 模块前面：
+
+| 名称 | 等价声明 | 用途 |
+|------|------|------|
+| `RenderUniform` | `struct RenderUniform { position: vec2<f32>, size: vec2<f32> }` | 当前 shader rect 在舞台逻辑坐标中的位置和尺寸 |
+| `BuiltinsUniform` | `struct BuiltinsUniform { time: f32, time_delta: f32, progress: f32, effect_id: i32, frame: u32, channel_count: u32, stage_size: vec2<f32> }` | 引擎内建时间、进度和舞台信息 |
+| `HiddenUniform` | 内部辅助结构 | 引擎内部使用的采样修正信息，不建议依赖 |
+| `render_uniform` | `@group(1) @binding(0) var<uniform> render_uniform: RenderUniform;` | 读取当前 shader rect 的逻辑坐标与尺寸 |
+| `moyu_hidden_uniform_internal` | `@group(1) @binding(1) var<uniform> moyu_hidden_uniform_internal: HiddenUniform;` | 采样范围修正的内部 uniform，不属于稳定 API |
+| `builtins` | `@group(1) @binding(2) var<uniform> builtins: BuiltinsUniform;` | 读取内建时间、`progress`、舞台尺寸等 |
+| `texture_sampler` | `@group(1) @binding(4) var texture_sampler: sampler;` | 通用采样器 |
+| `channel0..3` | `@group(1) @binding(5..8) var channelN: texture_2d<f32>;` | 四个输入通道纹理 |
+| `sampleChannel0..3(uv)` | `fn sampleChannelN(uv: vec2<f32>) -> vec4<f32>` | 对对应通道进行带采样范围修正的常规采样 |
+
+这意味着在 raw shader 中，你**不需要也不应该**重复声明 `render_uniform`、`builtins`、`texture_sampler`、`channel0..3` 以及 `sampleChannel0..3()`。重复声明会与引擎注入版本重名。
+
+对于 `channel0..3` 的常规采样，应当优先使用 `sampleChannel0..3(uv)`，而不是直接写 `textureSample(channelN, texture_sampler, input.uv)`。helper 会自动处理 render-to-texture 带来的采样范围修正，同时保持 `input.uv` 继续表示当前 shader rect 内的逻辑归一化坐标 `0..1`。
+
+可以把两者的职责简单理解为：
+
+- `input.uv`：当前 shader rect 内的逻辑归一化坐标，始终是 `0..1`
+- `sampleChannel0..3(uv)`：在保持 `uv` 语义不变的前提下，采样对应输入 channel 的正确内容区域
+
+当你需要 `textureDimensions(channel0)`、`textureLoad(...)` 这类更底层的纹理操作时，仍然可以直接访问 `channel0..3` 和 `texture_sampler`。helper 只是统一提供这些符号，不会限制 raw shader 的能力。
+
+:::note
+这些 helper 是引擎在运行时注入的，不需要也不应该在你的 WGSL 源文件中重复定义。编辑器或静态分析工具可能无法识别这类运行时注入符号，但这不会影响 Shader 正常运行。
+:::
+
+### 你需要自己声明的内容
+
+| 项目 | 是否必须 | 说明 |
+|------|------|------|
+| `VertexOutput` | 是 | 片元入口参数类型，需要与引擎顶点着色器输出匹配 |
+| `fs_main` | 是 | 片元入口函数 |
+| `ParamsUniform` | 仅在读取 `params` 时需要 | 由你自己定义内存布局 |
+| `params` 变量 | 仅在读取 `params` 时需要 | 固定使用 `@group(1) @binding(3)` |
+
+一个最小的 raw WGSL 模板通常如下：
 
 ```wgsl
-struct RenderUniform {
-  position: vec2<f32>,
-  size: vec2<f32>,
-}
-
-struct BuiltinsUniform {
-  time: f32,
-  time_delta: f32,
-  progress: f32,
-  effect_id: i32,
-  frame: u32,
-  channel_count: u32,
-  stage_size: vec2<f32>,
-}
-
-/// 可以使用内存对齐的任意结构
 struct ParamsUniform {
   slots: array<vec4<u32>, 8>,
 }
@@ -139,29 +153,8 @@ struct VertexOutput {
   @location(0) uv: vec2<f32>,
 }
 
-@group(1) @binding(0)
-var<uniform> render_uniform: RenderUniform;
-
-@group(1) @binding(1)
-var<uniform> builtins: BuiltinsUniform;
-
-@group(1) @binding(2)
-var<uniform> params: ParamsUniform;
-
 @group(1) @binding(3)
-var texture_sampler: sampler;
-
-@group(1) @binding(4)
-var channel0: texture_2d<f32>;
-
-@group(1) @binding(5)
-var channel1: texture_2d<f32>;
-
-@group(1) @binding(6)
-var channel2: texture_2d<f32>;
-
-@group(1) @binding(7)
-var channel3: texture_2d<f32>;
+var<uniform> params: ParamsUniform;
 ```
 
 `BuiltinsUniform` 中各字段的含义如下：
@@ -259,7 +252,20 @@ shaderRef.current?.executeCommand({ subCommand: 'reset' });
 
 ## 事件
 
-当前 `shader` 节点暴露一个事件：
+当前 `shader` 节点暴露两个事件：
+
+### prepared
+
+仅在 `transition` 模式下触发，表示这次 `prepare` 已经完成，from 输入已经捕获完毕，可以安全执行 `perform`。React 层通常直接使用 `onPrepared`：
+
+```tsx
+<shader
+  timeControl="transition"
+  onPrepared={() => {
+    console.log('prepared');
+  }}
+/>
+```
 
 ### finished
 
@@ -325,21 +331,6 @@ function WipeTransition({ trigger }: { trigger: number }) {
 
 ```tsx
 const fragmentWgsl = `
-struct RenderUniform {
-  position: vec2<f32>,
-  size: vec2<f32>,
-}
-
-struct BuiltinsUniform {
-  time: f32,
-  time_delta: f32,
-  progress: f32,
-  effect_id: i32,
-  frame: u32,
-  channel_count: u32,
-  stage_size: vec2<f32>,
-}
-
 struct ParamsUniform {
   slots: array<vec4<u32>, 8>,
 }
@@ -349,29 +340,8 @@ struct VertexOutput {
   @location(0) uv: vec2<f32>,
 }
 
-@group(1) @binding(0)
-var<uniform> render_uniform: RenderUniform;
-
-@group(1) @binding(1)
-var<uniform> builtins: BuiltinsUniform;
-
-@group(1) @binding(2)
-var<uniform> params: ParamsUniform;
-
 @group(1) @binding(3)
-var texture_sampler: sampler;
-
-@group(1) @binding(4)
-var channel0: texture_2d<f32>;
-
-@group(1) @binding(5)
-var channel1: texture_2d<f32>;
-
-@group(1) @binding(6)
-var channel2: texture_2d<f32>;
-
-@group(1) @binding(7)
-var channel3: texture_2d<f32>;
+var<uniform> params: ParamsUniform;
 
 fn read_param_u32(index: u32) -> u32 {
   let lane = params.slots[index / 4u];
@@ -389,7 +359,7 @@ fn read_param_f32(index: u32) -> f32 {
 
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
-  let color = textureSample(channel0, texture_sampler, input.uv);
+  let color = sampleChannel0(input.uv);
   let strength = read_param_f32(0u);
   let speed = read_param_f32(1u);
   let wave = 0.5 + 0.5 * sin((input.uv.y * 8.0 + builtins.time * speed) * 6.28318);
