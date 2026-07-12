@@ -66,6 +66,17 @@ sidebar:
 | [charAutoTint](#charautotint) | 设置非说话角色的自动色调 |
 | [charTransEffect](#chartranseffect) | 设置立绘切换使用的转场效果 |
 
+### 自由精灵
+
+| 命令 | 说明 |
+| --- | --- |
+| [sprite](#sprite) | 创建或更新自由精灵节点 |
+| [spriteChange](#spritechange) | 修改已有精灵节点的属性 |
+| [spriteRemove](#spriteremove) | 移除精灵节点及其子树 |
+| [spriteMove](#spritemove) | 移动精灵节点到新的父节点或根层 |
+| [spriteTransEffect](#spritetranseffect) | 设置精灵切换使用的转场效果 |
+| [spriteTransEffectReset](#spritetranseffectreset) | 重置精灵转场效果配置 |
+
 ### 音频
 
 | 命令 | 说明 |
@@ -791,6 +802,201 @@ sidebar:
 | `effect` | `string` | `crossfade` | 转场效果名称 |
 
 其余参数随 `effect` 而变化，含义与 [`transPerform`](#transperform) 完全一致，但这里不包含 `fadeTime`、`skippable` 和 `noWait`。
+
+---
+
+## 自由精灵
+
+自由精灵是标准框架提供的一个独立显示层，用于在舞台上放置图片、视频和帧动画。与角色立绘不同，自由精灵不参与自动色调和说话人逻辑，适合用于横幅、自定义显示内容等。
+
+自由精灵支持**父子节点树**结构——每个节点可以挂载子节点，子节点跟随父节点一起移动、缩放和旋转。节点按 `zIndex` 在**同层级内**排序，不设置则按创建顺序排列（新创建的在上）。
+
+所有涉及变换的属性（位置、缩放、旋转、斜切、透明度、色调）都支持**补间动画**，通过 `fadeTime` 控制过渡时长。补间曲线为 `easeInOutCubic`，与角色动画一致。快进和快速定位时会瞬间落到目标值。
+
+精灵的资源类型通过 `kind` 参数指定，省略时自动推断：后缀为 `.mp4` / `.webm` 的视频文件按视频处理，`.apng` / `.webp` 按动画处理，其余按图片处理。
+
+:::tip[坐标系]
+自由精灵使用**屏幕坐标系**：原点在画面左上角，X 轴向右为正，Y 轴向下为正。这与角色坐标系（原点为底部中心，Y 轴向上）不同。
+:::
+
+### sprite
+
+创建一个自由精灵节点。如果同名节点已存在，则按局部更新处理——仅更新显式提供的字段，未指定的保持不变。
+
+:::note
+此命令默认不阻塞脚本执行（`noWait=true`）。设置 `noWait=false` 可以等待入场动画完成后才继续。
+:::
+
+```sixu
+@sprite name="mySprite" src="ui/panel.png" x=960 y=540 anchor=[0.5,0.5] fadeTime=400 noWait=false
+```
+
+创建子节点（挂载到已有节点下方）：
+
+```sixu
+@sprite name="myBadge" src="ui/badge.png" parent="mySprite" x=100 y=-50 scaleX=0.5 scaleY=0.5
+```
+
+创建动画精灵：
+
+```sixu
+@sprite name="myAnim" src="effects/sparkle.apng" kind="animation" animationFormat="apng" x=200 y=300
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | 节点名称，全局唯一 |
+| `src` | `string` | *必填* | 精灵的资源路径（相对于 `assets/`） |
+| `kind` | `"image" \| "video" \| "animation"` | 自动推断 | 资源类型；省略时根据文件后缀自动识别 |
+| `animationFormat` | `"apng" \| "webp"` | `"apng"` | 动画格式，仅在 `kind="animation"` 时有效 |
+| `parent` | `string` | — | 父节点名称；省略时挂载到根层 |
+| `x` | `number` | `0` | X 坐标（屏幕坐标系，原点为左上角） |
+| `y` | `number` | `0` | Y 坐标（屏幕坐标系，原点为左上角） |
+| `scaleX` | `number` | `1` | 横向缩放系数 |
+| `scaleY` | `number` | `1` | 纵向缩放系数 |
+| `rotation` | `number` | `0` | 旋转角度（弧度） |
+| `skewX` | `number` | `0` | 横向斜切角度（弧度） |
+| `skewY` | `number` | `0` | 纵向斜切角度（弧度） |
+| `anchor` | `[number, number]` | `[0, 0]` | 锚点坐标，按节点自身归一化，范围 0 到 1 |
+| `pivot` | `[number, number]` | `[0, 0]` | 旋转和缩放的中心点（像素） |
+| `opacity` | `number` | `1` | 透明度，范围 0 到 1 |
+| `visible` | `boolean` | `true` | 是否可见 |
+| `tint` | `string` | — | 色调颜色值，如 `"#ffcc00"` |
+| `interactive` | `boolean` | `false` | 是否标记为可交互节点 |
+| `zIndex` | `number` | `0` | 同一父节点下的层级顺序 |
+| `fadeTime` | `number` | `500` | 入场动画时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待动画完成，设为 `false` 可等待入场结束 |
+
+---
+
+### spriteChange
+
+修改一个已有精灵节点的属性。仅更新显式提供的字段，未指定的保持不变。常用于移动、缩放、变色或更换资源。
+
+:::note
+此命令默认不阻塞脚本执行（`noWait=true`）。设置 `noWait=false` 可以等待补间动画完成后才继续。
+:::
+
+```sixu
+@spriteChange name="mySprite" x=1200 y=300 tint="#ffcc88" fadeTime=800 noWait=false
+```
+
+更换资源（图片切换会触发转场效果，同时属性也会补间）：
+
+```sixu
+@spriteChange name="mySprite" src="ui/panel_highlighted.png" fadeTime=600
+```
+
+连续更新（`noWait=true` 时从当前插值位置平滑衔接到新目标）：
+
+```sixu
+@spriteChange name="mySprite" x=400 rotation=0.5 fadeTime=1000 noWait=true
+@wait time=300
+@spriteChange name="mySprite" x=800 rotation=-0.3 fadeTime=800 noWait=false
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | 要修改的节点名称 |
+| `src` | `string` | — | 新的资源路径；更换图片时会触发转场效果 |
+| `kind` | `"image" \| "video" \| "animation"` | — | 新的资源类型 |
+| `animationFormat` | `"apng" \| "webp"` | — | 新的动画格式 |
+| `x` | `number` | — | X 坐标 |
+| `y` | `number` | — | Y 坐标 |
+| `scaleX` | `number` | — | 横向缩放系数 |
+| `scaleY` | `number` | — | 纵向缩放系数 |
+| `rotation` | `number` | — | 旋转角度（弧度） |
+| `skewX` | `number` | — | 横向斜切角度（弧度） |
+| `skewY` | `number` | — | 纵向斜切角度（弧度） |
+| `anchor` | `[number, number]` | — | 锚点坐标 |
+| `pivot` | `[number, number]` | — | 旋转和缩放中心点 |
+| `opacity` | `number` | — | 透明度 |
+| `visible` | `boolean` | — | 是否可见 |
+| `tint` | `string` | — | 色调颜色值 |
+| `interactive` | `boolean` | — | 是否可交互 |
+| `zIndex` | `number` | — | 层级顺序 |
+| `fadeTime` | `number` | `500` | 补间动画时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待动画完成 |
+
+---
+
+### spriteRemove
+
+移除一个精灵节点及其所有子孙节点。节点会先执行离场动画，动画结束后从场景中删除。
+
+```sixu
+@spriteRemove name="mySprite" fadeTime=300
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | 要移除的节点名称 |
+| `fadeTime` | `number` | `500` | 离场动画时间（毫秒） |
+| `skippable` | `boolean` | `false` | 是否允许玩家点击跳过等待 |
+| `noWait` | `boolean` | `true` | 是否跳过等待离场完成 |
+
+---
+
+### spriteMove
+
+将一个精灵节点移动到新的父节点下，或移动到根层。也可以仅调整 `zIndex` 层级顺序。
+
+```sixu
+// 移动到根层
+@spriteMove name="myBadge"
+
+// 挂载到另一个父节点并调整层级
+@spriteMove name="myBadge" toParent="mySprite" zIndex=5
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | 要移动的节点名称 |
+| `toParent` | `string` | — | 目标父节点名称；省略时移动到根层 |
+| `zIndex` | `number` | — | 新的层级顺序 |
+
+---
+
+### spriteTransEffect
+
+设置自由精灵层或单个精灵节点使用的转场效果。影响后续的精灵资源切换（`sprite` 或 `spriteChange` 更换 `src` 时）。
+
+省略 `name` 时设置层的默认转场，所有未单独配置的节点都会使用此效果。指定 `name` 时仅为该节点设置，不影响其他节点。默认效果为 `crossfade`。
+
+```sixu
+// 为整层设置擦除转场
+@spriteTransEffect effect="wipe" direction="right" softness=0.1
+
+// 为特定节点设置放大转场
+@spriteTransEffect name="mySprite" effect="zoom" startScale=0.8 endScale=1
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `effect` | `string` | `"crossfade"` | 转场效果名称 |
+| `name` | `string` | — | 节点名称；省略时设置层的默认转场 |
+
+其余参数随 `effect` 而变化，含义与 [`transPerform`](#transperform) 完全一致，但这里不包含 `fadeTime`、`skippable` 和 `noWait`。
+
+---
+
+### spriteTransEffectReset
+
+重置自由精灵层或单个节点的转场效果配置。省略 `name` 时重置层的默认转场为 `crossfade`；指定 `name` 时清除该节点的独立转场设置，使其回退到层的默认值。
+
+```sixu
+// 重置特定节点的转场
+@spriteTransEffectReset name="mySprite"
+
+// 重置整层为默认
+@spriteTransEffectReset
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | — | 节点名称；省略时重置层的默认转场 |
 
 ---
 
