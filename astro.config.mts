@@ -71,27 +71,27 @@ export default defineConfig({
       sidebar: [
         {
           label: '开始',
-          autogenerate: { directory: 'start' },
+          items: [{ autogenerate: { directory: 'start' } }],
         },
         {
           label: '发布与部署',
-          autogenerate: { directory: 'deploy' },
+          items: [{ autogenerate: { directory: 'deploy' } }],
         },
         {
           label: '定制框架',
-          autogenerate: { directory: 'customize' },
+          items: [{ autogenerate: { directory: 'customize' } }],
         },
         {
           label: '引擎 API',
-          autogenerate: { directory: 'engine-api' },
+          items: [{ autogenerate: { directory: 'engine-api' } }],
         },
         {
           label: '深入引擎',
-          autogenerate: { directory: 'deep-into' },
+          items: [{ autogenerate: { directory: 'deep-into' } }],
         },
         {
           label: '更多',
-          autogenerate: { directory: 'more' },
+          items: [{ autogenerate: { directory: 'more' } }],
         },
       ],
       lastUpdated: true,
