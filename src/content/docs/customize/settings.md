@@ -67,3 +67,20 @@ sidebar:
 | backend                    | string  | `auto`              | 用于渲染的后端。可能的值：`auto`, `dx12`, `vulkan`, `gles`, `metal`, `webgpu`。除非你知道自己在做什么，否则不要更改此项。 |
 | <small>desiredMaximumFrameLatency</small> | number  | 2                   | 期望的最大帧延迟。除非你知道自己在做什么，否则不要更改此项。                                                              |
 | showFPS                    | boolean | false               | 是否显示 FPS。通常用于调试，请勿在发布版中设置。                                                                          |
+| enableGamepads               | boolean | false               | 是否启用游戏手柄支持。详见[手柄与其他 API](../engine-api/misc.md)                                                                  |
+| enableMSAA                 | boolean | false               | 是否启用 4 倍多重采样抗锯齿（4× MSAA），用于改善图形边缘的锯齿。                                                          |
+| enableMipmaps              | boolean | false               | 是否为静态图片生成 mipmap，用于改善图片缩小时的清晰度和稳定性。                                                           |
+
+### 多重采样抗锯齿（MSAA）
+
+将 `enableMSAA` 设置为 `true` 后，引擎会启用 4× MSAA。它主要改善 Sprite 等图形在旋转、缩放或显示斜边时产生的锯齿，也会应用于 Filter 和 Shader 中实际绘制场景内容的部分。
+
+MSAA 会增加 GPU 的显存占用和渲染开销。文字使用 SDF 渲染，Filter 和 Shader 自身产生的着色效果也主要由对应的着色器决定，因此开启 MSAA 通常不会明显改善这些内容。建议根据游戏画面和目标设备的性能测试结果决定是否开启。
+
+### 静态图片 mipmap
+
+将 `enableMipmaps` 设置为 `true` 后，引擎会在静态图片载入时生成一组逐级缩小的纹理。图片被缩小显示时，GPU 会从合适的层级采样，可以减少摩尔纹、闪烁和细节跳动，尤其适合会被大幅缩小、旋转或远距离显示的图片。
+
+目前 mipmap 适用于通过资源管理器载入的静态图片，包括 Sprite 使用的图片和启动图。Animation、Video、文字 SDF 纹理、Filter、Backdrop、Shader 渲染目标和截图不会生成 mipmap。
+
+生成 mipmap 会增加图片载入时的 GPU 工作量，并占用约三分之一的额外纹理显存。图片始终按接近原始尺寸显示时，收益通常不明显；如果游戏中经常缩小图片，建议开启并在目标设备上进行测试。
