@@ -25,6 +25,8 @@ sidebar:
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
+| `width` | `number` | 自动 | 显式布局宽度；未设置时按 normal、非空 slot 的内容宽度计算 |
+| `height` | `number` | 自动 | 显式布局高度；未设置时按 normal、非空 slot 的内容高度计算 |
 | `shader` | `ShaderSource` | `{ type: 'builtin', name: 'crossfade' }` | 着色器来源，可以是内建效果，也可以是自定义 raw WGSL |
 | `timeControl` | `"auto" \| "manual" \| "transition"` | `"auto"` | 时间推进方式 |
 | `displayChannel` | `number \| null` | `null` | 稳定状态下直接显示的 channel；做转场时通常设为目标 channel |
@@ -37,6 +39,12 @@ sidebar:
 - `manual`：初始暂停，通过命令手动开始、停止和重置时间。
 - `transition`：进入转场状态机，由 `prepare` / `perform` 驱动 `progress`，并在完成后触发 `finished` 事件。
 
+### 布局尺寸
+
+`shader` 默认汇总直属 `shader-slot` 的内容尺寸：只计算 `space="normal"` 且 `empty={false}` 的 slot，并分别取宽、高的最大值。`space="shader"` 和 empty slot 不贡献自动尺寸。
+
+设置 `width` 或 `height` 后，对应轴改为显式尺寸，另一个未设置的轴仍按内容自动计算。显式尺寸适合没有 normal 内容的程序化 shader，或需要在布局容器中预留固定空间的场景。
+
 ## `<shader-slot>` 属性
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -44,11 +52,15 @@ sidebar:
 | `channel` | `number` | `0` | 输入 channel 编号，范围 `0..3` |
 | `empty` | `boolean` | `false` | 是否声明为空输入；为空时不会渲染子节点 |
 | `static` | `boolean` | `false` | 将输入视为静态内容，作为减少重复 render-to-texture 的优化手段 |
-| `space` | `ShaderSlotSpace` | `'normal'` | 控制子内容使用普通舞台坐标还是 shader 局部坐标；设为 `shader` 时，slot 左上角为 `(0, 0)` |
+| `space` | `ShaderSlotSpace` | `'normal'` | 控制输入的内容原点；`normal` 使用 shader 效果区域左上角，`shader` 使用 slot 自身的局部原点 |
 | `width` | `number` | `0` | `empty={true}` 时的纹理宽度，必须为非零值 |
 | `height` | `number` | `0` | `empty={true}` 时的纹理高度，必须为非零值 |
 
 `shader-slot` 通常直接作为 `<shader>` 的子节点使用。对于 `mask` 这类需要额外规则图的效果，常见做法是把规则图放在 `channel={2}`，并配合 `space="shader"`。
+
+`shader-slot` 的布局尺寸固定为 `0 × 0`，不参与普通父级测量，也不能作为 `<vbox>` 或 `<hbox>` 的直接布局子节点。这个尺寸不影响它的离屏输入纹理：normal、非空 slot 会单独测量其直属子内容，供父 `<shader>` 自动计算尺寸；`empty` slot 的 `width` / `height` 只用于分配空输入纹理。
+
+由于 slot 本身为 `0 × 0`，其**直接子节点**的 anchor 以 `0 × 0` 为基准。更深层子节点仍根据各自父节点的实际布局尺寸计算 anchor。
 
 ## `ShaderSource`
 

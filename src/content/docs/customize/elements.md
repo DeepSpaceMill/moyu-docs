@@ -343,6 +343,8 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 
 `<shader>` 通常与 `<shader-slot>` 配合使用，由各个 slot 提供输入纹理。完整的 props、命令、事件和 WGSL 约定见[着色器 API](/engine-api/shader)。
 
+默认情况下，`<shader>` 的布局尺寸取所有 `space="normal"`、且非空 slot 内容尺寸的最大值，因此可以作为 `<vbox>` 或 `<hbox>` 的普通子节点。也可以用 `width` / `height` 显式指定任一轴；未指定的轴仍按内容自动计算。
+
 ---
 
 ## `<shader-slot>` — 着色器输入槽位
@@ -363,8 +365,10 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 常见用法还包括：
 
 - 设置 `static={true}`，把明确不会变化的输入当作静态纹理使用。
-- 设置 `space="shader"`，让子节点以 slot 左上角为原点参与采样，适合遮罩规则图这类局部输入。
+- 设置 `space="shader"`，让子节点以 slot 自身局部原点参与采样，适合遮罩规则图这类局部输入。
 - 设置 `empty={true}` 并提供 `width` / `height`，声明一个没有子内容的空通道。
+
+`<shader-slot>` 自身始终占用 `0 × 0` 布局空间，不参与父级的普通布局测量。它只负责把子内容提供给 `<shader>`：直接子节点的 anchor 会以这个 `0 × 0` 空间为基准；子树更深层的节点仍按各自父节点的实际尺寸布局。
 
 未占用的 channel 会自动使用 dummy texture 填充。详细说明见[着色器 API](/engine-api/shader)。
 
