@@ -80,6 +80,49 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 
 ---
 
+## `<vbox>` — 纵向布局
+
+按照从上到下的顺序自动排列直接子元素。适合菜单、设置项和纵向按钮组。
+
+```tsx
+<vbox x={100} y={100} gap={24} padding={20}>
+  <text text="开始游戏" fontSize={32} />
+  <text text="读取存档" fontSize={32} />
+  <text text="退出游戏" fontSize={32} />
+</vbox>
+```
+
+## `<hbox>` — 横向布局
+
+按照从左到右的顺序自动排列直接子元素。适合工具栏、横向按钮组和并排信息。
+
+```tsx
+<hbox x={100} y={100} gap={16} alignItems="center">
+  <sprite src="ui/icon.png" />
+  <text text="设置" fontSize={32} />
+</hbox>
+```
+
+### 专有属性
+
+`<vbox>` 和 `<hbox>` 使用相同的布局属性：
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `width` | `number` | 自动 | 显式宽度；省略时根据子元素和内边距计算 |
+| `height` | `number` | 自动 | 显式高度；省略时根据子元素和内边距计算 |
+| `gap` | `number` | `0` | 相邻子元素之间的间距 |
+| `padding` | `number` | `0` | 四边内边距 |
+| `paddingX` | `number` | — | 水平内边距，覆盖 `padding` 的左右值 |
+| `paddingY` | `number` | — | 垂直内边距，覆盖 `padding` 的上下值 |
+| `justifyContent` | `"start" \| "center" \| "end" \| "space-between"` | `"start"` | 子元素在排列方向上的对齐方式 |
+| `alignItems` | `"start" \| "center" \| "end"` | `"start"` | 子元素在另一方向上的对齐方式 |
+| `onLayout` | `(event: LayoutEvent) => void` | — | 布局尺寸变化时触发，事件包含 `width` 和 `height` |
+
+`<vbox>` 和 `<hbox>` 可以互相嵌套，也可以放进普通 `<container>`。完整的尺寸、对齐和嵌套规则见[布局系统](/customize/layout/)。
+
+---
+
 ## `<sprite>` — 图片精灵
 
 用于显示图片。这是最常用的元素之一。
