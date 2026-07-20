@@ -29,6 +29,7 @@ sidebar:
 | `opacity` | `number` | `1` | 透明度（0~1） |
 | `interactive` | `boolean` | `false` | 是否响应交互事件 |
 | `cursor` | `MoyuCursor` | — | 鼠标悬停时的光标样式 |
+| `zIndex` | `number` | `0` | 同一父节点下的绘制和命中顺序，支持负数 |
 
 ### 事件处理
 
@@ -62,6 +63,22 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 ### 坐标系
 
 末语使用左上角为原点的坐标系，X 轴向右，Y 轴向下。坐标以舞台尺寸为基准（通常为 1920×1080），引擎会自动处理到不同窗口大小的缩放。
+
+### 绘制顺序与 zIndex
+
+同一父节点下的直接子节点按照 `zIndex` 从小到大绘制。较大的值后绘制，因此显示在较小值的上方；`zIndex` 相同时保持 JSX 中的原始顺序，靠后的节点显示在上方。
+
+```tsx
+<container>
+  <sprite src="ui/background.png" zIndex={-1} />
+  <sprite src="ui/panel.png" />
+  <text text="置顶提示" zIndex={10} />
+</container>
+```
+
+`zIndex` 只比较同一个父节点的直接子节点。每个子节点会连同整棵子树一起排序，子树内部的节点不能越过父节点的兄弟节点。如果需要让一个弹出层覆盖组件外部的内容，应在两者共同父节点下，为包含弹出层的直接子节点设置 `zIndex`。
+
+鼠标、触摸和滚轮事件使用相反的顺序进行命中检测，画面上最靠前的节点会优先收到事件。`zIndex` 不改变 JSX 顺序、布局位置或布局尺寸。
 
 ---
 

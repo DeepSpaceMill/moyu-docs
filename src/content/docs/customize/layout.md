@@ -209,6 +209,32 @@ VBox/HBox 决定子元素的基础位置。子元素自己的 `x` 和 `y` 会在
 
 布局容器的直接子元素不使用 `anchor` 决定布局位置。`pivot`、scale、rotation 和 skew 仍然可以改变视觉效果，但不会推动相邻元素。
 
+## 布局顺序与绘制顺序
+
+VBox/HBox 始终按照 JSX 中的原始顺序测量和排列直接子元素。`zIndex` 只改变同一父节点下直接子节点的绘制与命中顺序，不改变布局位置、自动尺寸、`gap` 或对齐结果。
+
+```tsx
+<vbox gap={20}>
+  <hbox zIndex={1}>
+    <text text="显示模式" fontSize={30} />
+    <Select />
+  </hbox>
+
+  <hbox>
+    <text text="背景音量" fontSize={30} />
+    <Slider />
+  </hbox>
+</vbox>
+```
+
+这里第一行仍然排在第二行之前，但它的整棵子树会在第二行之后绘制。因此，`Select` 展开时可以覆盖下面的 Slider，重叠区域的鼠标、触摸和滚轮事件也会优先交给第一行中的节点。
+
+`zIndex` 只在同一父节点下比较。若只给 `Select` 内部的下拉图片设置 `zIndex`，它只能改变 Select 内部节点的顺序，不能越过后续表单行。需要覆盖后续行时，应为包含 Select 的 HBox 设置 `zIndex`；需要覆盖另一列时，还要在两列共同的父节点下调整对应列容器的 `zIndex`。
+
+:::note
+`zIndex` 不会创建类似 CSS 的全局层叠上下文。孙节点不能仅靠更大的值越过父节点的兄弟节点。
+:::
+
 ## 嵌套布局
 
 VBox 和 HBox 可以互相嵌套。常见做法是用 VBox 组织多行，再用 HBox 组织每一行：
