@@ -1,7 +1,7 @@
 ---
 title: 手柄与其他 API
 sidebar:
-  order: 8
+  order: 9
 ---
 
 ## 手柄 API

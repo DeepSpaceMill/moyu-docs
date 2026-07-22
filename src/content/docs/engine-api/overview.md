@@ -65,7 +65,7 @@ const result = executePluginCommand('audio', {
 });
 ```
 
-- `pluginName` — 插件名称（`'audio'` | `'scenario'` | `'system'` | `'gamepad'`）
+- `pluginName` — 插件名称（`'audio'` | `'scenario'` | `'system'` | `'gamepad'` | `'steam'`）
 - `payload` — 命令数据，必须包含 `subCommand` 字段
 - 返回值取决于具体命令，可能是同步值或 Promise
 
@@ -113,4 +113,5 @@ const { width, height, scaleFactor } = getStageSize();
 - [音频 API](/engine-api/audio) — 音频插件完整参考
 - [剧本引擎 API](/engine-api/scenario) — 剧本和变量管理
 - [系统 API](/engine-api/system) — 窗口和系统控制
+- [Steam API](/engine-api/steam) — Achievement、Stats、Overlay、DLC、Timeline 与 Workshop
 - [其他 API](/engine-api/misc) — Gamepad、运行时环境等
