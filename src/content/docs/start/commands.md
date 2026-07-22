@@ -104,6 +104,16 @@ sidebar:
 | [waitClick](#waitclick) | 等待玩家点击 |
 | [leaveStage](#leavestage) | 离开舞台并跳转页面 |
 
+### Steam 成就
+
+| 命令 | 说明 |
+| --- | --- |
+| [achievementSet](#achievementset) | 解锁 Steam 成就 |
+| [achievementClear](#achievementclear) | 清除 Steam 成就的解锁状态 |
+| [achievementClearAll](#achievementclearall) | 清除全部 Steam 成就的解锁状态 |
+| [achievementGet](#achievementget) | 查询 Steam 成就是否已解锁 |
+| [achievementIndicateProgress](#achievementindicateprogress) | 显示 Steam 成就进度通知 |
+
 ### 其他
 
 | 命令 | 说明 |
@@ -1309,6 +1319,86 @@ sidebar:
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `gotoPage` | `string` | *必填* | 要跳转到的页面名称（如 `"title"`） |
+
+---
+
+## Steam 成就
+
+Steam 成就命令用于在剧本中解锁、清除和查询 Steam 成就，以及显示成就进度通知。`name` 参数是 Steamworks 后台配置的 Achievement API Name。
+
+这些命令只在启用了 Steam 插件的桌面版本中可用。Steam 插件未启用或初始化失败时，命令会返回错误。关于 Steam 配置和底层 API，见 [Steam API](/engine-api/steam/)。
+
+### achievementSet
+
+解锁指定 Steam 成就，并立即向 Steam 提交更新后的状态。
+
+```sixu
+@achievementSet name="ACH_FIRST_CHAPTER"
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | Steamworks 后台配置的 Achievement API Name |
+
+---
+
+### achievementClear
+
+清除指定 Steam 成就的解锁状态，并立即向 Steam 提交更新后的状态。此命令不会重置与成就关联的 Stat。
+
+```sixu
+@achievementClear name="ACH_FIRST_CHAPTER"
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | Steamworks 后台配置的 Achievement API Name |
+
+---
+
+### achievementClearAll
+
+清除当前游戏的全部 Steam 成就解锁状态，并在全部清除后提交一次状态。此命令不会重置游戏 Stats。
+
+```sixu
+@achievementClearAll
+```
+
+此命令没有参数。
+
+---
+
+### achievementGet
+
+查询指定 Steam 成就是否已解锁，并将布尔结果写入 `saveTo` 指定的剧本局部变量。
+
+```sixu
+@achievementGet name="ACH_FIRST_CHAPTER" saveTo="first_chapter_unlocked"
+
+#[if("LOCAL.first_chapter_unlocked")]
+[Alice] "第一章成就已经解锁。"
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | Steamworks 后台配置的 Achievement API Name |
+| `saveTo` | `string` | *必填* | 保存查询结果的局部变量名；结果类型为 `boolean` |
+
+---
+
+### achievementIndicateProgress
+
+在 Steam Overlay 中显示一次成就进度通知。此命令不保存进度，也不会自动解锁成就。
+
+```sixu
+@achievementIndicateProgress name="ACH_READ_100_LINES" current=40 max=100
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `name` | `string` | *必填* | Steamworks 后台配置的 Achievement API Name |
+| `current` | `number` | *必填* | 当前进度；必须是非负整数且小于 `max` |
+| `max` | `number` | *必填* | 最大进度；必须是大于 0 的整数 |
 
 ---
 
