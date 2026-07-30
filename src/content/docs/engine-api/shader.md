@@ -27,7 +27,7 @@ sidebar:
 |------|------|--------|------|
 | `width` | `number` | 自动 | 显式布局宽度；未设置时按 normal、非空 slot 的内容宽度计算 |
 | `height` | `number` | 自动 | 显式布局高度；未设置时按 normal、非空 slot 的内容高度计算 |
-| `shader` | `ShaderSource` | `{ type: 'builtin', name: 'crossfade' }` | 着色器来源，可以是内建效果，也可以是自定义 raw WGSL |
+| `shader` | `ShaderSource` | `{ type: 'builtin', name: 'crossfade' }` | 着色器来源：内建效果、raw WGSL 或 WGSL 资源文件 |
 | `timeControl` | `"auto" \| "manual" \| "transition"` | `"auto"` | 时间推进方式 |
 | `displayChannel` | `number \| null` | `null` | 稳定状态下直接显示的 channel；做转场时通常设为目标 channel |
 | `onPrepared` | `() => void` | — | `transition` 模式下，`prepare` 完成捕获并进入可执行状态时触发 |
@@ -107,11 +107,36 @@ raw 模式要求传入**完整的片元 WGSL 模块**，而不是单个函数片
 </shader>
 ```
 
-`params` 仅在 `type: 'raw'` 时可用。每一项都是一个 4 字节槽位，类型只支持 `float` 和 `int`。当前总共提供 `32` 个槽位，也就是 `128` 字节。
+### 自定义 WGSL 文件
 
-## Raw WGSL 约定
+file 模式从 `assets/` 下异步加载 UTF-8 WGSL 文件，路径相对于资源目录：
 
-引擎会提供顶点着色器，因此你只需要编写片元模块，并导出 `fs_main`。raw shader 的运行时符号分为两部分：一部分由引擎自动注入，另一部分需要你自己声明。
+```tsx
+<shader
+  shader={{
+    type: 'file',
+    src: 'shaders/wave.wgsl',
+    params: [
+      { name: 'strength', type: 'float', value: 0.35 },
+      { name: 'speed', type: 'float', value: 1.2 },
+    ],
+  }}
+  timeControl="auto"
+  displayChannel={0}
+>
+  <shader-slot channel={0}>
+    <sprite src="bg/classroom.png" />
+  </shader-slot>
+</shader>
+```
+
+文件内容与 `raw.content` 遵循相同的 WGSL 约定。
+
+`params` 可用于 `raw` 和 `file`。每一项都是一个 4 字节槽位，类型只支持 `float` 和 `int`。当前总共提供 `32` 个槽位，也就是 `128` 字节。
+
+## 自定义 WGSL 约定
+
+引擎会提供顶点着色器，因此你只需要编写片元模块，并导出 `fs_main`。raw 和 file shader 使用相同的运行时符号。
 
 ### 引擎自动注入的内容
 
@@ -129,7 +154,7 @@ raw 模式要求传入**完整的片元 WGSL 模块**，而不是单个函数片
 | `channel0..3` | `@group(1) @binding(5..8) var channelN: texture_2d<f32>;` | 四个输入通道纹理 |
 | `sampleChannel0..3(uv)` | `fn sampleChannelN(uv: vec2<f32>) -> vec4<f32>` | 对对应通道进行带采样范围修正的常规采样 |
 
-这意味着在 raw shader 中，你**不需要也不应该**重复声明 `render_uniform`、`builtins`、`texture_sampler`、`channel0..3` 以及 `sampleChannel0..3()`。重复声明会与引擎注入版本重名。
+这意味着在自定义 shader 中，你**不需要也不应该**重复声明 `render_uniform`、`builtins`、`texture_sampler`、`channel0..3` 以及 `sampleChannel0..3()`。重复声明会与引擎注入版本重名。
 
 对于 `channel0..3` 的常规采样，应当优先使用 `sampleChannel0..3(uv)`，而不是直接写 `textureSample(channelN, texture_sampler, input.uv)`。helper 会自动处理 render-to-texture 带来的采样范围修正，同时保持 `input.uv` 继续表示当前 shader rect 内的逻辑归一化坐标 `0..1`。
 
@@ -138,7 +163,7 @@ raw 模式要求传入**完整的片元 WGSL 模块**，而不是单个函数片
 - `input.uv`：当前 shader rect 内的逻辑归一化坐标，始终是 `0..1`
 - `sampleChannel0..3(uv)`：在保持 `uv` 语义不变的前提下，采样对应输入 channel 的正确内容区域
 
-当你需要 `textureDimensions(channel0)`、`textureLoad(...)` 这类更底层的纹理操作时，仍然可以直接访问 `channel0..3` 和 `texture_sampler`。helper 只是统一提供这些符号，不会限制 raw shader 的能力。
+当你需要 `textureDimensions(channel0)`、`textureLoad(...)` 这类更底层的纹理操作时，仍然可以直接访问 `channel0..3` 和 `texture_sampler`。helper 只是统一提供这些符号，不会限制自定义 shader 的能力。
 
 :::note
 这些 helper 是引擎在运行时注入的，不需要也不应该在你的 WGSL 源文件中重复定义。编辑器或静态分析工具可能无法识别这类运行时注入符号，但这不会影响 Shader 正常运行。
@@ -153,7 +178,7 @@ raw 模式要求传入**完整的片元 WGSL 模块**，而不是单个函数片
 | `ParamsUniform` | 仅在读取 `params` 时需要 | 由你自己定义内存布局 |
 | `params` 变量 | 仅在读取 `params` 时需要 | 固定使用 `@group(1) @binding(3)` |
 
-一个最小的 raw WGSL 模板通常如下：
+一个最小的自定义 WGSL 模板通常如下：
 
 ```wgsl
 struct ParamsUniform {
@@ -176,7 +201,7 @@ var<uniform> params: ParamsUniform;
 | `time` | 已播放时间（秒）。`auto` / `manual` 模式下来自普通时间轴；`transition` 模式下来自当前转场时间轴 |
 | `time_delta` | 与上一帧的时间差（秒） |
 | `progress` | 转场进度，范围 `0~1`；非 `transition` 模式下恒为 `0` |
-| `effect_id` | 内建效果编号；raw shader 下固定为 `-1` |
+| `effect_id` | 内建效果编号；raw 和 file shader 下固定为 `-1` |
 | `frame` | 当前节点的局部帧计数 |
 | `channel_count` | 当前已声明的 channel 数量 |
 | `stage_size` | 逻辑舞台尺寸 |
