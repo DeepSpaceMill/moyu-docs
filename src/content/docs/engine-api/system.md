@@ -143,6 +143,25 @@ const text = await executePluginCommand('system', {
 
 ## 应用控制
 
+### openUrl — 在默认浏览器中打开链接
+
+在系统默认浏览器中打开 HTTP 或 HTTPS 链接。
+
+```typescript
+executePluginCommand('system', {
+  subCommand: 'openUrl',
+  url: 'https://momoyu.ink/',
+});
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `url` | `string` | 要打开的 HTTP 或 HTTPS URL |
+
+:::caution
+出于安全考虑，仅支持 `http:` 和 `https:` 协议。其他协议会返回错误。
+:::
+
 ### getParams — 获取自定义参数
 
 ```typescript
