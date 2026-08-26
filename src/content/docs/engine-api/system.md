@@ -91,6 +91,40 @@ const size = executePluginCommand('system', {
 `getStageSize` 返回的是逻辑尺寸（设计分辨率），`getWindowInnerSize` 返回的是实际物理像素尺寸。布局时应以 `getStageSize` 为依据。
 :::
 
+### getPlatform — 获取运行平台
+
+同步返回引擎构建目标对应的平台标记。所有字段均在编译期确定，可用于按平台选择功能或资源。
+
+```typescript
+import { getPlatform } from '@momoyu-ink/kit';
+
+const platform = getPlatform();
+
+if (platform.isAndroid || platform.isIOS) {
+  // Use touch controls.
+}
+```
+
+也可以直接调用 system plugin：
+
+```typescript
+const platform = executePluginCommand('system', {
+  subCommand: 'getPlatform',
+});
+```
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `isLinux` | `boolean` | 是否为 Linux |
+| `isMacOS` | `boolean` | 是否为 macOS |
+| `isAndroid` | `boolean` | 是否为 Android |
+| `isIOS` | `boolean` | 是否为 iOS |
+| `isWasm` | `boolean` | 是否为 WebAssembly 构建，与 `isWeb` 等价 |
+| `isNative` | `boolean` | 是否为原生平台（即所有非 Web 平台）构建 |
+| `isDesktop` | `boolean` | 是否为桌面平台（即 Windows、macOS 或 Linux）构建 |
+| `isMobile` | `boolean` | 是否为移动平台（即 Android 或 iOS）构建 |
+| `isWeb` | `boolean` | 是否为 Web 构建 |
+
 ## 截图
 
 ### takeSnapshot — 截取当前画面
