@@ -120,13 +120,24 @@ interface Character {
 ### textbox — 文本框
 
 ```typescript
+interface TextEntry {
+  name: string;              // 当前段落的说话人
+  text: string;              // 段落文本
+  avatarName: string;        // 当前段落使用的头像变体名
+}
+
 interface TextBoxState {
-  name: string;              // 说话者名字
-  text: string;              // 文本内容
-  avatarName: string;        // 当前行的头像变体名（来自文本前导第三槽位）
+  mode: 'adv' | 'nvl';       // 文本框显示模式
+  entries: TextEntry[];      // 已接收的文本段落
+  showName: boolean;         // NVL 模式是否显示说话人名称
+  paragraphGap: number;      // NVL 段落间距（像素）
+  pastColorEnabled: boolean; // NVL 是否使用历史段落文字颜色
+  pastFillColor: string;     // NVL 历史段落文字颜色
+  pastFadeTime: number;      // NVL 历史文字颜色过渡时间（毫秒）
   visible: boolean;          // 文本框是否可见
-  shouldClear?: boolean;     // 下次显示文本前是否清空
-  shouldAddNewline?: boolean; // 是否添加换行
+  hideReason?: 'command' | 'manual';
+  shouldClear?: boolean;     // 下一条命令前是否清除 ADV 文本
+  shouldAddNewline?: boolean; // 下一段文本是否从新段落开始
 
   // 文本渲染配置（通过 @textBox 命令设置）
   printMode: 'instant' | 'typewriter' | 'printer';
@@ -149,6 +160,13 @@ interface TextBoxState {
   avatarFor: TextBoxAvatarForConfig[];  // 按角色 / 变体配置的头像列表
 }
 ```
+
+`entries` 是文本框的统一文本表示：
+
+- `adv` 模式通常在下一条文本行到来前清除已有 entries，因此画面上显示当前对话内容。
+- `nvl` 模式保留多个 entries，并按 `paragraphGap` 在同一文本区域中排列。
+- 文本行末尾的 `+` 会保留已有内容，`&` 会继续当前段落而不创建新段落。两者也可以组合使用。
+- `textClear` 会清空全部 entries；`textBoxShow` 和 `textBoxHide` 只改变可见性，不清除文本。
 
 文本框头像的解析规则、`@avatar` / `@avatarFor` 命令及前导第三槽位详见[文本前导与对话表现](../text-leading/)。
 

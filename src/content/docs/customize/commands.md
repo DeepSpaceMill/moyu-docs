@@ -168,24 +168,29 @@ export function Stage() {
 
 ```typescript
 const handleTextLine: TextLineHandler = (text, control) => {
-  // text.content — 文本内容
-  // text.name    — 说话者名字（可能为空）
-  // text.clear   — 是否清除之前的文本
-  // text.newline — 是否换行
+  // text.leading — 前导，包含说话人、语音和头像变体
+  // text.text    — 文本内容
+  // text.tailing — 尾标，如 `+`、`&` 和 `!`
+  const { speaker, avatarName } = parseTextLeading(text.leading);
+  const textbox = gameState.textbox;
 
-  gameState.textbox.name = text.name ?? '';
-
-  if (text.clear) {
-    gameState.textbox.shouldClear = true;
+  // ADV uses the pending clear/newline flags before the next command.
+  if (textbox.mode === 'adv' && textbox.shouldClear && textbox.shouldAddNewline) {
+    textbox.entries.length = 0;
   }
 
-  if (text.newline && gameState.textbox.text.length > 0) {
-    gameState.textbox.text += '\n';
+  const content = text.text ?? '';
+  const currentEntry = textbox.entries[textbox.entries.length - 1];
+  if (!textbox.shouldAddNewline && currentEntry) {
+    currentEntry.text += content;
+  } else {
+    textbox.entries.push({ name: speaker, text: content, avatarName });
   }
 
-  gameState.textbox.text += text.content;
+  textbox.shouldClear = !text.tailing?.includes('+');
+  textbox.shouldAddNewline = !text.tailing?.includes('&');
   gameState.textbox.visible = true;
-  gameState.character.currentSpeaker = text.name;
+  gameState.character.currentSpeaker = speaker || undefined;
 
   // 等待用户点击
   control.hold();
@@ -463,8 +468,8 @@ import { useBeforeHandleCommandCallback } from '@momoyu-ink/kit';
 
 function TextBoxActor() {
   useBeforeHandleCommandCallback(() => {
-    if (gameState.textbox.shouldClear) {
-      gameState.textbox.text = '';
+    if (gameState.textbox.mode === 'adv' && gameState.textbox.shouldClear) {
+      gameState.textbox.entries.length = 0;
     }
   });
 }

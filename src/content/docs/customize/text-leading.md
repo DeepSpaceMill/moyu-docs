@@ -46,13 +46,18 @@ function parseTextLeading(leading: string | null | undefined) {
 
 ```typescript
 gameState.character.currentSpeaker = speaker || undefined;
-gameState.textbox.name = speaker;
-gameState.textbox.avatarName = avatarName;
+gameState.textbox.entries.push({
+  name: speaker,
+  text: textLine.text ?? '',
+  avatarName,
+});
 ```
+
+在 `adv` 模式中，说话人用于姓名框和头像匹配；在 `nvl` 模式中，说话人保存在当前文本段落中，并由 `textBox` 命令的 `showName` 设置决定是否在说话人发生变化时显示姓名。头像变体仍会随段落保存，文本框切回 `adv` 模式后可继续用于头像匹配。
 
 ## 说话人槽位
 
-说话人会同时写入 `gameState.textbox.name`（姓名框显示文本）与 `gameState.character.currentSpeaker`（当前发言角色标识）。后者是立绘自动变暗的判定依据，见下文。
+说话人会写入当前 `TextEntry` 的 `name` 字段，并写入 `gameState.character.currentSpeaker`（当前发言角色标识）。在 ADV 模式中，当前段落的 `name` 用于姓名框；在 NVL 模式中，`textBox` 命令的 `showName` 决定是否显示姓名。`currentSpeaker` 是立绘自动变暗的判定依据，见下文。
 
 旁白行省略说话人即可（前导留空或整体省略），此时姓名框不显示、且没有角色被视为发言者。
 

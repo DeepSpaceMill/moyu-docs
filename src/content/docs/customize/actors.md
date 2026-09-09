@@ -122,15 +122,19 @@ export function CharacterActor() {
 
 ### TextBoxActor — 文本框
 
-监听 `gameState.textbox`，渲染对话框、姓名框和文本内容。
+监听 `gameState.textbox`，根据 `mode` 渲染传统对话框（ADV）或连续阅读文本框（NVL）。文本内容保存在 `entries` 中，文本行处理器负责写入段落，TextBoxActor 负责将其排版到对应的文本区域。
 
 **关键特性**：
-- 使用 `<text>` 元素的 `printMode` 实现打字机效果
+- 使用 `<text>` 元素的 `printMode` 实现打字机效果，当前段落打印完成后才显示光标
+- ADV 模式显示当前段落、姓名框和可选头像；NVL 模式在同一文本区域中保留多个段落
+- NVL 模式可按配置显示说话人名称，并为历史段落应用独立的文字颜色和过渡效果
 - 注册 `useInterruptCallback` 支持点击完成打字
-- 注册 `useBeforeHandleCommandCallback` 在新命令前清除文本
+- 注册 `useBeforeHandleCommandCallback` 在 ADV 模式的新命令前清除已完成文本
 - 悬停时显示工具栏按钮（快存、快读、设置等）
-- 打印完成后显示闪烁光标
+- 打印完成后显示光标
 - 渲染文本框头像，并根据头像可见性让文本区 / 姓名框退让（详见[文本前导与对话表现](../text-leading/#文本框头像)）
+
+两种模式共用打印速度、文字样式、头像和工具栏配置。模式切换通过 `textBox` 命令完成；清除文本使用 `textClear`，隐藏或显示文本框使用 `textBoxHide` / `textBoxShow`。
 
 ### BGMActor — 背景音乐
 

@@ -86,12 +86,17 @@ const saveToSlot = async (slotId: string) => {
   await executePluginCommand('scenario', {
     subCommand: 'saveGame',
     name: slotId,
-    extra: { text: currentGameState.textbox.text },
+    extra: {
+      text:
+        currentGameState.textbox.entries[currentGameState.textbox.entries.length - 1]?.text ?? '',
+    },
   });
 
   refreshSlots();
 };
 ```
+
+文本框内容属于 `gameState`，会随存档一起保存。NVL 模式下，`textbox.entries` 中的全部段落都会被保存并在读档后恢复；存档列表中的文本预览使用最后一个段落。
 
 ### 读取
 

@@ -26,7 +26,7 @@ sidebar:
 | --- | --- |
 | [text](#text) | 显示对话或旁白文本 |
 | [textClear](#textclear) | 清空文本框内容 |
-| [textBox](#textbox) | 配置文本框样式 |
+| [textBox](#textbox) | 配置文本框模式、样式和排版 |
 | [textBoxShow](#textboxshow) | 显示文本框 |
 | [textBoxHide](#textboxhide) | 隐藏文本框 |
 | [avatar](#avatar) | 配置文本框全局默认头像 |
@@ -230,9 +230,34 @@ sidebar:
 
 ### textBox
 
-配置文本框的显示样式和排版属性。仅更新显式提供的字段，未指定的字段保持不变。
+配置文本框的显示模式、样式和排版属性。仅更新显式提供的字段，未指定的字段保持不变。
 
-基本用法——设置打字机模式和文字颜色：
+文本框支持两种显示模式：
+
+- `adv`：逐行替换文本，适合传统对话框。
+- `nvl`：在同一文本区域中保留多个段落，适合连续阅读。
+
+切换到 NVL 模式：
+
+```sixu
+@textBox mode="nvl" showName=true paragraphGap=24
+```
+
+在 NVL 模式中，文本行会依次保留在文本区域内。当前段落使用普通文字颜色，较早的段落可以使用单独的历史文字颜色，并通过 `pastFadeTime` 设置颜色过渡时间：
+
+```sixu
+@textBox mode="nvl" pastColorEnabled=true pastFillColor="#a0a0a0" pastFadeTime=180
+```
+
+切回传统对话框：
+
+```sixu
+@textBox mode="adv"
+```
+
+`mode` 只改变文本框的显示方式，不会清除已经保存的文本段落。需要清除全部文本时使用 [`textClear`](#textclear)。
+
+基本用法：设置打字机模式和文字颜色。
 
 ```sixu
 @textBox printMode="typewriter" printSpeed=30 fillColor="#f0f0f0"
@@ -260,6 +285,24 @@ sidebar:
 
 **`position`** `[number, number]`
 文本框的 x, y 坐标。
+
+**`mode`** `"adv" | "nvl"`
+文本框显示模式。`adv` 逐行显示并替换文本，`nvl` 保留多个段落并在同一文本区域中显示。
+
+**`showName`** `boolean`
+是否在 NVL 模式显示说话人名称。姓名只会在说话人发生变化时显示一次。此参数对 ADV 模式没有影响。
+
+**`paragraphGap`** `number`
+NVL 模式中相邻文本段落之间的间距，单位为像素。
+
+**`pastColorEnabled`** `boolean`
+是否为 NVL 模式中的历史段落使用单独的文字颜色。关闭后，所有段落使用当前文字颜色。
+
+**`pastFillColor`** `string`
+NVL 模式中历史段落的文字颜色。
+
+**`pastFadeTime`** `number`
+当前段落变为历史段落时的文字颜色过渡时间，单位为毫秒。
 
 **`printMode`** `"instant" | "typewriter" | "printer"`
 文本打印模式。`instant` 立即显示全部文本；`typewriter` 按字逐字显示；`printer` 按行逐行显示。
