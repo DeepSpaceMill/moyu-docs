@@ -22,10 +22,21 @@ sidebar:
 我们提供了一个官方的标准框架，包含了基本的文件结构和示例代码。你可以通过以下命令克隆这个框架：
 
 ```bash
+# Git 需要开启 LFS 支持
 git clone https://github.com/DeepSpaceMill/framework.git my-vn-project
 ```
 
 如果你不想使用 Git，也可以直接从 GitHub 上下载 ZIP 文件并解压到你硬盘上的任意位置。
+
+**准备 Node.js 和 Yarn**
+
+- Node.js 需要 `22.20` 或更高版本，你可以在[Node.js 官网](https://nodejs.org/zh-cn/download)下载并安装。
+- 这个项目使用 Yarn 4。第一次在新机器上运行时，先启用 Corepack：
+
+```bash
+corepack enable
+yarn
+```
 
 然后，进入项目目录并安装依赖：
 
