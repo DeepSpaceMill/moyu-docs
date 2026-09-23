@@ -302,7 +302,7 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 <text text="这是<color=#E7931C>橙色文字</color>，<bold>加粗</bold>，<shadow color=#0008 offsetX=1 offsetY=2 blur=4>带阴影文字</shadow>。" />
 ```
 
-所有标签、属性、转义规则、可用状态和开发中能力见[富文本语法](/customize/rich-text/)。需要把 `<`、`>` 当作普通字符显示时，写成 `<<`、`>>`，或设置 `parseMarkup={false}`。
+所有标签、属性、转义规则、可用状态和开发中能力见[富文本](/start/rich-text/)。需要把 `<`、`>` 当作普通字符显示时，写成 `<<`、`>>`，或设置 `parseMarkup={false}`。
 
 :::tip[命令控制]
 `<text>` 支持通过 `ref.current?.executeCommand()` 发送命令，例如立即完成打印、设置文本、获取光标位置等。详见[节点命令参考](/engine-api/nodes/#text-节点命令)。
