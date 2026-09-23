@@ -57,7 +57,7 @@ sidebar:
 | -------------------------- | ------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | entry                      | string  | `./index.json`      | 重定向游戏入口点，可以是绝对路径或相对路径。这也指定了其他资源（assets）的根路径。通常无需设置。                          |
 | entryFilename              | string  | `index.js`          | 游戏的入口文件名，相对于根路径。除非你知道自己在做什么，否则不要更改此项。                                                |
-| fontFile                   | string  | `fonts/default.otf` | 用于渲染文本的字体文件，必须相对于根路径。支持 .otf 和 .ttf 格式。                                                        |
+| fontFile                   | string 或 array | `fonts/default.otf` | 用于渲染文本的字体文件。路径必须相对于根路径，支持 .otf 和 .ttf 格式。数组中的字体按从前到后的顺序作为 fallback 使用。 |
 | windowTitle                | string  | `moyu`              | 窗口的标题。                                                                                                              |
 | windowState                | string  | `idle`              | 窗口的初始状态。可能的值：`idle`, `minimized`, `maximized`, `fullscreen`。                                                |
 | windowResizable            | boolean | false               | 窗口可否任意调整大小。                                                                                                      |
@@ -70,6 +70,29 @@ sidebar:
 | enableGamepads               | boolean | false               | 是否启用游戏手柄支持。详见[手柄与其他 API](../engine-api/misc.md)                                                                  |
 | enableMSAA                 | boolean | false               | 是否启用 4 倍多重采样抗锯齿（4× MSAA），用于改善图形边缘的锯齿。                                                          |
 | enableMipmaps              | boolean | false               | 是否为静态图片生成 mipmap，用于改善图片缩小时的清晰度和稳定性。                                                           |
+
+### 字体 fallback
+
+`fontFile` 默认是一个字体路径，旧写法仍然有效。需要为缺少字形的文本指定 fallback 字体时，可以将它设为数组；引擎按数组从前到后的顺序查找字形。
+
+数组中的每一项可以是路径字符串，也可以是带可选 `alias` 和 `kind` 的对象。`alias` 用于区分同一字体文件的不同配置；`kind` 可为 `cjk` 或 `latin`，用于优先选择中文或拉丁文字的对应字体。未设置 `kind` 时，仍按数组顺序选择。
+
+```json
+{
+  "fontFile": [
+    { "path": "fonts/SourceHanSansSC-VF.otf", "alias": "siyuan", "kind": "cjk" },
+    { "path": "fonts/Inter-Variable.ttf", "alias": "inter", "kind": "latin" }
+  ]
+}
+```
+
+:::info[可变字体]
+
+可变字体在一个字体文件中包含多个字重和斜体样式。项目可用时，建议优先配置可变字体，以减少字体文件数量与 `fontFile` 配置项。
+
+很多字体（如思源黑体）都提供了可变字体版本。
+
+:::
 
 ### 多重采样抗锯齿（MSAA）
 

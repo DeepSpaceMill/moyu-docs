@@ -116,11 +116,13 @@ import { FileTree } from '@astrojs/starlight/components';
 [Kei] 这也是一句对话，效果相同。
 ```
 
-文本中支持富文本标签：
+文本中支持 `<...>` 富文本标签：
 
 ```sixu
-[Alice] "这是<fillColor=#E7931C>橙色文字</fillColor>，这是<bold>加粗文字</bold>，这是<underline>下划线</underline>。"
+[Alice] "这是<color=#E7931C>橙色文字</color>，这是<bold>加粗文字</bold>，这是<shadow color=#0008 offsetX=1 offsetY=2 blur=4>带阴影文字</shadow>。"
 ```
+
+完整语法与可用状态见[富文本语法](/customize/rich-text/)。
 
 ### 命令
 

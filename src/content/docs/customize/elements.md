@@ -201,14 +201,13 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | `text` | `string` | `""` | 文本内容 |
 | `fontSize` | `number` | — | 字号 |
 | `fillColor` | `string` | — | 文本颜色（CSS 颜色值） |
+| `parseMarkup` | `boolean` | `true` | 是否解析 `<...>` 富文本标签；设为 `false` 时原样显示文本 |
 | `printMode` | `"instant" \| "typewriter" \| "printer"` | `"instant"` | 打印模式 |
 | `printSpeed` | `number` | — | 打印速度（typewriter: 字/秒，printer: 行/秒） |
 | `boxWidth` | `number` | — | 文本框宽度 |
 | `boxHeight` | `number` | — | 文本框高度 |
 | `lineHeight` | `number` | — | 行高倍数 |
 | `indent` | `number` | — | 段首缩进（像素） |
-| `direction` | `"horizontal" \| "vertical"` | `"horizontal"` | 排版方向 |
-| `glyphGridSize` | `number` | — | 字形网格大小 |
 
 ### 文本效果
 
@@ -265,13 +264,45 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | `onProgress` | `(progress: number) => void` | 打印进度（0~1） |
 | `onFinish` | `() => void` | 打印完成时触发 |
 
-### 富文本标签
+### 布局与链接事件
 
-`<text>` 元素的文本内容支持内联富文本标签：
+文本完成布局时会触发 `onTextLayout`，可取得实际尺寸与最后一个字符后的本地光标坐标：
 
 ```tsx
-<text text="这是<fillColor=#E7931C>橙色文字</fillColor>，<bold>加粗</bold>，<underline>下划线</underline>。" />
+<text
+  text="需要测量的文本"
+  onTextLayout={({ width, height, endCursorPosition }) => {
+    console.log(width, height, endCursorPosition);
+  }}
+/>
 ```
+
+富文本 `<link>` 区域可以通过 `onInteraction` 接收局部指针事件。链接必须同时声明 `id` 和 `target`；`id` 是回调中的识别符，应用可据此决定是否打开或跳转。
+
+```tsx
+<text
+  text={'阅读<link id="guide" target="/guide">使用指南</link>'}
+  interactive
+  cursor="pointer"
+  onInteraction={({ id, kind }) => {
+    if (kind === 'click') {
+      console.log(`点击链接：${id}`);
+    }
+  }}
+/>
+```
+
+`kind` 的值为 `over`、`enter`、`leave`、`down`、`up` 或 `click`。只有指针位于对应 `<link>` 文本的排版区域内，`onInteraction` 才会触发；`<text>` 的其他区域仍按普通节点处理。
+
+### 富文本
+
+`<text>` 默认使用 `<` 和 `>` 作为富文本标签符号：
+
+```tsx
+<text text="这是<color=#E7931C>橙色文字</color>，<bold>加粗</bold>，<shadow color=#0008 offsetX=1 offsetY=2 blur=4>带阴影文字</shadow>。" />
+```
+
+所有标签、属性、转义规则、可用状态和开发中能力见[富文本语法](/customize/rich-text/)。需要把 `<`、`>` 当作普通字符显示时，写成 `<<`、`>>`，或设置 `parseMarkup={false}`。
 
 :::tip[命令控制]
 `<text>` 支持通过 `ref.current?.executeCommand()` 发送命令，例如立即完成打印、设置文本、获取光标位置等。详见[节点命令参考](/engine-api/nodes/#text-节点命令)。
