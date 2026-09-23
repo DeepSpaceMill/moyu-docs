@@ -57,6 +57,7 @@ sidebar:
 | -------------------------- | ------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | entry                      | string  | `./index.json`      | 重定向游戏入口点，可以是绝对路径或相对路径。这也指定了其他资源（assets）的根路径。通常无需设置。                          |
 | entryFilename              | string  | `index.js`          | 游戏的入口文件名，相对于根路径。除非你知道自己在做什么，否则不要更改此项。                                                |
+| appName                    | string  | `moyu`              | 应用名称，用于确定应用数据目录的名称。                                                                                    |
 | fontFile                   | string 或 array | `fonts/default.otf` | 用于渲染文本的字体文件。路径必须相对于根路径，支持 .otf 和 .ttf 格式。数组中的字体按从前到后的顺序作为 fallback 使用。 |
 | windowTitle                | string  | `moyu`              | 窗口的标题。                                                                                                              |
 | windowState                | string  | `idle`              | 窗口的初始状态。可能的值：`idle`, `minimized`, `maximized`, `fullscreen`。                                                |
@@ -66,10 +67,12 @@ sidebar:
 | presentMode                | string  | `recommended`       | 表面的呈现模式。可能的值：`recommended`, `autovsync`, `autonovsync`。除非你知道自己在做什么，否则不要更改此项。           |
 | backend                    | string  | `auto`              | 用于渲染的后端。可能的值：`auto`, `dx12`, `vulkan`, `gles`, `metal`, `webgpu`。除非你知道自己在做什么，否则不要更改此项。 |
 | <small>desiredMaximumFrameLatency</small> | number  | 2                   | 期望的最大帧延迟。除非你知道自己在做什么，否则不要更改此项。                                                              |
+| backgroundColor            | string  | `transparent`       | 表面初始化时使用的背景颜色。                                                                                                |
 | showFPS                    | boolean | false               | 是否显示 FPS。通常用于调试，请勿在发布版中设置。                                                                          |
 | enableGamepads               | boolean | false               | 是否启用游戏手柄支持。详见[手柄与其他 API](../engine-api/misc.md)                                                                  |
 | enableMSAA                 | boolean | false               | 是否启用 4 倍多重采样抗锯齿（4× MSAA），用于改善图形边缘的锯齿。                                                          |
 | enableMipmaps              | boolean | false               | 是否为静态图片生成 mipmap，用于改善图片缩小时的清晰度和稳定性。                                                           |
+| steam                      | object  | 无                  | Steam 配置。字段说明见 [Steam API](../engine-api/steam.md)。                                                               |
 
 ### 字体 fallback
 
