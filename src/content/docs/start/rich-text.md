@@ -4,7 +4,7 @@ sidebar:
   order: 6
 ---
 
-富文本用于在一段文字中改变局部的外观或行为，例如把关键词显示为金色、把警告文字加粗、为文字添加阴影，或让一小段文字可以点击。
+富文本用于在一段文字中改变局部的外观或行为，例如把关键词显示为金色、把警告文字加粗、为文字添加阴影、给一段文字加上背景或下划线，或让一小段文字可以点击。
 
 它可用于 JSX 的 `<text>` 节点，也可直接写在 Sixu 剧本的对话中。标签写法接近 HTML：开始标签包住文字，结束标签恢复原来的样式。
 
@@ -130,6 +130,91 @@ E = mc<baseline=-8 size=18>2</baseline>
 | `style` | 允许补出斜体。 |
 | `all` | 同时允许补出粗体和斜体，默认值。 |
 
+## 背景、线条与装饰
+
+这些标签为一段文字添加装饰，作用接近 CSS 的 `background` 和 `text-decoration`，都只影响自己包住的文字。
+
+```text
+<background color="#FFF3BF" paddingX=6 paddingY=2 radius=6>提示</background>
+<underline color="#1677FF" thickness=2>下划线</underline>
+<lineThrough color="#666666" thickness=2>删除线</lineThrough>
+<emphasis>着重号</emphasis>
+<mourning>示亡号</mourning>
+<properNoun>专名号</properNoun>
+<bookTitle>书名号</bookTitle>
+```
+
+`background` 的常用属性：
+
+| 属性 | 说明 |
+| --- | --- |
+| `color` | 背景填充色，默认黑色。 |
+| `paddingX`、`paddingY` | 背景在文字四周留出的水平、垂直留白。 |
+| `radius` | 背景圆角半径。 |
+| `strokeColor`、`strokeWidth` | 可选背景描边。 |
+| `shadowColor`、`shadowOffsetX`、`shadowOffsetY`、`shadowBlur`、`shadowWidth` | 可选背景阴影。 |
+
+`underline` 和 `lineThrough` 的常用属性：
+
+| 属性 | 说明 |
+| --- | --- |
+| `color` | 线条颜色，默认黑色。 |
+| `thickness` | 线条粗细，默认 `1`。 |
+| `pattern` | `solid`、`dashed` 或 `dotted`，默认 `solid`。 |
+| `dashLength`、`gapLength` | 虚线与点线的长度。 |
+| `clearance` | 线条与文字之间的净空。 |
+| `strokeColor`、`strokeWidth`、`shadowColor`、`shadowOffsetX`、`shadowOffsetY`、`shadowBlur`、`shadowWidth` | 可选线条描边与阴影。 |
+
+```text
+<underline color="#1677FF" pattern=dashed dashLength=3 gapLength=2>可点击的链接文字</underline>
+```
+
+`emphasis`、`mourning`、`properNoun` 和 `bookTitle` 不需要属性，分别给内容加上着重号、示亡号、专名号和书名号。
+
+## 注音
+
+`ruby` 在文字旁添加拼音等注音，`bopomofo` 添加注音符号，概念上接近 HTML 的 `<ruby>`。
+
+```text
+<ruby text="tí qiàn">提椠</ruby>
+<bopomofo text="ㄓㄨˋ ㄧㄣ">注音</bopomofo>
+```
+
+两个标签都必须给出非空的 `text` 属性，也可以写成简写形式 `<ruby=text>`。`font` 和 `locale` 用于单独指定注音文字的字体和语言区域。
+
+## 行内代码
+
+`code` 为一段文字应用等宽字体和背景，类似 HTML 的 `<code>`。
+
+```text
+<code font="monospace" paddingX=4 paddingY=2 radius=3>cargo test</code>
+```
+
+`code` 的属性同时作用于代码文字和它的背景：`font`、`weight` 等文字样式属性按 `span` 的规则处理，`paddingX`、`paddingY`、`radius` 等背景属性按 `background` 的规则处理。因此 `color` 会同时决定代码文字和背景的颜色；需要两者不同色时，在 `code` 内部再嵌套 `<color>` 之类的文字样式标签。
+
+## 分段文字
+
+`<br />` 结束当前段落并开始下一段，各段独立排版：
+
+```text
+第一段文字<br />第二段文字
+```
+
+`<br />` 可以带属性设置下一段的排版，未指定的字段继承上一段：
+
+```text
+这是自动换行的长段落。<br indent=2 align=center lineHeight=54 />下一段使用首行缩进、居中的结束行和更大的行高。
+```
+
+| 属性 | 说明 |
+| --- | --- |
+| `indent` | 下一段的首行缩进。 |
+| `lineHeight` | 下一段的行高，直接写像素值，与 `<text>` 的 `lineHeight` 倍数写法不同。 |
+| `blockIndent` | 下一段所有行的起始缩进。 |
+| `align` | `start`、`center` 或 `end`。 |
+
+连续写多个 `<br />` 会产生空段落，空段落占一行高度但不显示内容。
+
 ## 可点击文字
 
 `link` 为一段文字定义链接区域，概念上接近 HTML 的 `<a>`。它必须包含 `target`；若要在 JSX 中接收事件，再添加非空的 `id`。
@@ -223,28 +308,28 @@ E = mc<baseline=-8 size=18>2</baseline>
 | `baseline` | 上下移动局部文字。 | `<baseline=-6>文字</baseline>` |
 | `locale` | 指定语言区域。 | `<locale=ja>日本語</locale>` |
 | `fontSynthesis` | 控制仿粗和仿斜。 | `<fontSynthesis=none>文字</fontSynthesis>` |
+| `background` | 添加背景色、圆角和内边距。 | `<background color=#FFF3BF radius=6>文字</background>` |
+| `underline` | 添加下划线。 | `<underline color=#1677FF thickness=2>文字</underline>` |
+| `lineThrough` | 添加删除线。 | `<lineThrough color=#666666>文字</lineThrough>` |
+| `ruby` | 添加拼音等注音。 | `<ruby text="tí qiàn">提椠</ruby>` |
+| `bopomofo` | 添加注音符号。 | `<bopomofo text="ㄓㄨˋ ㄧㄣ">注音</bopomofo>` |
+| `emphasis` | 添加着重号。 | `<emphasis>文字</emphasis>` |
+| `mourning` | 添加示亡号。 | `<mourning>文字</mourning>` |
+| `properNoun` | 添加专名号。 | `<properNoun>文字</properNoun>` |
+| `bookTitle` | 添加书名号。 | `<bookTitle>书名</bookTitle>` |
+| `code` | 应用等宽字体与背景。 | `<code paddingX=4 radius=3>cargo test</code>` |
 | `link` | 定义可交互链接文字。 | `<link id="guide" target="/guide">文字</link>` |
+| `br /` | 结束当前段落并开始下一段。 | `第一段<br />第二段` |
 
 `span` 还可使用以下属性：`strokeColor`、`strokeWidth`、`shadowColor`、`shadowOffsetX`、`shadowOffsetY`、`shadowBlur`、`shadowWidth`、`font`、`weight`、`italic`、`fontSynthesis`、`locale`、`baseline` 和 `attach`。
 
-## 正在开发的标签
+## 尚未生效的标签
 
 下列标签的写法已经确定，但当前版本不应依赖它们产生可见效果。它们保留在这里，便于项目升级后查阅。
 
 | 标签 | 未来用途 | 当前情况 |
 | --- | --- | --- |
-| `background` | 为文字添加背景色、圆角和内边距，类似 CSS 的 `background`。 | 不显示背景。 |
-| `underline` | 添加下划线，类似 HTML 的 `<u>`。 | 不显示线条。 |
-| `lineThrough` | 添加删除线，类似 HTML 的 `<s>`。 | 不显示线条。 |
-| `ruby` | 添加拼音或其他注音，类似 HTML 的 `<ruby>`。 | 不显示注音。 |
-| `bopomofo` | 添加注音符号。 | 不显示注音。 |
-| `emphasis` | 添加着重号。 | 不显示装饰。 |
-| `mourning` | 添加示亡号。 | 不显示装饰。 |
-| `properNoun` | 添加专名号。 | 不显示装饰。 |
-| `bookTitle` | 添加书名号。 | 不显示装饰。 |
-| `code` | 为代码文字添加等宽字体与背景，类似 HTML 的 `<code>`。 | 文字样式可用，背景不显示。 |
-| `br />` | 结束当前段落并设置下一段样式。 | 当前只显示第一段。 |
-| `object />` | 在文字中放置图像或其他对象。 | 不显示对象。 |
+| `object /` | 在文字中放置图像或其他对象。 | 会占用排版空间，但不绘制内容。 |
 
 `technical`、`noAutoSpace` 和 `box` 是排版控制标签，当前已经可用，但主要用于需要精细控制断行、自动间距或文字两侧空间的排版场景。普通对话和 UI 文案通常不需要使用它们。
 
@@ -278,4 +363,10 @@ E = mc<baseline=-8 size=18>2</baseline>
 
 ### 需要分段文字
 
-当前不要依赖 `<br />` 创建多段文本。请使用多个 `<text>` 节点，或使用普通换行文本。
+用 `<br />` 分段，各段会独立排版：
+
+```text
+第一段文字<br />第二段文字
+```
+
+也可以使用多个 `<text>` 节点，让每段各自控制位置和样式。
