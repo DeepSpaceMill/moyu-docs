@@ -103,13 +103,13 @@ sidebar:
 
 `fontFile` 默认是一个字体路径，旧写法仍然有效。需要为缺少字形的文本指定 fallback 字体时，可以将它设为数组；引擎按数组从前到后的顺序查找字形。
 
-数组中的每一项可以是路径字符串，也可以是带可选 `alias` 和 `kind` 的对象。`alias` 用于区分同一字体文件的不同配置；`kind` 可为 `cjk` 或 `latin`，用于优先选择中文或拉丁文字的对应字体。未设置 `kind` 时，仍按数组顺序选择。
+数组中的每一项可以是路径字符串，也可以是带可选 `alias` 和 `kind` 的对象。`alias` 用于区分同一字体文件的不同配置；`kind` 可为 `cjk` 或 `western`，用于优先选择中文或西文的对应字体。未设置 `kind` 时，仍按数组顺序选择。
 
 ```json
 {
   "fontFile": [
     { "path": "fonts/SourceHanSansSC-VF.otf", "alias": "siyuan", "kind": "cjk" },
-    { "path": "fonts/Inter-Variable.ttf", "alias": "inter", "kind": "latin" }
+    { "path": "fonts/Inter-Variable.ttf", "alias": "inter", "kind": "western" }
   ]
 }
 ```
