@@ -55,35 +55,62 @@ useEffect(() => {
 
 | 事件 | 触发时机 |
 |------|---------|
-| `onClick` | 鼠标点击 |
-| `onMouseDown` | 鼠标按下 |
-| `onMouseUp` | 鼠标抬起 |
+| `onClick` | 主键（左键）点击 |
+| `onAuxClick` | 非主键（中键 / 右键 / 侧键）点击 |
+| `onDoubleClick` | 主键双击 |
+| `onContextMenu` | 右键按下时 |
+| `onMouseDown` | 鼠标任意按键按下 |
+| `onMouseUp` | 鼠标任意按键抬起 |
 | `onMouseMove` | 鼠标移动 |
-| `onMouseEnter` | 鼠标进入（不冒泡） |
-| `onMouseLeave` | 鼠标离开（不冒泡） |
+| `onMouseEnter` | 指针进入节点 |
+| `onMouseLeave` | 指针离开节点 |
 
 ### MouseEvent 属性
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
-| `x` | `number` | 舞台坐标 X |
-| `y` | `number` | 舞台坐标 Y |
-| `button` | `number` | 鼠标按键（0=左, 1=中, 2=右） |
+| `x` / `y` | `number` | 舞台逻辑坐标（`clientX` / `clientY` 的别名） |
+| `clientX` / `clientY` | `number` | 舞台逻辑坐标 |
+| `screenX` / `screenY` | `number` | 含窗口位置的屏幕坐标 |
+| `offsetX` / `offsetY` | `number` | 相对当前节点原点的局部坐标 |
+| `button` | `number` | 本次事件对应的按键（0=左, 1=中, 2=右, 3=后退, 4=前进；非按键事件为 0） |
+| `buttons` | `number` | 事件发生时按住的按键掩码（1=左, 2=右, 4=中, 8=后退, 16=前进） |
 | `ctrlKey` | `boolean` | Ctrl 键是否按下 |
 | `shiftKey` | `boolean` | Shift 键是否按下 |
 | `altKey` | `boolean` | Alt 键是否按下 |
 | `metaKey` | `boolean` | Meta 键是否按下 |
 
+按键编码与 DOM `MouseEvent` 一致，中键的 `button` 为 1 但 `buttons` 位为 4。`kit` 提供 `MouseButton`（按键编号）与 `MouseButtons`（位掩码）两组常量。
+
+### 事件顺序与手势目标
+
+| 手势 | 事件序列 |
+|------|---------|
+| 左键单击 | `onMouseDown` → `onMouseUp` → `onClick` |
+| 右键单击 | `onMouseDown` → `onContextMenu` → `onMouseUp` → `onAuxClick` |
+| 中键单击 | `onMouseDown` → `onMouseUp` → `onAuxClick` |
+| 左键双击 | 两次单击序列 → `onDoubleClick` |
+
+点击手势的目标是按下与抬起两个节点的最近公共祖先。按下与抬起处于不同节点时，`onClick` / `onAuxClick` / `onDoubleClick` 仍会派出，目标是两者的公共祖先。
+
 ### 全局鼠标事件
 
 ```typescript
 addEventListener('click', (e: MouseEvent) => { ... });
+addEventListener('auxclick', (e: MouseEvent) => { ... });
+addEventListener('doubleclick', (e: MouseEvent) => { ... });
+addEventListener('contextmenu', (e: MouseEvent) => { ... });
 addEventListener('mousedown', (e: MouseEvent) => { ... });
 addEventListener('mouseup', (e: MouseEvent) => { ... });
 addEventListener('mousemove', (e: MouseEvent) => { ... });
-addEventListener('contextmenu', (e: MouseEvent) => { ... });
-addEventListener('doubleclick', (e: MouseEvent) => { ... });
 ```
+
+### 与 DOM 的差异
+
+- `onMouseEnter` / `onMouseLeave` 在每次命中目标变化时触发并沿节点树冒泡，接近 DOM 的 `mouseover` / `mouseout`；DOM 的 `mouseenter` / `mouseleave` 不冒泡，引擎暂不提供该行为。
+- `detail`（点击次数）与 `which` 未实现。
+- 物理按键中只有左 / 中 / 右 / 后退 / 前进参与事件，其余按键不产生鼠标事件。
+- `WheelEvent` 不携带坐标与按键字段。
 
 ## 键盘事件
 
@@ -130,10 +157,10 @@ addEventListener('keyup', (e: KeyboardEvent) => { ... });
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
-| `id` | `number` | 触摸点 ID |
-| `x` | `number` | 舞台坐标 X |
-| `y` | `number` | 舞台坐标 Y |
-| `force` | `number` | 压力（如果支持） |
+| `identifier` | `number` | 触摸点 ID |
+| `clientX` / `clientY` | `number` | 舞台逻辑坐标 |
+| `screenX` / `screenY` | `number` | 含窗口位置的屏幕坐标 |
+| `offsetX` / `offsetY` | `number` | 相对当前节点原点的局部坐标 |
 
 ## 冒泡机制
 
