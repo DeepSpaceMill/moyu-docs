@@ -28,6 +28,7 @@ sidebar:
 | `tint` | `string` | `"#FFFFFF"` | 着色（CSS 颜色值） |
 | `opacity` | `number` | `1` | 透明度（0~1） |
 | `interactive` | `boolean` | `false` | 是否响应交互事件 |
+| `hitTestSelf` | `boolean` | `true` | 自身是否作为命中目标；`false` 时自身不参与命中判定，子节点照常 |
 | `cursor` | `MoyuCursor` | — | 鼠标悬停时的光标样式 |
 | `zIndex` | `number` | `0` | 同一父节点下的绘制和命中顺序，支持负数 |
 
@@ -156,6 +157,7 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | `src` | `string` | — | 图片路径（相对于 `assets/`） |
 | `mode` | `"normal" \| "nineslice"` | `"normal"` | 渲染模式 |
 | `area` | `[number, number, number, number]` | — | 裁剪区域（归一化坐标 0~1：`[x0, y0, x1, y1]`） |
+| `alphaHitTest` | `boolean` | `false` | 按纹素透明度判定命中，透明像素不参与命中（仅 `mode="normal"`） |
 
 ### 九宫格模式
 
@@ -165,7 +167,7 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 <sprite
   src="ui/panel_bg.png"
   mode="nineslice"
-  bounds={[20, 20, 20, 20]}
+  bounds={[0.25, 0.25, 0.25, 0.25]}
   targetWidth={400}
   targetHeight={300}
 />
@@ -173,7 +175,7 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
-| `bounds` | `[left, top, right, bottom]` | 九宫格边距（像素） |
+| `bounds` | `[left, top, right, bottom]` | 九宫格边距，相对 `area` 的比例（0~1） |
 | `nineSliceMode` | `"stretch" \| "repeat" \| "mirror" \| "blank"` | 中间区域的填充方式 |
 | `targetWidth` | `number` | 目标宽度 |
 | `targetHeight` | `number` | 目标高度 |
@@ -503,7 +505,7 @@ function SimpleDialog() {
       <sprite
         src="ui/dialog_bg.png"
         mode="nineslice"
-        bounds={[24, 24, 24, 24]}
+        bounds={[0.25, 0.25, 0.25, 0.25]}
         targetWidth={800}
         targetHeight={400}
         x={560}

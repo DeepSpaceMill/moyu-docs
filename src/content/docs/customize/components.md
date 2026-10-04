@@ -32,7 +32,7 @@ import { Button } from '../components/button';
 | `color` | `string \| [string, string, string]` | — | 文字颜色，可为三态分别设置 |
 | `textAlign` | `"left" \| "center" \| "right"` | `"center"` | 文字对齐 |
 | `nineSlice` | `boolean` | `false` | 启用九宫格模式 |
-| `bounds` | `[number, number, number, number]` | — | 九宫格边距 |
+| `bounds` | `[number, number, number, number]` | — | 九宫格边距，相对 `area` 的比例（0~1） |
 | `targetWidth` | `number` | — | 九宫格目标宽度 |
 | `targetHeight` | `number` | — | 九宫格目标高度 |
 
@@ -56,7 +56,7 @@ import { Button } from '../components/button';
 <Button
   fileNames={['btn_9s.png', 'btn_9s.png', 'btn_9s.png']}
   nineSlice={true}
-  bounds={[12, 12, 12, 12]}
+  bounds={[0.25, 0.25, 0.25, 0.25]}
   targetWidth={200}
   targetHeight={60}
   text="确认"
