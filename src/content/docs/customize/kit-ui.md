@@ -84,7 +84,7 @@ type ControlStateValue<T> = T | readonly [idle: T, hover?: T, press?: T, disable
 
 `children` 渲染在素材内部，可以放任意节点。
 
-素材启用 `alphaHitTest` 后，贴图的透明位置不再接收命中（Button 的包装层让出了自身命中），点击会落到后面的节点。
+素材启用 `alphaHitTest` 后，贴图的透明位置不再接收命中，点击会落到后面的节点。
 
 ## Checkbox
 
