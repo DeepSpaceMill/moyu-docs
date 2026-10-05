@@ -4,177 +4,132 @@ sidebar:
   order: 9
 ---
 
-标准框架在 `src/components/` 中提供了一系列可复用的 UI 组件。你可以直接使用它们来构建界面，也可以参考其实现来创建自己的组件。
+标准框架在 `@momoyu-ink/kit` 的组件之上，固定了项目素材与配色，并补充了对话框、通知、转场等页面级组件。Kit 的通用组件与 Hook 见 [UI 组件库（Kit）](/customize/kit-ui/)。
 
-## Button — 按钮
+所有组件从 `../components/` 导入，风格在 `src/theme.ts` 中集中定义。
 
-三态图片按钮，支持普通模式和九宫格模式。
+## Checkbox — 勾选框
 
-```tsx
-import { Button } from '../components/button';
-
-<Button
-  fileNames={['btn_idle.png', 'btn_hover.png', 'btn_press.png']}
-  x={100}
-  y={200}
-  onClick={() => console.log('clicked')}
-/>
-```
-
-### 属性
-
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `fileNames` | `[string, string, string]` | — | 三态图片路径：`[idle, hover, pressed]` |
-| `onClick` | `() => void` | — | 点击回调 |
-| `text` | `string` | — | 按钮文字 |
-| `fontSize` | `number` | — | 字号 |
-| `color` | `string \| [string, string, string]` | — | 文字颜色，可为三态分别设置 |
-| `textAlign` | `"left" \| "center" \| "right"` | `"center"` | 文字对齐 |
-| `nineSlice` | `boolean` | `false` | 启用九宫格模式 |
-| `bounds` | `[number, number, number, number]` | — | 九宫格边距，相对 `area` 的比例（0~1） |
-| `targetWidth` | `number` | — | 九宫格目标宽度 |
-| `targetHeight` | `number` | — | 九宫格目标高度 |
-
-其他通用属性（`x`, `y`, `visible` 等）也支持。
-
-### 带文字的按钮
-
-```tsx
-<Button
-  fileNames={['btn_bg.png', 'btn_bg_hover.png', 'btn_bg_press.png']}
-  text="开始游戏"
-  fontSize={28}
-  color={['#CCCCCC', '#FFFFFF', '#AAAAAA']}
-  shadow={{ color: '#000000', offsetX: 1, offsetY: 1, blur: 2 }}
-/>
-```
-
-### 九宫格按钮
-
-```tsx
-<Button
-  fileNames={['btn_9s.png', 'btn_9s.png', 'btn_9s.png']}
-  nineSlice={true}
-  bounds={[0.25, 0.25, 0.25, 0.25]}
-  targetWidth={200}
-  targetHeight={60}
-  text="确认"
-/>
-```
-
----
-
-## Slider — 滑动条
-
-水平滑动条，返回 0~1 范围的值。
-
-```tsx
-import { Slider } from '../components/slider';
-
-<Slider
-  x={100}
-  y={200}
-  value={0.5}
-  onChange={(val) => console.log(val)}
-  trackImage="ui/slider_track.png"
-  fillImage="ui/slider_fill.png"
-  thumbImage="ui/slider_thumb.png"
-/>
-```
-
-### 属性
-
-| 属性 | 类型 | 说明 |
-|------|------|------|
-| `value` | `number` | 当前值（0~1） |
-| `onChange` | `(value: number) => void` | 值变化回调 |
-| `trackImage` | `string` | 轨道背景图 |
-| `fillImage` | `string` | 已填充部分的图片 |
-| `thumbImage` | `string` | 滑块图片 |
-| `trackWidth` | `number` | 轨道宽度 |
-
-支持鼠标拖动和轨道点击两种交互方式。
-
----
-
-## Select — 下拉选择
-
-```tsx
-import { Select } from '../components/select';
-
-<Select
-  x={100}
-  y={200}
-  options={[
-    { label: '720p', value: '720' },
-    { label: '1080p', value: '1080' },
-    { label: '全屏', value: 'fullscreen' },
-  ]}
-  value="720"
-  onChange={(val) => console.log(val)}
-/>
-```
-
-### 属性
-
-| 属性 | 类型 | 说明 |
-|------|------|------|
-| `options` | `{ label: string, value: string }[]` | 选项列表 |
-| `value` | `string` | 当前选中值 |
-| `onChange` | `(value: string) => void` | 选择变化回调 |
-
----
-
-## Checkbox — 复选框
-
-基于 Button 组件实现的复选框。
+固定使用 `ui/unchecked*.png` 与 `ui/checked*.png` 素材的复选框，其余行为与 Kit 的 `Checkbox` 相同。
 
 ```tsx
 import { Checkbox } from '../components/checkbox';
 
 <Checkbox
-  checked={true}
-  onChange={(checked) => console.log(checked)}
-  fileNames={['checkbox_off.png', 'checkbox_on.png']}
+  checked={checked}
+  onCheckedChange={setChecked}
+  text="启用自动阅读"
+  textStyle={{ fontSize: 24, fillColor: '#dbe4f3' }}
+  targetWidth={48}
+  targetHeight={48}
 />
 ```
 
----
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `targetWidth` / `targetHeight` | `number` | `0` | 素材绘制尺寸 |
+| `mode` | `'normal' \| 'nineslice'` | `'normal'` | 绘制模式 |
+| `bounds` | `[number, number, number, number]` | 未设置 | 九宫格边距（0~1 比例） |
+| `checked` / `defaultChecked` / `onCheckedChange` | — | — | 选中状态，见 Kit 文档 |
+
+## Select — 下拉选择
+
+固定使用 `ui/dropdown*.png` 素材的选择框，配色由 `color` 与 `fontSize` 描述。
+
+```tsx
+import { Select } from '../components/select';
+
+<Select
+  value={quality}
+  onValueChange={setQuality}
+  options={[
+    { text: '720p', value: '720' },
+    { text: '1080p', value: '1080' },
+  ]}
+  fontSize={22}
+  color="#ffffff"
+  targetWidth={360}
+  targetHeight={56}
+/>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `options` | `{ text: string, value: string }[]` | `[]` | 选项列表 |
+| `fontSize` | `number` | 未设置 | 文字字号 |
+| `color` | `string \| readonly [string, string?, string?, string?]` | `'black'` | 文字颜色，可按 idle / hover / press / disabled 四态提供 |
+| `mode` / `bounds` | — | 未设置 | 触发按钮的绘制模式与九宫格边距 |
+| `targetWidth` / `targetHeight` | `number` | `0` | 触发按钮绘制尺寸 |
+| `value` / `defaultValue` / `onValueChange` | — | — | 选中值，见 Kit 文档 |
+
+展开列表与选项素材固定，列表宽度跟随 `targetWidth`。
+
+## Slider — 滑动条
+
+固定使用 `ui/slider_track*.png` 与 `ui/slider_handle*.png` 素材的滑动条。
+
+```tsx
+import { Slider } from '../components/slider';
+
+<Slider
+  value={volume}
+  onValueChange={setVolume}
+  targetWidth={400}
+  targetHeight={12}
+/>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `targetWidth` | `number` | `0` | 轨道宽度 |
+| `targetHeight` | `number` | `0` | 轨道高度 |
+| `value` / `defaultValue` / `onValueChange` / `onValueCommit` | — | — | 当前值（0~1），见 Kit 文档 |
+
+滑块素材宽度固定为 24。
 
 ## Dialog — 对话框
 
-模态对话框，支持 alert 和 confirm 两种模式。通常不直接使用，而是通过 `uiActions.confirm()` 调用。
+模态确认框，以 overlay 形式打开。通常经由 `uiActions.confirm()` 调用：
 
-```tsx
-import { Dialog } from '../components/dialog';
+```typescript
+import { uiActions } from '../state/ui';
 
-// 确认模式
-<Dialog
-  message="确定要退出吗？"
-  onConfirm={() => { ... }}
-  onCancel={() => { ... }}
-/>
-
-// 提示模式
-<Dialog message="操作成功" />
+uiActions.confirm('确定要退出吗？', () => {
+  // 确认后执行
+});
 ```
 
-### 属性
+`confirm` 会插入 `confirm` overlay，参数为：
 
-| 属性 | 类型 | 说明 |
+| 参数 | 类型 | 说明 |
 |------|------|------|
 | `message` | `string` | 对话框消息 |
+| `mode` | `'alert' \| 'confirm'` | 提示框或确认框 |
 | `onConfirm` | `() => void` | 确认回调 |
-| `onCancel` | `() => void` | 取消回调（存在时显示两个按钮） |
+| `onCancel` | `() => void` | 取消回调 |
 
-对话框包含模糊背景效果（`<backdrop>`）和缩放进出动画。
+`Dialog` 组件读取这些导航参数完成渲染，包含对背景应用 blur 滤镜（`<backdrop>`）与缩放进出动画，关闭动画结束后调用对应回调。
 
----
+## Notification — 通知
+
+全局通知，在 `Main` 中已挂载。通过 `uiActions.notify()` 触发：
+
+```typescript
+import { uiActions } from '../state/ui';
+
+uiActions.notify('保存成功');
+uiActions.notify('操作完成', {
+  duration: 3000,       // 显示时长（毫秒）
+  fadeInDuration: 300,  // 淡入时长
+  fadeOutDuration: 300, // 淡出时长
+});
+```
+
+多条通知会纵向堆叠，超时后自动淡出移除。
 
 ## TransitionBoundary — 转场边界
 
-基于 `<shader>` / `<shader-slot>` 封装的转场容器。标准框架内部的场景转场、背景切换和立绘切换都使用它实现。
+基于 `<shader>` / `<shader-slot>` 的转场容器。框架内部的场景转场、背景切换和立绘切换都使用它实现。
 
 ```tsx
 import { TransitionBoundary } from '../components/transitionBoundary';
@@ -188,44 +143,25 @@ import { TransitionBoundary } from '../components/transitionBoundary';
 </TransitionBoundary>
 ```
 
-### 属性
-
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `transitionKey` | `string` | — | 当前显示内容的键值；变化时会建立一次新的 from/to 边界 |
-| `retain` | `"static" \| "live"` | `"static"` | 旧内容保留方式；`live` 会在真正开始转场前继续保持实时更新 |
-| `effect` | `object` | — | 转场效果对象，结构与 `@transPerform` 的 `effect` 参数一致 |
+| `transitionKey` | `string` | 必填 | 当前显示内容的键值；变化时建立一次新的 from/to 边界 |
+| `retain` | `'static' \| 'live'` | `'static'` | 旧内容保留方式；`live` 在转场开始前继续保持实时更新 |
+| `effect` | `SceneTransitionEffect` | — | 转场效果对象，与 `@transPerform` 的 `effect` 参数一致 |
 | `duration` | `number` | — | 转场时长（毫秒） |
-| `performKey` | `string \| number \| null` | `transitionKey` | 用于区分同一内容键值下的不同执行轮次；通常无需手动指定 |
-| `label` | `string` | `"Transition Boundary"` | 调试标签 |
+| `performKey` | `string \| number \| null` | `transitionKey` | 区分同一内容键值下的执行轮次，通常无需指定 |
+| `label` | `string` | `'Transition Boundary'` | 调试标签 |
 | `onFinished` | `() => void` | — | 转场完成时触发 |
 
-典型场景是：用 `transitionKey` 标识当前内容版本，用 `effect` 和 `duration` 描述这次过渡，而具体的 from/to 画面管理交给组件内部处理。底层 shader 命令与通道模型见[着色器 API](/engine-api/shader)。
+跳过剧情时转场会立即结束，不需要额外处理。`components/sprite.tsx` 的 `Sprite` 组件把 `transition` 配置接到这里，为场景内容统一提供转场能力。
 
----
+## SceneTransitionBoundary — 场景转场边界
 
-## Notification — 通知
-
-全局通知组件，在 `Main` 组件中已挂载。通过 `uiActions.notify()` 触发。
-
-```typescript
-import { uiActions } from '../state/ui';
-
-uiActions.notify('保存成功');
-uiActions.notify('操作完成', {
-  duration: 3000,       // 显示时长（毫秒）
-  fadeInDuration: 300,  // 淡入时长
-  fadeOutDuration: 300, // 淡出时长
-});
-```
-
-通知会自动堆叠显示并在超时后淡出。
-
----
+读取 `gameState.sceneTransition` 的场景级转场容器，由剧本命令（如 `@transPrepare` / `@transPerform`）驱动，已挂在 Stage 页面上。自定义页面通常不需要直接使用它；需要单次转场时使用 `TransitionBoundary`。
 
 ## FrameAnimation — 帧动画
 
-基于精灵表（sprite sheet）的帧动画组件。
+基于精灵表（sprite sheet）的帧动画，通过切换 Sprite 的 `area` 逐帧播放。
 
 ```tsx
 import { FrameAnimation } from '../components/frame';
@@ -240,60 +176,15 @@ import { FrameAnimation } from '../components/frame';
 />
 ```
 
-### 属性
-
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `src` | `string` | — | 精灵表图片路径 |
-| `direction` | `"horizontal" \| "vertical"` | — | 帧排列方向 |
-| `frameCount` | `number` | — | 总帧数 |
-| `interval` | `number` | — | 帧间隔（毫秒） |
-| `loop` | `boolean \| number` | `false` | 是否循环（或循环次数） |
-| `loopMode` | `"none" \| "always" \| "bounce" \| "reverse"` | `"none"` | 循环模式 |
+| `src` | `string` | 必填 | 精灵表的图片路径 |
+| `direction` | `'horizontal' \| 'vertical'` | 必填 | 帧排列方向 |
+| `frameCount` | `number` | 必填 | 总帧数 |
+| `interval` | `number` | 必填 | 帧间隔（毫秒） |
+| `loop` | `boolean \| number` | `false` | 是否循环，或循环次数 |
+| `loopMode` | `'none' \| 'always' \| 'bounce' \| 'reverse'` | `'none'` | 循环方式 |
 
-循环模式说明：
-- `"none"` — 不循环，播放一次后停止
-- `"always"` — 无限循环
-- `"bounce"` — 来回播放（1→N→1→N...）
-- `"reverse"` — 反向循环（N→1→N→1...）
+循环方式：`none` 播放一次后停止；`always` 从头循环；`bounce` 来回播放；`reverse` 反向循环。
 
----
-
-## 使用 react-spring 动画
-
-`@momoyu-ink/kit` 内置了 [react-spring](https://react-spring.dev/) 动画库。你可以在任何组件中使用它：
-
-```tsx
-import { animated, useSpring, useTransition } from '@momoyu-ink/kit';
-
-// 基础弹簧动画
-function FadeInSprite() {
-  const styles = useSpring({
-    opacity: 1,
-    x: 100,
-    from: { opacity: 0, x: 0 },
-  });
-
-  return <animated.sprite src="image.png" opacity={styles.opacity} x={styles.x} />;
-}
-
-// 列表过渡动画
-function AnimatedList({ items }: { items: string[] }) {
-  const transitions = useTransition(items, {
-    keys: (item) => item,
-    from: { opacity: 0, y: 50 },
-    enter: { opacity: 1, y: 0 },
-    leave: { opacity: 0, y: -50 },
-  });
-
-  return (
-    <container>
-      {transitions((style, item) => (
-        <animated.text text={item} opacity={style.opacity} y={style.y} />
-      ))}
-    </container>
-  );
-}
-```
-
-支持的 `animated` 基础元素：`animated.container`, `animated.sprite`, `animated.text`, `animated.clip`, `animated.filter`, `animated.backdrop`, `animated.animation`。
+其余 Sprite 属性（`x`、`y`、`scale`、`tint` 等）都可以透传。

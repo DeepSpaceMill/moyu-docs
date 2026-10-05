@@ -176,9 +176,11 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | 属性 | 类型 | 说明 |
 |------|------|------|
 | `bounds` | `[left, top, right, bottom]` | 九宫格边距，相对 `area` 的比例（0~1） |
-| `nineSliceMode` | `"stretch" \| "repeat" \| "mirror" \| "blank"` | 中间区域的填充方式 |
+| `nineSliceMode` | `"stretch" \| "repeat" \| "mirror" \| "blank"` | 边缘与中心的填充方式：拉伸、平铺、镜像平铺、中心留空 |
 | `targetWidth` | `number` | 目标宽度 |
 | `targetHeight` | `number` | 目标高度 |
+
+`repeat` 与 `mirror` 按图案原始尺寸平铺，充满边缘与中心区域；`blank` 保持四角与边缘（同 `stretch`），不绘制中心。
 
 ---
 
