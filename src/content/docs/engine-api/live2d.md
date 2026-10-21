@@ -42,7 +42,7 @@ Live2D Cubism SDK 有自己的授权条款，它的派生产物不能按本引�
 | 参数 | 修改单个或批量参数 |
 | 部件 | 调整部件透明度 |
 | 效果 | 物理、姿态、眨眼、呼吸、目光跟随、自动待机，均可单独开关 |
-| 交互 | 命中测试、动作事件回调 |
+| 交互 | 按下命中区域回调、手动命中测试、动作事件 |
 
 ## 安装与放置
 
@@ -149,6 +149,7 @@ function Character() {
 | `breath` | `boolean` | `true` | 自动呼吸 |
 | `look` | `boolean` | `false` | 目光跟随指针，影响瞳孔、头部与身体朝向 |
 | `idle` | `boolean` | `true` | 空闲时随机播放待机动作 |
+| `hitTest` | `boolean` | `false` | 按下时自动做命中测试，命中即触发 `onHit` |
 
 `physics` 控制物理模拟本身，动作、呼吸与参数调整仍会带动头发和衣物。
 
@@ -247,6 +248,25 @@ ref.current?.executeCommand({ subCommand: 'setPartOpacity', id: 'PartHairFront',
 
 ### 命中测试
 
+开启 `hitTest` 后，每次按下都会对模型做命中测试，碰到区域时触发 `onHit`：
+
+```tsx
+<live2d
+  ref={ref}
+  src="live2d/Hiyori/Hiyori.model3.json"
+  hitTest
+  onHit={(event) => {
+    if (event.area === 'Body') {
+      ref.current?.executeCommand({ subCommand: 'startMotion', group: 'TapBody', index: 0, priority: 3 });
+    }
+  }}
+/>
+```
+
+`onHit` 只在命中时触发，未命中不回调。区域重叠时，每个命中的区域各触发一次。
+
+需要主动判定的场景，可以直接调用命令：
+
 ```typescript
 const hit = ref.current?.executeCommand({
   subCommand: 'hitTest',
@@ -256,7 +276,13 @@ const hit = ref.current?.executeCommand({
 });
 ```
 
-`x` / `y` 使用画布坐标，参见下方「坐标与尺寸」。返回点是否落在该区域内；区域名不存在时返回 `false`。
+`x` / `y` 使用画布坐标，参见下方「坐标与尺寸」。返回点是否落在该区域内。
+
+:::note[命中后做什么由项目决定]
+
+模型的 `HitAreas` 与 `Motions` 在配置里彼此独立，不包含「点击某个区域就播放某个动作」的映射。上例里的 `TapBody` 是模型作者约定的组名，需要按实际动作组填写。
+
+:::
 
 ## 事件
 
@@ -266,6 +292,7 @@ const hit = ref.current?.executeCommand({
 | `onMotionFinished` | `{ group, index }` | 动作播放结束 |
 | `onMotionEvent` | `{ value }` | 动作内嵌事件触发 |
 | `onBlendModeUnsupported` | `{ value }` | 模型包含无法完全还原的绘制效果 |
+| `onHit` | `{ area, x, y }` | 按下时命中了某个区域（需开启 `hitTest`） |
 | `onError` | `{ code, message }` | 插件不可用、模型或贴图加载失败 |
 
 `onReady` 表示可以开始发送命令。贴图随后异步加载，加载失败时会触发 `onError`。
@@ -341,6 +368,7 @@ const canvasY = (stageY - globalNodeY) / globalScale;
 | 收到 `code: 5` | 模型文件解析失败 | 确认模型由官方工具导出且未损坏 |
 | 模型大小或位置不合适 | 节点尺寸取自画布，通常大于舞台 | 调整 `scale` |
 | 点击命中测试总是未命中 | 传入了舞台坐标 | 按「坐标与尺寸」换算 |
+| 设了 `hitTest` 但 `onHit` 不触发 | 按下处不在模型上，或区域名不对 | 确认在模型可见区域按下；区域名取自 `ready` 的 `hitAreas` |
 | 切换动作没有反应 | 优先级不足 | 提高 `priority` 或先调用 `stopAllMotions` |
 | 关闭 `idle` 后动作仍在播放 | 关闭 `idle` 只影响后续待机 | 同时调用 `stopAllMotions` |
 | `stopAllMotions` 后又开始播放 | `idle` 仍为开启状态 | 先关闭 `idle` |
