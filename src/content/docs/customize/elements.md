@@ -492,6 +492,55 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 
 ---
 
+## `<live2d>` — Live2D 模型
+
+播放 Cubism 模型，支持动作、表情、参数与部件透明度控制。
+
+```tsx
+<live2d src="live2d/Hiyori/Hiyori.model3.json" scale={0.18} look />
+```
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `src` | `string \| null` | 模型入口文件路径（`.model3.json`）；`null` 卸载模型。必填 |
+| `physics` | `boolean` | 物理演算，默认 `true` |
+| `pose` | `boolean` | 姿态映射，控制部件的显示与隐藏，默认 `true` |
+| `blink` | `boolean` | 自动眨眼，默认 `true` |
+| `breath` | `boolean` | 自动呼吸，默认 `true` |
+| `look` | `boolean` | 目光跟随指针，默认 `false` |
+| `idle` | `boolean` | 空闲时随机播放待机动作，默认 `true` |
+| `hitTest` | `boolean` | 按下时自动做命中测试并触发 `onHit`，默认 `false` |
+
+节点的尺寸取自模型画布，通常比舞台大很多，需要配合 `scale` 缩放使用。
+
+该功能需要一份闭源插件与 Cubism Core 动态库。完整的属性、命令、事件说明见 [Live2D 模型](/engine-api/live2d)。
+
+---
+
+## `<spine>` — Spine 骨骼动画
+
+播放 Spine 骨骼动画模型，支持多轨动画、混合过渡、皮肤与附件切换，以及点击命中。
+
+```tsx
+<spine src="spine/hero/hero.json" atlas="spine/hero/hero.atlas" scale={0.8} />
+```
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `src` | `string \| null` | 骨架文件路径（`.json` 或 `.skel`）；`null` 卸载模型。必填 |
+| `atlas` | `string` | 图集文件路径 |
+| `skin` | `string` | 皮肤名，留空使用默认皮肤 |
+| `timeScale` | `number` | 时间缩放 |
+| `paused` | `boolean` | 暂停推进时间 |
+| `physics` | `"none" \| "pose" \| "update"` | 物理模式 |
+| `hitArea` | `boolean` | 按下时自动做命中测试并触发 `onHit` |
+
+节点的尺寸取自模型的原始几何范围，不随动画变化，通常需要配合 `scale` 缩放使用。
+
+该功能需要一份闭源插件。完整的属性、命令、事件说明见 [Spine 骨骼动画](/engine-api/spine)。
+
+---
+
 ## 组合示例
 
 以下是一个实际的 UI 组合示例，展示如何用这些元素构建界面：

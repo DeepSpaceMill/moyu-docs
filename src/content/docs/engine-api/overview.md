@@ -114,4 +114,6 @@ const { width, height, scaleFactor } = getStageSize();
 - [剧本引擎 API](/engine-api/scenario) — 剧本和变量管理
 - [系统 API](/engine-api/system) — 窗口和系统控制
 - [Steam API](/engine-api/steam) — Achievement、Stats、Overlay、DLC、Timeline 与 Workshop
+- [Live2D 模型](/engine-api/live2d) — `<live2d>` 节点、动作表情、参数与部件控制
+- [Spine 骨骼动画](/engine-api/spine) — `<spine>` 节点、多轨动画、皮肤附件与命中测试
 - [其他 API](/engine-api/misc) — Gamepad、运行时环境等
