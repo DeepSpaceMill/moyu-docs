@@ -29,7 +29,7 @@ sidebar:
 | `opacity` | `number` | `1` | 透明度（0~1） |
 | `interactive` | `boolean` | `false` | 是否响应交互事件 |
 | `hitTestSelf` | `boolean` | `true` | 自身是否作为命中目标；`false` 时自身不参与命中判定，子节点照常 |
-| `cursor` | `MoyuCursor` | — | 鼠标悬停时的光标样式 |
+| `cursor` | `MoyuCursor` | — | 鼠标悬停时的光标样式，仅在 `interactive` 时生效。可用自定义指针图片，见[自定义鼠标指针](/customize/custom-cursor/) |
 | `zIndex` | `number` | `0` | 同一父节点下的绘制和命中顺序，支持负数 |
 
 ### 事件处理

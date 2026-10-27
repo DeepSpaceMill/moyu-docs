@@ -97,6 +97,7 @@ sidebar:
 | multiResAssets             | string 或 number | `off`         | 多倍图的选择方式。`off` 关闭（默认），`auto` 按显示倍率自动选择，数字则强制使用该倍率。详见[多倍图资源](#多倍图资源)。      |
 | multiResAssetScales        | array   | `[1.5, 2]`          | 允许尝试的变体倍率，整体覆盖默认值。空数组表示只使用基础图。详见[多倍图资源](#多倍图资源)。                              |
 | multiResAssetPolicy        | string  | `quality`           | 候选倍率的选择策略。`quality` 优先清晰度，`balanced` 优先显存。                                                            |
+| cursor                     | string 或 object | 无         | 自定义鼠标指针。详见[自定义鼠标指针](./custom-cursor.md)。                                                                 |
 | steam                      | object  | 无                  | Steam 配置。字段说明见 [Steam API](../engine-api/steam.md)。                                                               |
 
 ### 字体 fallback

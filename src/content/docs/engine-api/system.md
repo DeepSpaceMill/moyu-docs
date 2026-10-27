@@ -74,6 +74,43 @@ const size = executePluginCommand('system', {
 // 返回 { width: number, height: number }
 ```
 
+### setCustomCursors — 设置自定义鼠标指针
+
+在运行时更换鼠标指针。参数与 `index.json` 中的 `cursor` 字段格式完全一致。
+
+```typescript
+// 换成一套指针
+await executePluginCommand('system', {
+  subCommand: 'setCustomCursors',
+  cursors: {
+    default: 'ui/arrow.png',
+    pointer: { src: 'ui/hand.png', hotspot: [14, 3] },
+  },
+});
+
+// 恢复为系统指针
+await executePluginCommand('system', {
+  subCommand: 'setCustomCursors',
+  cursors: {},
+});
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `cursors` | `string \| object` | 指针配置。字符串表示所有状态共用一张图；对象按状态名指定，值为路径或 `{ src, hotspot }` |
+
+传入空对象 `{}` 会清空所有自定义指针，回到系统指针。
+
+命令返回 `Promise`。图片读取与解码是异步的，`await` 之后新配置已经生效。
+
+:::note
+每次调用都会整体替换之前的配置。想在保留部分状态的同时修改另一部分，需要在一次调用里写全。
+
+每次调用都会重新读取图片，适合场景切换之类的低频操作。
+:::
+
+配置说明、热点含义与注意事项见[自定义鼠标指针](/customize/custom-cursor/)。
+
 ## 舞台
 
 ### getStageSize — 获取舞台尺寸
