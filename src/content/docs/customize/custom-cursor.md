@@ -175,6 +175,19 @@ await executePluginCommand('system', {
 
 节点的 `cursor` 属性只在节点同时设置了 `interactive` 时才起作用。这是引擎的既有行为，但配置指针时容易忽略。
 
+### 子节点继承父节点的指针
+
+与 CSS 的 `cursor` 一样，指针会从最近的、设置过 `cursor` 的祖先节点继承下来。所以给一个容器设置 `cursor`，它内部的所有内容（包括文字、图片等子节点）都会显示这个指针，不需要给每个子节点重复设置。
+
+子节点自己设置了 `cursor` 时，以自己的为准。
+
+```jsx
+{/* 整个色块包括内部的文字都使用 pointer */}
+<sprite interactive cursor="pointer">
+  <text text="点击这里" />
+</sprite>
+```
+
 ### 移动端与无窗口环境
 
 在 Android 和 iOS 上，系统不允许应用替换鼠标指针，配置会被读取但不会生效。无窗口（`--headless`）运行同样不会显示指针。
