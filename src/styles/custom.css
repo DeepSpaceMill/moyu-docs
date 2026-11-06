@@ -1,8 +1,11 @@
+/* Keep marketing utilities above Starlight's layered defaults. */
+@layer starlight, theme, base, components, utilities;
+
 /* Dark mode colors. */
 :root {
-  --sl-color-accent-low: #112827;
-  --sl-color-accent: #0c7a75;
-  --sl-color-accent-high: #b4cfcd;
+  --sl-color-accent-low: #263b39;
+  --sl-color-accent: #8ac9c1;
+  --sl-color-accent-high: #d8eeeb;
   --sl-color-white: #ffffff;
   --sl-color-gray-1: #eceef2;
   --sl-color-gray-2: #c0c2c7;
@@ -18,8 +21,8 @@
 }
 /* Light mode colors. */
 :root[data-theme='light'] {
-  --sl-color-accent-low: #c7dcda;
-  --sl-color-accent: #097974;
+  --sl-color-accent-low: #d8eeeb;
+  --sl-color-accent: #1e6d65;
   --sl-color-accent-high: #123937;
   --sl-color-white: #17181c;
   --sl-color-gray-1: #24272f;
@@ -36,11 +39,11 @@
   font-size: 20px;
 }
 
-main strong {
+main:where(:not(.site-ui *)) strong {
   color: var(--sl-color-accent);
 }
 
-main code:not(:has(div)) {
+main:where(:not(.site-ui *)) code:not(:has(div)) {
   background-color: var(--sl-color-accent-low);
   border-radius: 3px;
   color: var(--sl-color-accent-high);

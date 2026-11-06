@@ -1,0 +1,190 @@
+---
+import '../../styles/site-ui.css';
+import EngineExample from './EngineExample.astro';
+import ProductMedia from './ProductMedia.astro';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  MonitorSmartphone,
+  PanelsTopLeft,
+  Layers,
+  TextCursorInput,
+  Blend,
+  Plug,
+  PackageCheck,
+  Terminal,
+  CodeXml,
+} from 'lucide-react';
+import { buttonVariants } from '../ui/button';
+import { cn } from 'cn';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import hero from '../../assets/products/editor-hero.png';
+import { copy } from '../../data/site-copy';
+import { engineHomeCopy } from '../../data/engine-home-copy';
+import { docPath, marketingPath, type Locale } from '../../data/site-nav';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copy[locale];
+const h = engineHomeCopy[locale];
+const doc = (path: string) => docPath(locale, path);
+const featureIcons = {
+  platforms: MonitorSmartphone,
+  interface: PanelsTopLeft,
+  progressive: Layers,
+  typography: TextCursorInput,
+  effects: Blend,
+  integrations: Plug,
+  publishing: PackageCheck,
+  tools: Terminal,
+  license: CodeXml,
+};
+const slogan = t.footer;
+const primaryLink = cn(buttonVariants(), 'h-11 gap-2.5 px-5 text-base hover:bg-primary-hover');
+const secondaryLink = cn(buttonVariants({ variant: 'link' }), 'h-11 gap-2 px-1 text-base');
+const featureLink = cn(
+  buttonVariants({ variant: 'link' }),
+  'min-h-11 gap-1.5 px-0 text-sm whitespace-normal text-left',
+);
+---
+
+<div class="site-ui">
+  <section
+    class="mx-auto w-[calc(100%-80px)] max-w-[1184px] pt-[60px] pb-[50px] text-center max-lg:w-[calc(100%-56px)] max-md:w-[calc(100%-40px)] max-md:pt-10 max-md:pb-[30px]"
+  >
+    <div class="mx-auto max-w-[960px]">
+      <h1 id="_top"
+        class="text-[46px] leading-[1.3] font-semibold tracking-[-1px] text-foreground max-lg:text-4xl max-md:text-[clamp(26px,7.2vw,30px)] max-md:leading-[1.4]"
+      >
+        {t.engineName}
+      </h1>
+      <p
+        class="mt-1.5 text-[46px] leading-[1.34] font-light tracking-[-1px] text-muted-foreground max-lg:text-4xl max-md:text-[clamp(26px,7.2vw,30px)] max-md:leading-[1.4]"
+      >
+        {h.description}
+      </p>
+      <div
+        class="mt-[30px] flex items-center justify-center gap-[27px] max-md:mt-[22px] max-md:flex-wrap max-md:gap-[22px]"
+      >
+        <a class={primaryLink} href={doc('/start/quick-start/')}
+          >{t.start}<ArrowRight className="size-[18px]" aria-hidden="true" /></a
+        >
+        <a class={secondaryLink} href={doc('/start/intro/')}
+          >{h.browseDocs}<ArrowUpRight className="size-[18px]" aria-hidden="true" /></a
+        >
+      </div>
+      <p
+        class="mt-6 text-[15px] leading-[1.9] tracking-[.04em] text-muted-foreground max-md:mt-5 max-md:text-[13px] max-md:leading-[1.85]"
+      >
+        {slogan}
+      </p>
+    </div>
+    <div
+      class="mx-auto mt-[46px] max-w-[1020px] max-md:mt-[30px]"
+    >
+      <EngineExample locale={locale} />
+    </div>
+  </section>
+  <div
+    class="mx-auto flex w-[calc(100%-80px)] max-w-[1184px] items-center justify-between gap-6 border-y border-border py-[22px] text-[14px] leading-[normal] text-muted-foreground max-lg:w-[calc(100%-56px)] max-lg:text-[13px] max-md:w-[calc(100%-40px)] max-md:flex-col max-md:items-start max-md:gap-3 max-md:py-5 max-md:text-[12px]"
+  >
+    <span>{h.strip}</span><p class="text-foreground [word-spacing:10px] max-md:[word-spacing:7px]">
+      Rust <span class="text-muted-foreground">·</span> React <span class="text-muted-foreground">·</span> MPL-2.0
+    </p>
+  </div>
+  <section
+    class="mx-auto w-[calc(100%-80px)] max-w-[1184px] pt-12 pb-10 max-lg:w-[calc(100%-56px)] max-md:w-[calc(100%-40px)] max-md:pt-8 max-md:pb-6"
+    id="features"
+  >
+    <div class="mb-16 flex items-end justify-center gap-10 max-lg:gap-[30px] max-md:block">
+      <h2>{h.title.split('\n').map((line) => <span class="block">{line}</span>)}</h2>
+    </div>
+    <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        h.features.map((feature) => {
+          const Icon = featureIcons[feature.id];
+          const isExpression = ['typography', 'effects', 'integrations'].includes(feature.id);
+          return (
+            <Card
+              role="article"
+              aria-labelledby={`feature-${feature.id}`}
+              className={cn(
+                'min-w-0 gap-0 rounded-none border-t border-border bg-transparent py-0 ring-0',
+                isExpression && 'rounded-lg border-t-0 bg-muted',
+              )}
+            >
+              <CardHeader className="flex flex-row items-start gap-3 rounded-none px-5 pt-5 pb-0">
+                <Icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+                <CardTitle
+                  id={`feature-${feature.id}`}
+                  role="heading"
+                  aria-level={3}
+                  className="text-[21px] font-semibold leading-snug"
+                >
+                  {feature.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 px-5 pt-2 pb-0">
+                <p class="text-base leading-[1.65] text-muted-foreground whitespace-pre-wrap">{feature.text}</p>
+              </CardContent>
+              <CardFooter className="mt-1 flex-wrap gap-x-5 gap-y-0 rounded-none border-0 bg-transparent px-5 pt-0 pb-3">
+                {feature.links.map((link) => (
+                  <a class={featureLink} href={link.href.startsWith('/') ? doc(link.href) : link.href}>
+                    {link.label}
+                    <ArrowUpRight className="size-4 shrink-0" aria-hidden="true" />
+                  </a>
+                ))}
+              </CardFooter>
+            </Card>
+          );
+        })
+      }
+    </div>
+  </section>
+  <section
+    class="mx-auto grid w-[calc(100%-80px)] max-w-[1184px] grid-cols-2 items-center gap-16 pt-[55px] pb-[90px] max-lg:w-[calc(100%-56px)] max-lg:gap-[35px] max-md:w-[calc(100%-40px)] max-md:grid-cols-1 max-md:gap-[22px] max-md:pt-[35px] max-md:pb-[50px]"
+  >
+    <h2 class="pl-[38px] max-lg:pl-[26px]">
+      {h.developerTitle.split('\n').map((line) => <span class="block">{line}</span>)}
+    </h2>
+    <div>
+      <p class="text-base leading-[1.9] text-muted-foreground whitespace-pre-wrap">{h.developerText}</p><div
+        class="mt-[25px] flex flex-wrap items-center gap-x-7 gap-y-5"
+      >
+        <a class={secondaryLink} href={doc('/customize/overview/')}
+          >{h.framework}<ArrowRight className="size-[18px]" aria-hidden="true" /></a
+        ><a class={secondaryLink} href={doc('/deep-into/architecture/')}
+          >{h.architecture}<ArrowUpRight className="size-[18px]" aria-hidden="true" /></a
+        >
+      </div>
+    </div>
+  </section>
+  <section
+    class="mx-auto mb-[90px] w-[calc(100%-80px)] max-w-[1184px] max-lg:w-[calc(100%-56px)] max-md:mb-[50px] max-md:w-[calc(100%-40px)]"
+  >
+    <Card
+      className="grid grid-cols-[0.9fr_1.1fr] items-center gap-[55px] rounded-lg bg-muted p-[38px] ring-0 max-lg:gap-8 max-lg:p-[26px] max-md:grid-cols-1 max-md:gap-6 max-md:p-6"
+    >
+      <div>
+        <h2 class="text-[27px] max-md:text-2xl">{t.relatedTitle}</h2>
+        <p class="mt-4 text-base leading-7 text-muted-foreground whitespace-pre-wrap">{t.relatedText}</p>
+        <a class={cn(primaryLink, 'mt-6')} href={marketingPath(locale, 'editor')}
+          >{t.relatedLink}<ArrowRight className="size-[18px]" aria-hidden="true" /></a
+        >
+      </div>
+      <div>
+        <ProductMedia
+          image={hero}
+          format="png"
+          alt={t.editorHeroAlt}
+          imageClass="max-h-80 object-contain"
+          missing={t.missing}
+          retry={t.retry}
+          sizes="(max-width: 767px) 80vw, 48vw"
+        />
+      </div>
+    </Card>
+  </section>
+</div>

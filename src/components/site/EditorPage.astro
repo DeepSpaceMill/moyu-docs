@@ -1,0 +1,139 @@
+---
+import ProductMedia from './ProductMedia.astro';
+import EditorFeatureTabs from './EditorFeatureTabs';
+import EditorDownloadButton from './EditorDownloadButton';
+import { ArrowUpRight } from 'lucide-react';
+import { buttonVariants } from '../ui/button';
+import { Card } from '../ui/card';
+import { cn } from 'cn';
+import hero from '../../assets/products/editor-hero.png';
+import uiVideo from '../../assets/products/editor-ui.webm?url';
+import uiPoster from '../../assets/products/editor-ui-poster.png';
+import assets from '../../assets/products/editor-assets.png';
+import scenario from '../../assets/products/editor-scenario.webm?url';
+import scenarioPoster from '../../assets/products/editor-scenario-poster.png';
+import preview from '../../assets/products/editor-preview.webm?url';
+import previewPoster from '../../assets/products/editor-preview-poster.png';
+import { getImage } from 'astro:assets';
+import voice from '../../assets/products/editor-voice.png';
+import { copy } from '../../data/site-copy';
+import type { Locale } from '../../data/site-nav';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copy[locale];
+const secondaryLink = cn(buttonVariants({ variant: 'link' }), 'h-11 gap-2 px-1 text-base');
+const poster = await getImage({ src: scenarioPoster, width: 1440, format: 'png' });
+const previewCover = await getImage({ src: previewPoster, width: 1440, format: 'png' });
+const uiCover = await getImage({ src: uiPoster, width: 1440, format: 'png' });
+const featureImageClass = 'h-full border-0 bg-transparent object-contain';
+---
+
+<section
+  class="mx-auto w-[calc(100%-80px)] max-w-[1184px] pt-[60px] pb-12 max-lg:w-[calc(100%-56px)] max-md:w-[calc(100%-40px)] max-md:pt-10 max-md:pb-8"
+>
+  <div class="max-w-[820px]">
+    <h1 id="_top"
+      class="text-[46px] leading-[1.3] font-semibold tracking-[-1px] max-lg:text-4xl max-md:text-[30px] max-md:leading-[1.4]"
+    >
+      {t.editorName}
+    </h1>
+    <p class="mt-5 max-w-[630px] text-base leading-[1.85] text-muted-foreground max-md:mt-4 whitespace-pre-wrap">
+      {t.editorDesc}
+    </p>
+    <div class="mt-6 flex flex-wrap items-center gap-x-[27px] gap-y-3 max-md:gap-x-[22px]">
+      <EditorDownloadButton client:load locale={locale} />
+      <a class={secondaryLink} href="#features">
+        {t.workflow}<ArrowUpRight className="size-[18px]" aria-hidden="true" />
+      </a>
+    </div>
+  </div>
+  <Card className="mt-9 gap-0 rounded-lg bg-muted p-4 ring-0 max-md:mt-7 max-md:p-3">
+    <ProductMedia
+      image={hero}
+      format="png"
+      alt={t.editorHeroAlt}
+      eager
+      missing={t.missing}
+      retry={t.retry}
+      sizes="(max-width: 767px) calc(100vw - 66px), (max-width: 1023px) calc(100vw - 90px), 1150px"
+    />
+  </Card>
+</section>
+<section
+  class="mx-auto mb-[75px] w-[calc(100%-80px)] max-w-[1184px] pt-12 max-lg:w-[calc(100%-56px)] max-md:mb-12 max-md:w-[calc(100%-40px)] max-md:pt-8"
+  id="features"
+>
+  <div class="mb-6 max-w-[760px]">
+    <h2>{t.editorFeatureTitle}</h2>
+    <p class="mt-3 text-base leading-[1.85] text-muted-foreground whitespace-pre-wrap">
+      {t.editorFeatureDesc}
+    </p>
+  </div>
+  <EditorFeatureTabs client:load locale={locale}>
+    <Fragment slot="script">
+      <video
+        src={scenario}
+        poster={poster.src}
+        width="1920"
+        height="1080"
+        controls
+        playsinline
+        preload="metadata"
+        aria-label={t.scriptVideoLabel}
+      >
+        <a href={scenario}>{t.scriptVideoLabel}</a>
+      </video>
+    </Fragment>
+    <Fragment slot="assets">
+      <ProductMedia
+        image={assets}
+        format="png"
+        alt={t.assetsAlt}
+        imageClass={featureImageClass}
+        missing={t.missing}
+        retry={t.retry}
+      />
+    </Fragment>
+    <Fragment slot="preview">
+      <video
+        src={preview}
+        poster={previewCover.src}
+        width="1920"
+        height="1080"
+        controls
+        playsinline
+        preload="metadata"
+        aria-label={t.previewVideoLabel}
+      >
+        <a href={preview}>{t.previewVideoLabel}</a>
+      </video>
+    </Fragment>
+    <Fragment slot="ui">
+      <video
+        src={uiVideo}
+        poster={uiCover.src}
+        width="1920"
+        height="1080"
+        controls
+        playsinline
+        preload="metadata"
+        aria-label={t.uiVideoLabel}
+      >
+        <a href={uiVideo}>{t.uiVideoLabel}</a>
+      </video>
+    </Fragment>
+    <Fragment slot="voice">
+      <ProductMedia
+        image={voice}
+        format="png"
+        alt={t.voiceAlt}
+        imageClass={featureImageClass}
+        missing={t.missing}
+        retry={t.retry}
+      />
+    </Fragment>
+  </EditorFeatureTabs>
+</section>

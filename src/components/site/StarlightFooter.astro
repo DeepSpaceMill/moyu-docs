@@ -1,0 +1,17 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+import { copy } from '../../data/site-copy';
+import { docPath, marketingPageFor, type Locale } from '../../data/site-nav';
+const isMarketing = marketingPageFor(Astro.url.pathname) !== undefined;
+const routeLocale = Astro.locals.starlightRoute.locale;
+const locale: Locale = routeLocale === 'en' || routeLocale === 'ja' ? routeLocale : 'zh';
+const t = copy[locale];
+---
+{isMarketing ? (
+  <footer role="contentinfo" class="mx-auto flex w-[calc(100%-80px)] max-w-[1184px] items-center justify-between gap-[30px] border-t border-border pt-7 pb-[35px] text-[12px] leading-[normal] text-muted-foreground max-lg:w-[calc(100%-56px)] max-md:block max-md:w-[calc(100%-40px)] max-md:pt-[23px] max-md:pb-7 max-md:leading-[1.9]">
+    <p>{t.footer}</p>
+    <div class="flex gap-[25px] whitespace-nowrap max-md:mt-[18px] max-md:justify-between">
+      <a href={docPath(locale, '/more/about/')}>{t.about}</a><span>© 2026 MOYU</span>
+    </div>
+  </footer>
+) : <Default><slot /></Default>}

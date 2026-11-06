@@ -1,0 +1,9 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import EditorPage from '../../components/site/EditorPage.astro';
+import { copy } from '../../data/site-copy';
+const t = copy.en;
+---
+<Marketing locale="en" page="editor" description={t.editorDesc}>
+  <EditorPage locale="en"/>
+</Marketing>

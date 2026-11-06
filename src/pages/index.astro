@@ -1,0 +1,9 @@
+---
+import Marketing from '../layouts/Marketing.astro';
+import EngineHome from '../components/site/EngineHome.astro';
+import { copy } from '../data/site-copy';
+const t = copy.zh;
+---
+<Marketing locale="zh" page="home" description={t.engineDesc}>
+  <EngineHome locale="zh"/>
+</Marketing>

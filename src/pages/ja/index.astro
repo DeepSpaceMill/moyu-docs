@@ -1,0 +1,9 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import EngineHome from '../../components/site/EngineHome.astro';
+import { copy } from '../../data/site-copy';
+const t = copy.ja;
+---
+<Marketing locale="ja" page="home" description={t.engineDesc}>
+  <EngineHome locale="ja"/>
+</Marketing>

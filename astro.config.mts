@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
+import tailwindcss from '@tailwindcss/vite';
 import Icons from 'unplugin-icons/vite';
 import sixuGrammar from './src/sixu.tmLanguage.json';
 
@@ -98,7 +100,7 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/DeepSpaceMill/moyu-docs/edit/master/',
       },
-      customCss: ['./src/styles/custom.css'],
+      customCss: ['./src/styles/custom.css', './src/styles/marketing.css'],
       expressiveCode: {
         shiki: {
           langs: [{ ...(sixuGrammar as any), name: 'sixu' }],
@@ -106,10 +108,19 @@ export default defineConfig({
       },
       components: {
         SocialIcons: './src/components/SocialIcons.astro',
+        Header: './src/components/site/StarlightHeader.astro',
+        PageFrame: './src/components/site/StarlightPageFrame.astro',
+        ContentPanel: './src/components/site/StarlightContentPanel.astro',
+        MarkdownContent: './src/components/site/StarlightMarkdownContent.astro',
+        PageTitle: './src/components/site/StarlightPageTitle.astro',
+        Footer: './src/components/site/StarlightFooter.astro',
+        MobileMenuFooter: './src/components/site/StarlightMobileMenuFooter.astro',
       },
     }),
+    react(),
   ],
   vite: {
-    plugins: [Icons({ compiler: 'astro' })],
+    optimizeDeps: { include: ['@base-ui/react/tabs'] },
+    plugins: [Icons({ compiler: 'astro' }), tailwindcss()],
   },
 });

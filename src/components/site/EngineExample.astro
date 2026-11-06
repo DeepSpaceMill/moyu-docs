@@ -1,0 +1,56 @@
+---
+import '../../styles/site-ui.css';
+import { FileCode2 } from 'lucide-react';
+import { Card, CardHeader } from '../ui/card';
+import { CodeBlock } from '../reui/code-block/code-block';
+import { highlightCode } from '../reui/code-block/code-block-highlight';
+import ProductMedia from './ProductMedia.astro';
+import scene from '../../assets/products/scene.webp';
+import { copy } from '../../data/site-copy';
+import { engineHomeCopy } from '../../data/engine-home-copy';
+import type { Locale } from '../../data/site-nav';
+
+interface Props { locale?: Locale }
+const { locale = 'zh' } = Astro.props;
+const t = engineHomeCopy[locale];
+const common = copy[locale];
+const example = `export function GameScene() {
+  return (
+    <Scene>
+      <Background src="room.webp" />
+      <Character src="girl.png" />
+      <DialogueBox>
+        她侧身越过我，倚靠着茶几坐在地毯上。
+      </DialogueBox>
+    </Scene>
+  );
+}`;
+const lines = await highlightCode(example, { language: 'tsx' });
+---
+<section class="engine-example site-ui text-left" aria-label={t.exampleHeading}>
+  <Card className="grid grid-cols-1 items-stretch gap-4 rounded-lg border border-border bg-background p-4 ring-0 md:grid-cols-[0.9fr_1.1fr] max-md:gap-3 max-md:p-3">
+    <div class="min-w-0 overflow-hidden rounded-lg border border-border bg-background [--font-mono:'SFMono-Regular',Consolas,'Liberation_Mono',Menlo,var(--font-sans)]">
+      <CardHeader className="flex h-8 flex-row items-center gap-2 rounded-none border-b-1 border-border bg-card px-4 py-0">
+        <FileCode2 className="size-4 text-primary" aria-hidden="true" />
+        <span class="font-mono text-xs text-muted-foreground">Scene.tsx</span>
+      </CardHeader>
+      <CodeBlock
+        lines={lines}
+        showLineNumbers
+        wrap
+        className="min-w-0 rounded-none border-0 bg-transparent [--code-block-bg:var(--background)] [--code-block-padding:--spacing(3)] [--code-block-gutter-width:--spacing(8)] [--code-block-gutter-gap:--spacing(2)] [--code-block-font-size:14px] [--code-block-line-height:22px] max-lg:[--code-block-font-size:13px] [&_pre]:m-0 [&_code]:[font-family:inherit]"
+      />
+    </div>
+    <div class="flex min-w-0 items-center overflow-hidden rounded-lg border border-border bg-background [&>figure]:w-full" data-scene-panel>
+      <ProductMedia
+        image={scene}
+        alt={t.exampleImageAlt}
+        imageClass="aspect-video rounded-none border-0 object-contain"
+        missing={common.missing}
+        retry={common.retry}
+        eager
+        sizes="(max-width: 767px) calc(100vw - 66px), (max-width: 1023px) 50vw, 540px"
+      />
+    </div>
+  </Card>
+</section>

@@ -1,0 +1,17 @@
+---
+import Default from '@astrojs/starlight/components/PageFrame.astro';
+import { marketingPageFor } from '../../data/site-nav';
+const isMarketing = marketingPageFor(Astro.url.pathname) !== undefined;
+---
+{isMarketing ? (
+  <div class="site-ui min-h-screen bg-background text-foreground">
+    <slot name="header" />
+    <slot />
+  </div>
+) : (
+  <Default>
+    <slot name="header" slot="header" />
+    <slot name="sidebar" slot="sidebar" />
+    <slot />
+  </Default>
+)}

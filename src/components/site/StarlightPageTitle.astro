@@ -1,0 +1,6 @@
+---
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+import { marketingPageFor } from '../../data/site-nav';
+const isMarketing = marketingPageFor(Astro.url.pathname) !== undefined;
+---
+{!isMarketing && <Default><slot /></Default>}

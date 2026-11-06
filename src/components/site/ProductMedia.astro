@@ -1,0 +1,28 @@
+---
+import '../../styles/site-ui.css';
+import { cn } from 'cn';
+import { Image } from 'astro:assets';
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from '../ui/empty';
+import { Button } from '../ui/button';
+interface Props { image: ImageMetadata; alt: string; caption?: string; eager?: boolean; missing: string; retry: string; sizes?: string; imageClass?: string; format?: 'png' | 'webp' }
+const { image, alt, caption, eager = false, missing, retry, sizes = '(max-width: 767px) 92vw, (max-width: 1279px) 90vw, 1184px', imageClass, format = 'webp' } = Astro.props;
+---
+<figure class="relative min-w-0" data-product-media>
+  <Image class={cn('block h-auto w-full rounded-lg border border-border bg-muted', imageClass)} src={image} alt={alt} widths={[400, 640, 800, 960, 1200, 1440]} sizes={sizes} format={format} quality={85} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'auto'} decoding="async"/>
+  <Empty className="site-ui absolute inset-0 min-h-[180px] rounded-lg border border-border bg-muted p-6" data-media-error hidden role="status">
+    <EmptyHeader><EmptyTitle className="text-base">{missing}</EmptyTitle></EmptyHeader>
+    <EmptyContent><Button type="button" variant="outline" className="h-11 px-4 text-base" data-retry-image>{retry}</Button></EmptyContent>
+  </Empty>
+  {caption && <figcaption class="mt-3 text-xs leading-[1.8] text-muted-foreground">{caption}</figcaption>}
+</figure>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-product-media]').forEach(figure => {
+    const image = figure.querySelector('img');
+    const error = figure.querySelector<HTMLElement>('[data-media-error]');
+    const fail = () => { if(error) error.hidden = false; };
+    image?.addEventListener('error', fail);
+    image?.addEventListener('load', () => { if(error) error.hidden = true; });
+    if(image?.complete && !image.naturalWidth) fail();
+    figure.querySelector('[data-retry-image]')?.addEventListener('click', () => { if(image) { const source = image.src; image.src = ''; image.src = source; } });
+  });
+</script>

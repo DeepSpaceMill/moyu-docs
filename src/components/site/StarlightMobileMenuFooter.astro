@@ -1,0 +1,32 @@
+---
+import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
+import SocialIcons from 'virtual:starlight/components/SocialIcons';
+import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
+import { copy } from '../../data/site-copy';
+import { docPath, marketingPath, type Locale } from '../../data/site-nav';
+
+const starlightLocale = Astro.locals.starlightRoute.locale;
+const locale: Locale = starlightLocale === 'en' || starlightLocale === 'ja' ? starlightLocale : 'zh';
+const t = copy[locale];
+const navLabel = locale === 'zh' ? '主导航' : 'Navigation';
+---
+<nav class="mobile-site-nav sl-flex" aria-label={navLabel}>
+  <a href={marketingPath(locale, 'home')}>{t.home}</a>
+  <a href={marketingPath(locale, 'editor')}>{t.editor}</a>
+  <a href={docPath(locale, '/start/intro/')} aria-current="page">{t.docs}</a>
+</nav>
+<div class="mobile-preferences sl-flex">
+  <div class="social-icons"><SocialIcons /></div>
+  <ThemeSelect />
+  <LanguageSelect />
+</div>
+<style>
+  @layer starlight.core {
+    .mobile-site-nav { flex-wrap: wrap; gap: 0.5rem; padding-block: 0.5rem; }
+    .mobile-site-nav a { padding: 0.5rem 0.85rem; border-radius: 0.5rem; font-size: var(--sl-text-sm); color: var(--sl-color-gray-2); text-decoration: none; }
+    .mobile-site-nav a[aria-current='page'] { color: var(--sl-color-text-accent); background: var(--sl-color-accent-low); }
+    .social-icons { display: flex; margin-inline-end: auto; gap: 1rem; align-items: center; padding-block: 1rem; }
+    .social-icons:empty { display: none; }
+    .mobile-preferences { justify-content: space-between; flex-wrap: wrap; border-top: 1px solid var(--sl-color-gray-6); column-gap: 1rem; padding: 0.5rem 0; }
+  }
+</style>

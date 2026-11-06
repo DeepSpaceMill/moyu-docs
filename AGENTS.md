@@ -1,6 +1,6 @@
 # Moyu Docs — Agent 指南
 
-本仓库是末语引擎与末语工坊的官网、文档站。修改前阅读本文件、相关迭代文档与对应代码。自然语言交流默认中文，代码注释使用英文。
+本仓库是末语引擎与末语工坊的官网、文档站。修改前阅读本文件与对应代码。自然语言交流默认中文，代码注释使用英文。
 
 ## 项目与命令
 
@@ -9,12 +9,13 @@
 - 默认语言为中文，无 URL 前缀；英语 `/en/`，日语 `/ja/`。
 - 包管理器：pnpm。`pnpm build` 构建，`pnpm astro --help` 查看 CLI。
 - 开发服务器由用户启动；agent 不自行运行 `pnpm dev`。
-- 引入组件的目标栈：与 FishFlow 一致的 shadcn `base-nova`、Base UI、ReUI、React、Tailwind CSS 4。当前安装状态以 `package.json` 为准，迁移方案见 `docs/iteration/2026-11/2026-11-05-refactor-component-system.md`。
+- 使用与 FishFlow 一致的 shadcn `base-nova`、Base UI、ReUI、React、Tailwind CSS 4，当前安装状态以 `package.json` 为准。
+- 不创建或维护仓库根目录的 `docs/`、迭代文档和 todo 文档；开发决策与验证结果在对话中说明。产品文档继续维护在 `src/content/docs/`。
 
 ## 产品与设计约束
 
 - 首页介绍面向代码开发者的末语引擎；`/editor/` 介绍独立可视化工具末语工坊。两者分别可用。
-- 保持已确定的首页居中结构、W1 首屏排版、编辑器 B1 大图与横向功能页签。
+- 保持首页居中结构与产品名/说明的首屏排版，编辑器页保留左对齐首屏、大图与横向功能页签。
 - 本轮变更范围仅为 header、首页、编辑器页。文档页仅 header 属于范围；正文、侧边栏、目录、搜索及其控件、文档主题不主动修改。文档移动菜单与 footer 保持当前实现。
 - 延续当前青色品牌与近中性背景，继承 FishFlow 的小圆角。官网控件尺寸与字号通常比 FishFlow 大一到两档，局部间距使用统一尺度；章节留白按官网的阅读需求设置。
 - 文案简洁、客观；新增用户可见文案补齐中、英、日版本，集中维护在 `src/data/`。
@@ -46,11 +47,13 @@ components/reui + components/ui-ext + components/ui
 
 避免修改 `ui/`、`reui/` 镜像组件的行为与接口。优先组合或在 `ui-ext/` 补充。必要的上游同步单独说明来源与验证结果。不从 FishFlow 引入编辑器业务、状态管理或桌面依赖。
 
-依赖使用 pnpm 安装，shadcn 使用 CLI init/add，ReUI 使用同一 CLI 的 `@reui/*` registry 安装。禁止读过源码后自行默写或直接复制 FishFlow 的上游组件文件。先 dry-run/diff 审阅安装范围，保留 CLI 生成结果与 lockfile；配置和作用域适配按迭代方案精确调整。
+依赖使用 pnpm 安装，shadcn 使用 CLI init/add，ReUI 使用同一 CLI 的 `@reui/*` registry 安装。禁止读过源码后自行默写或直接复制 FishFlow 的上游组件文件。先 dry-run/diff 审阅安装范围，保留 CLI 生成结果与 lockfile；配置和作用域适配仅改必要位置。
 
 ## Astro 与 React 的边界
 
 - Astro 负责页面结构、正文、图片优化、SEO 和静态内容输出。
+- 页面框架统一使用公开的 `StarlightPage`，首页和编辑器页采用 `template: 'splash'`。`Marketing.astro` 只装配页面配置与内容，不自行输出 HTML、Head 或主题初始化脚本。
+- 营销页通过公开组件覆盖入口调整内容容器、标题和页脚，使用 `marketingPageFor` 判断路由；其他路由必须转交 Starlight 默认组件并转发 slots。SEO 基础标签、语言链接、主题初始化及跳转主内容链接由 Starlight 维护。
 - React 负责需要客户端状态的控件，如功能页签、菜单与选择器；使用 Base UI 承接焦点、键盘、ARIA 和弹层行为。
 - 组件默认服务端输出，按交互需要设置 `client:*`；优先保证首屏内容在 HTML 中可读，避免整页客户端渲染。
 - 多个独立 island 之间不默认共享 React context；有关联的交互收在同一业务组件中。
@@ -68,16 +71,18 @@ components/reui + components/ui-ext + components/ui
 - 新语义 token 仅在营销页面根容器与 header 的组件作用域内提供，弹层 portal 使用对应容器或带相同作用域的根节点。保留文档 `--sl-*` 与现有全局主题变量。
 - 暗色选择器与 Starlight 的 `data-theme` 对齐，主题偏好继续使用 `starlight-theme`，保留自动跟随系统。
 - Tailwind 工具类和组件基础规则仅服务于 header、首页、编辑器页；不向文档注入全局 Preflight 或通用元素 reset。接入前检查 CSS 层级，避免改变文档正文、Expressive Code、搜索弹层及 Starlight 控件。
+- 页面布局、间距、尺寸、颜色和响应式优先使用 Tailwind utilities；控件优先复用组件 variants。CSS 保留主题 token、必要基础排版、reduced-motion 与 Starlight 适配，不为缩短 class 另建重复布局组件。
 - 避免宽泛的 `svg`、`a`、`button` 全局规则覆盖组件。组件视觉变体集中管理，页面样式负责排版。
 - 保持可见焦点、键盘导航、对比度与 reduced-motion 支持。
 
 ## 工作流程与验证
 
-1. 先阅读相关代码和最新迭代文档，明确范围；必要的设计决策写入 `docs/iteration/<YYYY-MM>/` 后实施。
+1. 先阅读相关代码，明确范围与设计；重大需求歧义先在对话中确认。
 2. 最小化改动，从问题来源处理；重大需求歧义先讨论。既有未提交改动需要保留。
-3. 完成后检查构建、类型与相关交互；按需更新 `docs/todo.md` 和迭代记录。
+3. 完成后检查构建、类型与相关交互，在对话中说明结果，不新建开发文档。
 4. UI 验证覆盖中英日、明暗/系统主题、桌面与窄屏；涉及菜单或页签时检查键盘与焦点行为。
 5. 涉及全局样式时回归文档正文、搜索、侧边栏、目录与代码高亮；检查横向溢出、图片加载和内部链接。
-6. 运行 `git diff --check`。不启动无关重构，不全仓格式化，不为低影响的样式替换添加重复实现的测试。
+6. 页面框架调整需检查标题、描述、canonical、语言链接、社交元信息与 sitemap，保留线上已有 SEO 信息；不主动改动 Starlight 的文档 SEO 输出。
+7. 运行 `git diff --check`。不启动无关重构，不全仓格式化，不为低影响的样式替换添加重复实现的测试。
 
 参考：ReUI <https://reui.io/llms.txt>；Base UI <https://base-ui.com/llms.txt>；Astro React 集成 <https://docs.astro.build/en/guides/integrations-guide/react/>。

@@ -1,0 +1,27 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import '../styles/site-ui.css';
+import { seoCopy } from '../data/seo-copy';
+import type { Locale } from '../data/site-nav';
+
+interface Props { locale: Locale; page: 'home' | 'editor'; description: string }
+const { locale, page, description } = Astro.props;
+const seo = seoCopy[locale];
+const metaDescription = description.replace(/\s+/g, ' ').trim();
+const title = page === 'home' ? seo.homeTitle : seo.editorTitle;
+---
+<StarlightPage frontmatter={{
+  title,
+  description: metaDescription,
+  template: 'splash',
+  tableOfContents: false,
+  head: [
+    { tag: 'title', content: title },
+    { tag: 'meta', attrs: { property: 'og:type', content: 'website' } },
+    { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary' } },
+    { tag: 'meta', attrs: { name: 'twitter:title', content: title } },
+    { tag: 'meta', attrs: { name: 'twitter:description', content: metaDescription } },
+  ],
+}}>
+  <slot />
+</StarlightPage>

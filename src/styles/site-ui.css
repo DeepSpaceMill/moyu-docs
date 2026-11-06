@@ -1,0 +1,161 @@
+/*
+ * Tailwind entry for the marketing pages, header and their components.
+ * Preflight is intentionally omitted so Starlight documentation keeps its own
+ * base styles; the component base rules at the end are scoped to .site-ui.
+ */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* Starlight owns the theme attribute on <html>; follow it instead of adding a second theme state. */
+@custom-variant dark (&:where([data-theme='dark'] *));
+
+@source '../../src/components/ui';
+@source '../../src/components/ui-ext';
+@source '../../src/components/reui';
+@source '../../src/components/site';
+@source '../../src/layouts';
+@source '../../src/pages';
+
+/* Radius is limited to the marketing components and documentation header navigation. */
+.site-ui,
+.site-nav-ui {
+  --radius: 0.25rem;
+}
+
+@theme inline {
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-invert-foreground: var(--invert-foreground);
+  --color-invert: var(--invert);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning: var(--warning);
+  --color-info-foreground: var(--info-foreground);
+  --color-info: var(--info);
+  --color-success-foreground: var(--success-foreground);
+  --color-success: var(--success);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+ * Marketing palette. The class is used on the marketing body and on portaled
+ * popups so they inherit the same semantic values.
+ */
+.site-ui {
+  --background: #fafbfb;
+  --foreground: #1e2826;
+  --card: #f6f8f8;
+  --card-foreground: #1e2826;
+  --popover: #f6f8f8;
+  --popover-foreground: #1e2826;
+  --primary: #1e6d65;
+  --primary-hover: #175d57;
+  --primary-foreground: #fafcfc;
+  --secondary: #f1f4f4;
+  --secondary-foreground: #1e2826;
+  --muted: #f1f4f4;
+  --muted-foreground: #4f5d5b;
+  --accent: #d8eeeb;
+  --accent-foreground: #1e6d65;
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: var(--color-red-800);
+  --border: #d9e0df;
+  --input: #d9e0df;
+  --ring: #1e6d65;
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-emerald-900);
+  --info: var(--color-violet-500);
+  --info-foreground: var(--color-violet-900);
+  --warning: var(--color-yellow-500);
+  --warning-foreground: var(--color-yellow-900);
+  --invert: var(--color-zinc-900);
+  --invert-foreground: var(--color-zinc-50);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+[data-theme='dark'] .site-ui {
+  --background: #1b1b1b;
+  --foreground: #ededed;
+  --card: #212121;
+  --card-foreground: #ededed;
+  --popover: #212121;
+  --popover-foreground: #ededed;
+  --primary: #8ac9c1;
+  --primary-hover: #9ed6ce;
+  --primary-foreground: #13211f;
+  --secondary: #272727;
+  --secondary-foreground: #ededed;
+  --muted: #272727;
+  --muted-foreground: #b0b0b0;
+  --accent: #263b39;
+  --accent-foreground: #8ac9c1;
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: var(--color-red-600);
+  --border: #505050;
+  --input: #505050;
+  --ring: #8ac9c1;
+  --success-foreground: var(--color-emerald-600);
+  --info-foreground: var(--color-violet-600);
+  --warning-foreground: var(--color-yellow-600);
+  --invert: var(--color-zinc-700);
+}
+
+/*
+ * Minimal component base rules, limited to the new Base UI controls. Starlight
+ * search and preference controls are not [data-slot] elements, so they keep
+ * their own styling.
+ */
+@layer base {
+  .site-ui,
+  .site-ui *,
+  .site-ui *::before,
+  .site-ui *::after {
+    box-sizing: border-box;
+  }
+
+  .site-ui :where(button[data-slot], a[data-slot]) {
+    font: inherit;
+    letter-spacing: inherit;
+  }
+
+  .site-ui :where(button[data-slot]) {
+    background-color: transparent;
+    background-image: none;
+    border-style: solid;
+  }
+}
+
+* {
+  text-autospace: normal;
+}
