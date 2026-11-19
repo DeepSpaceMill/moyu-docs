@@ -52,14 +52,6 @@ export const showcaseWorks: ShowcaseWork[] = [
     href: 'https://store.steampowered.com/app/5499170/',
   },
   {
-    title: '箱中轶事',
-    author: '浅红工作室',
-    tags: ['同人', '重返未来1999', '制作中'],
-    coverColor: '#9A7C70',
-    cover: xzysCover,
-    translations: { en: { tags: ['Doujin'] }, ja: { tags: ['同人'] } },
-  },
-  {
     title: '鱼想吃草莓',
     author: 'Fermentative Iron & Sand Hotel',
     tags: ['商业', '制作中'],
@@ -67,6 +59,14 @@ export const showcaseWorks: ShowcaseWork[] = [
     cover: fishberryCover,
     translations: { en: { tags: ['Commercial'] }, ja: { tags: ['商業'] } },
     href: 'https://store.steampowered.com/app/4655140/',
+  },
+  {
+    title: '箱中轶事',
+    author: '浅红工作室',
+    tags: ['同人', '重返未来1999', '制作中'],
+    coverColor: '#9A7C70',
+    cover: xzysCover,
+    translations: { en: { tags: ['Doujin'] }, ja: { tags: ['同人'] } },
   },
   // {
   //   title: '日落前的最后一班车',
