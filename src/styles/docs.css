@@ -1,0 +1,254 @@
+/*
+ * Documentation reading styles.
+ *
+ * Starlight owns the document structure, the sidebar and the table of contents;
+ * this file only adjusts their appearance so the documentation matches the
+ * marketing pages. Everything here is either a --sl-* mapping (see custom.css)
+ * or a scoped rule on Starlight's own class names, so no upstream component is
+ * copied.
+ *
+ * Conventions:
+ * - Radii come from --radius so the docs share one corner system with the
+ *   marketing components; no one-off pixel values.
+ * - Only colour changes on interactive rows. No shadow or size transitions on
+ *   list items, which repaint long lists on every frame.
+ * - One accent (--primary) drives selection everywhere. The aside variants keep
+ *   Starlight's semantic hues because those carry meaning.
+ *
+ * Layer notes:
+ * - starlight.core is Starlight's own component layer.
+ * - starlight.content covers the Markdown body.
+ * - starlight.components covers asides, code blocks and other user components.
+ * Rules are placed in the same layer as the upstream ones they adjust, so they
+ * win by source order instead of by extra specificity.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Left sidebar
+ * ------------------------------------------------------------------------ */
+
+@layer starlight.core {
+  /* Every link shares the rounded hit area, so hover and selection agree. */
+  .sidebar-content a {
+    border-radius: var(--radius);
+  }
+
+  .sidebar-content a:hover,
+  .sidebar-content a:focus {
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+
+  /* Current page: a quiet tinted row instead of the accent fill. */
+  .sidebar-content a[aria-current='page'],
+  .sidebar-content a[aria-current='page']:hover,
+  .sidebar-content a[aria-current='page']:focus {
+    background-color: var(--sl-color-accent-low);
+    color: var(--sl-color-text-accent);
+  }
+
+  /* Group labels read as headings, not links. */
+  .sidebar-content .top-level > li > details > summary .large {
+    color: var(--sl-color-white);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Table of contents
+ * ------------------------------------------------------------------------ */
+
+@layer starlight.core {
+  /*
+   * Selection is conveyed by colour only: no rail, no marker bar, no box. An
+   * inset shadow would follow the row's radius and read as a stray arc.
+   */
+  .right-sidebar-panel a {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /*
+   * Top-level entries (h2) read as section labels rather than links; nested
+   * entries (h3) stay quiet so a long command list remains scannable.
+   */
+  .right-sidebar-panel ul > li > a {
+    font-weight: 600;
+    color: var(--sl-color-gray-2);
+  }
+  .right-sidebar-panel ul > li > a[aria-current='true'] {
+    color: var(--sl-color-text-accent);
+  }
+
+  .right-sidebar-panel ul ul a {
+    font-size: var(--sl-text-2xs);
+    font-weight: 400;
+    color: var(--sl-color-gray-3);
+  }
+  .right-sidebar-panel ul ul a:hover {
+    color: var(--sl-color-white);
+  }
+  .right-sidebar-panel ul ul a[aria-current='true'] {
+    font-weight: 600;
+    color: var(--sl-color-text-accent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Markdown body
+ * ------------------------------------------------------------------------ */
+
+@layer starlight.content {
+  /*
+   * Starlight wraps each heading in `.sl-heading-wrapper` so it can position the
+   * anchor link. Spacing must therefore target the wrapper, not the heading, and
+   * the heading's own scroll offset is irrelevant because the wrapper moves with
+   * it.
+   */
+  .sl-markdown-content .sl-heading-wrapper {
+    scroll-margin-top: calc(var(--sl-nav-height) + 1.5rem);
+  }
+
+  /*
+   * Section spacing.
+   *
+   * Starlight spaces headings with
+   * `.sl-markdown-content :not(...) + :is(.sl-heading-wrapper)` (weight 0,2,0)
+   * and `font-size` on the wrapper, so em/rem values would scale with the
+   * heading level. These rules match that weight plus one class and use px.
+   */
+  .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h2 {
+    margin-top: 40px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--sl-color-hairline);
+  }
+
+  .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h3 {
+    margin-top: 32px;
+  }
+
+  .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h4 {
+    margin-top: 24px;
+  }
+
+  /* The first heading in the body should not push away from the page title. */
+  .sl-markdown-content > .sl-heading-wrapper:first-child {
+    margin-top: 0;
+  }
+
+  /*
+   * Tables: restore a readable first/last column inset, since Starlight removes
+   * the outer padding to align tables with the text column.
+   */
+  .sl-markdown-content :is(th, td) {
+    border-bottom: 1px solid var(--sl-color-hairline);
+  }
+  .sl-markdown-content :is(th:first-child, td:first-child) {
+    padding-inline-start: 0.75rem;
+  }
+  .sl-markdown-content :is(th:last-child, td:last-child) {
+    padding-inline-end: 0.75rem;
+  }
+  .sl-markdown-content tr:last-child :is(td, th) {
+    border-bottom: 0;
+  }
+
+  /*
+   * Inline code reads as a small chip. Starlight already reduces the size to
+   * --sl-text-code-sm, so only the shape is adjusted here; scaling again would
+   * compound the reduction.
+   */
+  .sl-markdown-content code:not(:where(.not-content *)) {
+    border-radius: var(--radius);
+    padding: 0.125rem 0.375rem;
+  }
+
+  /* Blockquotes get the accent edge instead of a gray one. */
+  .sl-markdown-content blockquote {
+    border-inline-start: 2px solid var(--sl-color-accent-low);
+    color: var(--sl-color-gray-2);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Asides
+ * ------------------------------------------------------------------------ */
+
+@layer starlight.components {
+  /* Keep the semantic colour per variant. */
+  .starlight-aside--note {
+    --sl-color-asides-border: var(--sl-color-blue);
+    --sl-color-asides-text-accent: var(--sl-color-blue-high);
+  }
+  .starlight-aside--tip {
+    --sl-color-asides-border: var(--sl-color-purple);
+    --sl-color-asides-text-accent: var(--sl-color-purple-high);
+  }
+  .starlight-aside--caution {
+    --sl-color-asides-border: var(--sl-color-orange);
+    --sl-color-asides-text-accent: var(--sl-color-orange-high);
+  }
+  .starlight-aside--danger {
+    --sl-color-asides-border: var(--sl-color-red);
+    --sl-color-asides-text-accent: var(--sl-color-red-high);
+  }
+
+  /*
+   * Starlight paints each aside with the fully saturated `*-low` colour, which
+   * is heavy behind body text in the light theme. Mixing it towards the page
+   * background keeps the hue readable while restoring text contrast.
+   *
+   * This rule is separate from the custom-property block above: the variant sets
+   * --sl-color-asides-border, and a single rule that both sets and consumes a
+   * custom property on the same element resolves against the inherited value.
+   */
+  .starlight-aside.starlight-aside--note,
+  .starlight-aside.starlight-aside--tip,
+  .starlight-aside.starlight-aside--caution,
+  .starlight-aside.starlight-aside--danger {
+    border-radius: var(--radius);
+    color: var(--sl-color-text);
+    background-color: color-mix(in srgb, var(--sl-color-asides-border) 12%, var(--sl-color-bg));
+  }
+
+  .starlight-aside__title {
+    font-size: var(--sl-text-base);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Page footer: previous / next, edit link and last updated
+ * ------------------------------------------------------------------------ */
+
+@layer starlight.core {
+  /* One state change per interaction: the border carries the accent. */
+  .pagination-links a {
+    border-radius: var(--radius);
+    box-shadow: none;
+  }
+  .pagination-links a:hover {
+    border-color: var(--sl-color-text-accent);
+  }
+
+  .pagination-links .link-title {
+    font-size: var(--sl-text-xl);
+    font-weight: 600;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Narrow viewports
+ * ------------------------------------------------------------------------ */
+
+@layer starlight.core {
+  /* The mobile menu already lists site sections, so keep the panel scrollable. */
+  .sidebar-content {
+    scrollbar-width: thin;
+  }
+
+  @media (max-width: 49.999rem) {
+    /* Larger touch targets for the documentation tree. */
+    .sidebar-content a {
+      padding-block: 0.45em;
+    }
+  }
+}

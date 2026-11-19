@@ -99,6 +99,7 @@ export default defineConfig({
       customCss: [
         './src/styles/theme-tokens.css',
         './src/styles/custom.css',
+        './src/styles/docs.css',
         './src/styles/marketing.css',
       ],
       expressiveCode: {

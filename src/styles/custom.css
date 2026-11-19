@@ -1,5 +1,17 @@
-/* Keep marketing utilities above Starlight's layered defaults, and resolve the documentation palette from the shared theme tokens. */
-@layer starlight, theme, base, components, utilities;
+/*
+ * Layer order.
+ *
+ * Starlight declares its own sublayer order in style/layers.css:
+ *   starlight.base, starlight.reset, starlight.core, starlight.content,
+ *   starlight.components, starlight.utils
+ * Tailwind's entry (site-ui.css) declares theme/base/components/utilities.
+ *
+ * Declaring `starlight` as a single layer here would flatten those sublayers and
+ * make every documentation rule lose to Tailwind utilities, so the sublayers are
+ * listed explicitly instead. Marketing rules must stay after Starlight's.
+ */
+@layer starlight.base, starlight.reset, starlight.core, starlight.content, starlight.components, starlight.utils,
+  theme, base, components, utilities;
 
 /*
  * Starlight exposes its palette through --sl-color-* variables. The single
@@ -121,9 +133,4 @@
 
 .social-icons {
   font-size: 20px;
-}
-
-.sidebar-content .top-level li ul li a[aria-current='page'] {
-  color: var(--sl-color-text-accent);
-  background-color: unset;
 }
