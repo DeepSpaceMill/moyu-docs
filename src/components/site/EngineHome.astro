@@ -2,6 +2,7 @@
 import '../../styles/site-ui.css';
 import EngineExample from './EngineExample.astro';
 import ProductMedia from './ProductMedia.astro';
+import ShowcaseGrid from './ShowcaseGrid.astro';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -21,6 +22,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card
 import hero from '../../assets/products/editor-hero.png';
 import { copy } from '../../data/site-copy';
 import { engineHomeCopy } from '../../data/engine-home-copy';
+import { showcaseCopy, showcaseWorks } from '../../data/showcase';
 import { docPath, marketingPath, type Locale } from '../../data/site-nav';
 
 interface Props {
@@ -162,7 +164,7 @@ const featureLink = cn(
     </div>
   </section>
   <section
-    class="mx-auto mb-[90px] w-[calc(100%-80px)] max-w-[1184px] max-lg:w-[calc(100%-56px)] max-md:mb-[50px] max-md:w-[calc(100%-40px)]"
+    class="mx-auto mb-[50px] w-[calc(100%-80px)] max-w-[1184px] max-lg:w-[calc(100%-56px)] max-md:mb-[50px] max-md:w-[calc(100%-40px)]"
   >
     <Card
       className="grid grid-cols-[0.9fr_1.1fr] items-center gap-[55px] rounded-lg bg-muted p-[38px] ring-0 max-lg:gap-8 max-lg:p-[26px] max-md:grid-cols-1 max-md:gap-6 max-md:p-6"
@@ -187,4 +189,18 @@ const featureLink = cn(
       </div>
     </Card>
   </section>
+  {showcaseWorks.length > 0 && (
+    <section
+      aria-labelledby="home-showcase-title"
+      class="mx-auto mb-[90px] w-[calc(100%-80px)] max-w-[1184px] max-lg:w-[calc(100%-56px)] max-md:mb-[50px] max-md:w-[calc(100%-40px)]"
+    >
+      <h2 id="home-showcase-title" class="mb-8 text-center max-md:mb-6">{t.showcase}</h2>
+      <ShowcaseGrid locale={locale} works={showcaseWorks} singleRow />
+      <div class="mt-6 flex justify-center">
+        <a class={secondaryLink} href={marketingPath(locale, 'showcase')}>
+          {showcaseCopy.viewMore[locale]}<ArrowRight className="size-[18px]" aria-hidden="true" />
+        </a>
+      </div>
+    </section>
+  )}
 </div>

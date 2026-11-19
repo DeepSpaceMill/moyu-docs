@@ -6,6 +6,7 @@ import xzysCover from '../assets/showcase/箱中轶事.png';
 import witchCover from '../assets/showcase/往逝魔女之匣.jpg';
 
 export const showcaseCopy = {
+  viewMore: { zh: '查看更多', en: 'View more', ja: 'もっと見る' },
   description: {
     zh: '浏览用末语引擎或末语工坊制作的游戏。',
     en: 'Browse games made with MOYU Engine or MOYU Atelier.',
