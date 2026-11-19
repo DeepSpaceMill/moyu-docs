@@ -2,13 +2,13 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import '../styles/site-ui.css';
 import { seoCopy } from '../data/seo-copy';
-import type { Locale } from '../data/site-nav';
+import type { Locale, MarketingPage } from '../data/site-nav';
 
-interface Props { locale: Locale; page: 'home' | 'editor'; description: string }
+interface Props { locale: Locale; page: MarketingPage; description: string }
 const { locale, page, description } = Astro.props;
 const seo = seoCopy[locale];
 const metaDescription = description.replace(/\s+/g, ' ').trim();
-const title = page === 'home' ? seo.homeTitle : seo.editorTitle;
+const title = seo[`${page}Title`];
 ---
 <StarlightPage frontmatter={{
   title,

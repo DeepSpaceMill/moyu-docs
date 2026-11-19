@@ -1,0 +1,17 @@
+---
+import ShowcaseGrid from './ShowcaseGrid.astro';
+import Marketing from '../../layouts/Marketing.astro';
+import { showcaseCopy, showcaseWorks } from '../../data/showcase';
+import { copy } from '../../data/site-copy';
+import type { Locale } from '../../data/site-nav';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
+<Marketing locale={locale} page="showcase" description={showcaseCopy.description[locale]}>
+  <section class="mx-auto w-[calc(100%-80px)] max-w-[1184px] pt-[60px] pb-16 max-lg:w-[calc(100%-56px)] max-md:w-[calc(100%-40px)] max-md:pt-10 max-md:pb-10">
+    <h1 id="_top" class="mb-8 text-[46px] leading-[1.3] font-semibold tracking-[-1px] max-lg:text-4xl max-md:mb-6 max-md:text-[30px]">{copy[locale].showcase}</h1>
+    <ShowcaseGrid locale={locale} works={showcaseWorks} />
+  </section>
+</Marketing>

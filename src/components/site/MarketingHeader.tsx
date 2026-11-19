@@ -15,14 +15,13 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { copy } from '@/data/site-copy';
-import { docPath, locales, localeLabels, marketingPath, prefixFor, type Locale } from '@/data/site-nav';
+import { docPath, locales, localeLabels, marketingPath, prefixFor, type Locale, type MarketingPage } from '@/data/site-nav';
 
-type Page = 'home' | 'editor';
 type ThemePreference = 'auto' | 'light' | 'dark';
 
 interface Props {
   locale: Locale;
-  current: Page;
+  current: MarketingPage;
 }
 
 const socialLinks = [
@@ -100,6 +99,7 @@ export default function MarketingHeader({ locale, current }: Props) {
   const links = [
     { href: marketingPath(locale, 'home'), label: t.home, active: current === 'home' },
     { href: marketingPath(locale, 'editor'), label: t.editor, active: current === 'editor' },
+    { href: marketingPath(locale, 'showcase'), label: t.showcase, active: current === 'showcase' },
     { href: docPath(locale, '/start/intro/'), label: t.docs, active: false },
   ];
   const themeItems: { value: ThemePreference; label: string }[] = [
@@ -141,7 +141,7 @@ export default function MarketingHeader({ locale, current }: Props) {
                     href={link.href}
                     active={link.active}
                     aria-current={link.active ? 'page' : undefined}
-                    className={`inline-flex h-11 items-center rounded-lg px-4 text-base whitespace-nowrap no-underline ${
+                    className={`inline-flex h-11 items-center rounded-lg px-4 text-base whitespace-nowrap no-underline max-xl:px-3 ${
                       link.active
                         ? 'bg-accent text-accent-foreground hover:bg-accent! focus:bg-accent! data-active:bg-accent! data-active:text-accent-foreground!'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'

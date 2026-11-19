@@ -1,0 +1,92 @@
+---
+import { Image } from 'astro:assets';
+import { ArrowUpRight } from 'lucide-react';
+import { showcaseCopy, type ShowcaseWork } from '../../data/showcase';
+import type { Locale } from '../../data/site-nav';
+
+interface Props {
+  locale: Locale;
+  works: readonly ShowcaseWork[];
+  singleRow?: boolean;
+}
+
+const { locale, works, singleRow = false } = Astro.props;
+const visibleWorks = singleRow ? works.slice(0, 3) : works;
+const Heading = singleRow ? 'h3' : 'h2';
+const firstCover = singleRow ? -1 : visibleWorks.slice(0, 2).findIndex(({ cover }) => cover);
+const smallSizes = '(min-width: 1264px) 379px, (min-width: 1024px) calc((100vw - 128px) / 3)';
+const narrowSizes = '(min-width: 768px) calc((100vw - 80px) / 2), (min-width: 640px) calc((100vw - 64px) / 2), calc(100vw - 40px)';
+---
+
+{visibleWorks.length ? (
+  <ul role="list" class:list={[
+    'm-0 grid list-none grid-cols-1 gap-x-6 gap-y-8 p-0 sm:grid-cols-2',
+    singleRow ? 'lg:grid-cols-3' : 'lg:grid-cols-6',
+  ]}>
+    {visibleWorks.map(({ title, author, tags, translations, cover, coverColor, href }, index) => {
+      const translation = translations?.[locale];
+      const name = translation?.title ?? title;
+      const creator = translation?.author ?? author;
+      const labels = translation?.tags ?? tags;
+      const large = !singleRow && index < 2;
+      const sizes = large
+        ? `(min-width: 1264px) 580px, (min-width: 1024px) calc((100vw - 104px) / 2), ${narrowSizes}`
+        : `${smallSizes}, ${narrowSizes}`;
+      const sourceWidth = cover ? Math.min(cover.width, Math.floor(cover.height * 16 / 9)) : 0;
+      const width = Math.min(sourceWidth, 640);
+      const widths = [...new Set((large ? [384, 640, 800, 960, 1200] : [384, 640, 800])
+        .map((candidate) => Math.min(candidate, sourceWidth)))];
+      const Card = href ? 'a' : 'div';
+      return (
+        <li class:list={[
+          'min-w-0',
+          singleRow
+            ? index === 1 ? 'max-sm:hidden' : index === 2 ? 'max-lg:hidden' : undefined
+            : large ? 'lg:col-span-3' : 'lg:col-span-2',
+        ]}>
+          <Card href={href} class="group block rounded-lg">
+            <div class="aspect-video overflow-hidden rounded-lg bg-muted" style={coverColor ? { backgroundColor: coverColor } : undefined}>
+              {cover && (
+                <Image
+                  data-showcase-cover
+                  class="block h-full w-full object-cover"
+                  src={cover}
+                  alt=""
+                  width={width}
+                  height={Math.round(width * 9 / 16)}
+                  widths={widths}
+                  sizes={sizes}
+                  format="webp"
+                  quality={80}
+                  fit="cover"
+                  loading={large ? 'eager' : 'lazy'}
+                  fetchpriority={index === firstCover ? 'high' : undefined}
+                  decoding="async"
+                />
+              )}
+            </div>
+            <Heading class:list={[
+              'mt-3 flex items-baseline justify-between gap-2 text-xl leading-snug font-semibold tracking-normal wrap-anywhere',
+              href && 'group-hover:text-primary group-focus-visible:text-primary',
+            ]}>
+              <span>{name}</span>
+              {href && <ArrowUpRight className="relative top-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />}
+            </Heading>
+            <div class="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-muted-foreground">
+              <span class="wrap-anywhere">{creator}</span>
+              {labels?.map((tag) => <span class="rounded-sm bg-muted px-1.5 py-0.5 text-xs">{tag}</span>)}
+            </div>
+          </Card>
+        </li>
+      );
+    })}
+  </ul>
+) : !singleRow && <p class="text-base text-muted-foreground">{showcaseCopy.empty[locale]}</p>}
+
+<script>
+  for (const image of document.querySelectorAll<HTMLImageElement>('[data-showcase-cover]')) {
+    const hideBrokenCover = () => { image.hidden = true; };
+    image.addEventListener('error', hideBrokenCover, { once: true });
+    if (image.complete && !image.naturalWidth) hideBrokenCover();
+  }
+</script>

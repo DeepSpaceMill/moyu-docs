@@ -2,6 +2,7 @@ export const copy = {
   zh: {
     home: '首页',
     editor: '编辑器',
+    showcase: '作品',
     docs: '文档',
     language: '语言',
     theme: '主题',
@@ -47,6 +48,7 @@ export const copy = {
   en: {
     home: 'Home',
     editor: 'Editor',
+    showcase: 'Showcase',
     docs: 'Docs',
     language: 'Language',
     theme: 'Theme',
@@ -94,6 +96,7 @@ export const copy = {
   ja: {
     home: 'ホーム',
     editor: 'エディター',
+    showcase: '作品',
     docs: 'ドキュメント',
     language: '言語',
     theme: 'テーマ',
