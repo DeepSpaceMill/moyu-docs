@@ -4,6 +4,7 @@ import type { Locale } from './site-nav';
 import zlzyCover from '../assets/showcase/智利之夜.png';
 import xzysCover from '../assets/showcase/箱中轶事.png';
 import witchCover from '../assets/showcase/往逝魔女之匣.jpg';
+import fishberryCover from '../assets/showcase/FISHBERRY.jpg';
 
 export const showcaseCopy = {
   viewMore: { zh: '查看更多', en: 'View more', ja: 'もっと見る' },
@@ -59,24 +60,33 @@ export const showcaseWorks: ShowcaseWork[] = [
     translations: { en: { tags: ['Doujin'] }, ja: { tags: ['同人'] } },
   },
   {
-    title: '日落前的最后一班车',
-    author: '十一月小组',
-    tags: ['原创'],
-    coverColor: '#b69a65',
-    translations: { en: { tags: ['Original'] }, ja: { tags: ['オリジナル'] } },
-  },
-  {
-    title: '隔壁房间的收音机',
-    author: '棠梨',
-    tags: ['商业'],
-    coverColor: '#7b718b',
+    title: '鱼想吃草莓',
+    author: 'Fermentative Iron & Sand Hotel',
+    tags: ['商业', '制作中'],
+    coverColor: '#9969C0',
+    cover: fishberryCover,
     translations: { en: { tags: ['Commercial'] }, ja: { tags: ['商業'] } },
+    href: 'https://store.steampowered.com/app/4655140/',
   },
-  {
-    title: '第九号温室',
-    author: '玻璃房',
-    tags: ['同人'],
-    coverColor: '#6b8576',
-    translations: { en: { tags: ['Fan game'] }, ja: { tags: ['二次創作'] } },
-  },
+  // {
+  //   title: '日落前的最后一班车',
+  //   author: '十一月小组',
+  //   tags: ['原创'],
+  //   coverColor: '#b69a65',
+  //   translations: { en: { tags: ['Original'] }, ja: { tags: ['オリジナル'] } },
+  // },
+  // {
+  //   title: '隔壁房间的收音机',
+  //   author: '棠梨',
+  //   tags: ['商业'],
+  //   coverColor: '#7b718b',
+  //   translations: { en: { tags: ['Commercial'] }, ja: { tags: ['商業'] } },
+  // },
+  // {
+  //   title: '第九号温室',
+  //   author: '玻璃房',
+  //   tags: ['同人'],
+  //   coverColor: '#6b8576',
+  //   translations: { en: { tags: ['Fan game'] }, ja: { tags: ['二次創作'] } },
+  // },
 ];
