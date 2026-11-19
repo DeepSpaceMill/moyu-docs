@@ -1,0 +1,83 @@
+/*
+ * Single palette source for the whole site.
+ *
+ * Values live on :root so that marketing pages (through the Tailwind semantic
+ * utilities defined in site-ui.css) and Starlight documentation pages (through
+ * the --sl-color-* mapping in custom.css) resolve to the same colours.
+ * Starlight owns the data-theme attribute on <html>.
+ */
+
+:root {
+  --background: #fafbfb;
+  --foreground: #1e2826;
+
+  --card: #f6f8f8;
+  --card-foreground: #1e2826;
+  --popover: #f6f8f8;
+  --popover-foreground: #1e2826;
+
+  --primary: #1e6d65;
+  --primary-hover: #175d57;
+  --primary-foreground: #fafcfc;
+
+  --secondary: #f1f4f4;
+  --secondary-foreground: #1e2826;
+  --muted: #f1f4f4;
+  --muted-foreground: #4f5d5b;
+  /* Dimmer than muted-foreground; used for secondary metadata such as the page TOC. */
+  --subtle-foreground: #6b7674;
+  --accent: #d8eeeb;
+  --accent-foreground: #1e6d65;
+
+  --destructive: oklch(57.7% 0.245 27.325);
+  --destructive-foreground: oklch(44.4% 0.177 26.899);
+  --success: oklch(69.6% 0.17 162.48);
+  --success-foreground: oklch(37.8% 0.077 168.94);
+  --info: oklch(60.6% 0.25 292.717);
+  --info-foreground: oklch(38% 0.189 293.745);
+  --warning: oklch(79.5% 0.184 86.047);
+  --warning-foreground: oklch(42.1% 0.095 57.708);
+
+  --border: #d9e0df;
+  --input: #d9e0df;
+  --ring: #1e6d65;
+
+  --invert: oklch(21% 0.006 285.885);
+  --invert-foreground: oklch(98.5% 0 0);
+
+  --radius: 0.25rem;
+}
+
+:root[data-theme='dark'] {
+  --background: #1b1b1b;
+  --foreground: #ededed;
+
+  --card: #212121;
+  --card-foreground: #ededed;
+  --popover: #212121;
+  --popover-foreground: #ededed;
+
+  --primary: #8ac9c1;
+  --primary-hover: #9ed6ce;
+  --primary-foreground: #13211f;
+
+  --secondary: #272727;
+  --secondary-foreground: #ededed;
+  --muted: #272727;
+  --muted-foreground: #b0b0b0;
+  --subtle-foreground: #8e8e8e;
+  --accent: #263b39;
+  --accent-foreground: #8ac9c1;
+
+  --destructive: oklch(70.4% 0.191 22.216);
+  --destructive-foreground: oklch(57.7% 0.245 27.325);
+  --success-foreground: oklch(59.6% 0.145 163.225);
+  --info-foreground: oklch(54.1% 0.281 293.009);
+  --warning-foreground: oklch(68.1% 0.162 75.834);
+
+  --border: #505050;
+  --input: #505050;
+  --ring: #8ac9c1;
+
+  --invert: oklch(37% 0.013 285.805);
+}

@@ -1,0 +1,221 @@
+---
+import config from 'virtual:starlight/user-config';
+import Search from 'virtual:starlight/components/Search';
+import '../../styles/site-ui.css';
+import { copy } from '@/data/site-copy';
+import {
+  homeHref,
+  localeSwitchTarget,
+  locales,
+  mainNav,
+  navLabels,
+  marketingPageFor,
+  toLocale,
+  type Locale,
+} from '@/data/site-nav';
+import SiteHeaderControls from './SiteHeaderControls';
+
+const locale = toLocale(Astro.locals.starlightRoute.locale);
+const marketingPage = marketingPageFor(Astro.url.pathname);
+const variant = marketingPage ? 'marketing' : 'docs';
+const t = copy[locale];
+const labels = navLabels(locale);
+const links = mainNav(locale, marketingPage);
+const localeHrefs = Object.fromEntries(
+  locales.map((value) => [value, localeSwitchTarget(Astro.url.pathname, value)])
+) as Record<Locale, string>;
+
+const shouldRenderSearch =
+  config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
+---
+
+<div class="site-header-bar" data-variant={variant}>
+  <div class="site-header-logo-col">
+    <a class="site-header-logo" href={homeHref(locale)} aria-label={t.engineName}>
+      <img
+        class="block h-10 w-30 object-contain max-xl:w-[120px] max-md:h-[30px] max-md:w-[87px] max-[359px]:w-[72px] dark:hidden"
+        src="/logo.png"
+        width="116"
+        height="37"
+        alt={t.engineName}
+      />
+      <img
+        class="hidden h-10 w-30 object-contain max-xl:w-[120px] max-md:h-[30px] max-md:w-[87px] max-[359px]:w-[72px] dark:block"
+        src="/logo_dark.png"
+        width="116"
+        height="37"
+        alt={t.engineName}
+      />
+    </a>
+  </div>
+  {
+    /*
+      Documentation gets its in-docs navigation from the sidebar, so the bar
+      carries no inline links there and the four site sections live in the site
+      navigation entry instead. Marketing pages keep inline links above 1024px.
+    */
+  }
+  {
+    variant === 'marketing' && (
+      <nav aria-label={labels.nav} class="hidden items-center gap-2 lg:flex max-xl:gap-1">
+        {links.map((link) => (
+          <a
+            href={link.href}
+            aria-current={link.active ? 'page' : undefined}
+            class:list={[
+              'inline-flex h-11 items-center rounded-lg px-4 text-base whitespace-nowrap no-underline max-xl:px-3',
+              link.active
+                ? 'bg-accent text-accent-foreground hover:bg-accent focus:bg-accent'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+            ]}
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+    )
+  }
+  {
+    variant === 'docs' && shouldRenderSearch && (
+      <div class="site-header-search">
+        <Search />
+      </div>
+    )
+  }
+  {variant === 'marketing' && <div class="site-header-spacer" aria-hidden="true" />}
+  <SiteHeaderControls
+    client:load
+    locale={locale}
+    links={links}
+    localeHrefs={localeHrefs}
+    variant={variant}
+    navLabel={labels.nav}
+  />
+</div>
+
+<style>
+  /*
+   * Unlayered on purpose: Tailwind utilities live in @layer utilities and would
+   * otherwise win over these layout rules on the same element.
+   */
+  .site-header-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    width: 100%;
+    min-height: 68px;
+  }
+
+  .site-header-logo {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .site-header-spacer {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Marketing: the bar shares the 1376px content container. */
+  .site-header-bar[data-variant='marketing'] {
+    margin-inline: auto;
+    max-width: 1376px;
+    padding-inline: 1.125rem;
+  }
+
+  .site-header-search {
+    min-width: 0;
+    flex: 1;
+  }
+
+  @media (max-width: 1279px) {
+    .site-header-bar {
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .site-header-bar {
+      gap: 1.125rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .site-header-bar {
+      gap: 0.625rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .site-header-bar {
+      min-height: 72px;
+    }
+    .site-header-bar[data-variant='marketing'] {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .site-header-bar {
+      min-height: 76px;
+    }
+    .site-header-bar[data-variant='marketing'] {
+      padding-inline: 2rem;
+    }
+  }
+
+  /*
+   * Documentation aligns the search field with the article column.
+   *
+   * The article column is not simply inset by the sidebar width: with a table
+   * of contents on the right, Starlight centres it inside the remaining space.
+   * The bar therefore repeats Starlight's own header grid, where the first
+   * column spans the sidebar and the free space to its left, the second column
+   * takes all remaining space for the search field, and the third holds the
+   * controls. --sl-content-inline-start is set from 50em up.
+   */
+  @media (min-width: 50em) {
+    .site-header-bar[data-variant='docs'] {
+      display: grid;
+      grid-template-columns:
+        minmax(
+          calc(var(--__sidebar-width) + max(0rem, var(--__main-column-fr) - var(--sl-nav-gap))),
+          auto
+        )
+        1fr
+        auto;
+      gap: var(--sl-nav-gap);
+    }
+
+    .site-header-bar[data-variant='docs'] {
+      --__sidebar-width: max(0rem, var(--sl-content-inline-start, 0rem) - var(--sl-nav-pad-x));
+      --__main-column-fr: calc(
+        (
+            100% + var(--__sidebar-pad, 0rem) - var(--__toc-width, var(--sl-sidebar-width)) -
+              (2 * var(--__toc-width, var(--sl-nav-pad-x))) - var(--sl-content-inline-start, 0rem) -
+              var(--sl-content-width)
+          ) /
+          2
+      );
+    }
+
+    :global(:root[data-has-sidebar]) .site-header-bar[data-variant='docs'] {
+      --__sidebar-pad: calc(2 * var(--sl-nav-pad-x));
+    }
+
+    :global(:root:not([data-has-toc])) .site-header-bar[data-variant='docs'] {
+      --__toc-width: 0rem;
+    }
+
+    /* The grid already places the logo; drop the flex basis and spacers. */
+    .site-header-bar[data-variant='docs'] .site-header-logo-col {
+      min-width: max-content;
+    }
+
+    .site-header-bar[data-variant='docs'] .site-header-search {
+      justify-self: start;
+      width: 100%;
+      max-width: 22rem;
+    }
+  }
+</style>

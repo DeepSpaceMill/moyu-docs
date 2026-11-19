@@ -1,5 +1,13 @@
-export const copy = {
-  zh: {
+/**
+ * Every locale must provide the same set of keys.
+ *
+ * The base locale defines the shape, and the other two are annotated with it,
+ * so a missing or misspelled key fails the type check instead of rendering an
+ * empty label at runtime. Keep `zh` as the base: it carries every key.
+ */
+export type Copy = typeof zhCopy;
+
+const zhCopy = {
     home: '首页',
     editor: '编辑器',
     showcase: '作品',
@@ -11,6 +19,8 @@ export const copy = {
     dark: '深色',
     menu: '打开导航菜单',
     close: '关闭导航菜单',
+    nav: '主导航',
+    siteNav: '站点导航',
     engineName: '末语引擎',
     editorName: '末语工坊',
     engineDesc: '跨平台视觉小说引擎。用 TypeScript 与 React 编写界面和逻辑，用 Sixu 组织剧情。',
@@ -44,8 +54,9 @@ export const copy = {
     relatedLink: '了解末语工坊',
     footer: '在 AI 的浪潮中，我们更坚信人的表达。',
     about: '关于末语',
-  },
-  en: {
+};
+
+const enCopy: Copy = {
     home: 'Home',
     editor: 'Editor',
     showcase: 'Showcase',
@@ -57,6 +68,8 @@ export const copy = {
     dark: 'Dark',
     menu: 'Open navigation',
     close: 'Close navigation',
+    nav: 'Navigation',
+    siteNav: 'Site navigation',
     engineName: 'MOYU Engine',
     editorName: 'MOYU Atelier',
     engineDesc:
@@ -92,8 +105,9 @@ export const copy = {
     relatedLink: 'Explore Atelier',
     footer: 'In the age of AI, we believe in human expression.',
     about: 'About MOYU',
-  },
-  ja: {
+};
+
+const jaCopy: Copy = {
     home: 'ホーム',
     editor: 'エディター',
     showcase: '作品',
@@ -105,6 +119,8 @@ export const copy = {
     dark: 'ダーク',
     menu: 'ナビゲーションを開く',
     close: 'ナビゲーションを閉じる',
+    nav: 'メインナビゲーション',
+    siteNav: 'サイトナビゲーション',
     engineName: '末語エンジン',
     editorName: 'MOYU Atelier',
     engineDesc:
@@ -139,5 +155,6 @@ export const copy = {
     relatedLink: 'Atelier を見る',
     footer: 'AI の時代だからこそ、人の表現を信じる。',
     about: '末語について',
-  },
 };
+
+export const copy = { zh: zhCopy, en: enCopy, ja: jaCopy };

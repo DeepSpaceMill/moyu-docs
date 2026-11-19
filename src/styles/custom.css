@@ -1,52 +1,126 @@
-/* Keep marketing utilities above Starlight's layered defaults. */
+/* Keep marketing utilities above Starlight's layered defaults, and resolve the documentation palette from the shared theme tokens. */
 @layer starlight, theme, base, components, utilities;
 
-/* Dark mode colors. */
+/*
+ * Starlight exposes its palette through --sl-color-* variables. The single
+ * source of the actual colours is theme-tokens.css; this block only maps
+ * Starlight's names onto those tokens so that documentation pages and
+ * marketing pages resolve to the same values, in light and dark mode alike.
+ *
+ * Keep the mapping unlayered: Starlight defines its defaults inside
+ * @layer starlight.base, so unlayered declarations win without extra
+ * specificity or !important.
+ */
 :root {
-  --sl-color-accent-low: #263b39;
-  --sl-color-accent: #8ac9c1;
-  --sl-color-accent-high: #d8eeeb;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #eceef2;
-  --sl-color-gray-2: #c0c2c7;
-  --sl-color-gray-3: #888b96;
-  --sl-color-gray-4: #545861;
-  --sl-color-gray-5: #353841;
-  --sl-color-gray-6: #24272f;
-  --sl-color-black: #17181c;
+  --sl-color-bg: var(--background);
+  --sl-color-bg-nav: var(--background);
+  --sl-color-bg-sidebar: var(--background);
+  --sl-color-bg-inline-code: var(--muted);
+  --sl-color-bg-accent: var(--primary);
+
+  --sl-color-text: var(--foreground);
+  --sl-color-text-accent: var(--primary);
+  --sl-color-text-invert: var(--primary-foreground);
+
+  --sl-color-accent-low: var(--accent);
+  --sl-color-accent: var(--primary);
+  --sl-color-accent-high: var(--accent-foreground);
+
+  --sl-color-hairline-light: var(--border);
+  --sl-color-hairline: var(--border);
+  --sl-color-hairline-shade: var(--border);
+
+  /* Scrim behind modal dialogs: neutral black in both themes. */
+  --sl-color-backdrop-overlay: oklch(0% 0 0 / 0.45);
+
+  /* Starlight uses "white" for headings and "black" for the page canvas. */
+  --sl-color-white: var(--foreground);
+  --sl-color-black: var(--background);
+
+  --sl-color-gray-1: var(--foreground);
+  --sl-color-gray-2: var(--muted-foreground);
+  --sl-color-gray-3: var(--subtle-foreground);
+  /*
+   * gray-4 must stay more prominent than gray-5: FileTree uses it for the hover
+   * border while gray-5 is the resting border, so mapping both to --border would
+   * make the hover state invisible.
+   */
+  --sl-color-gray-4: var(--muted-foreground);
+  --sl-color-gray-5: var(--border);
+  --sl-color-gray-6: var(--muted);
+  --sl-color-gray-7: var(--card);
 
   --sl-font-mono:
     SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', 'Microsoft YaHei', 'Source Han Sans',
     monospace, ui-monospace;
 }
-/* Light mode colors. */
-:root[data-theme='light'] {
-  --sl-color-accent-low: #d8eeeb;
-  --sl-color-accent: #1e6d65;
-  --sl-color-accent-high: #123937;
-  --sl-color-white: #17181c;
-  --sl-color-gray-1: #24272f;
-  --sl-color-gray-2: #353841;
-  --sl-color-gray-3: #545861;
-  --sl-color-gray-4: #888b96;
-  --sl-color-gray-5: #c0c2c7;
-  --sl-color-gray-6: #eceef2;
-  --sl-color-gray-7: #f5f6f8;
-  --sl-color-black: #ffffff;
+
+/*
+ * The shared header is taller than Starlight's default navigation bar. The
+ * sidebar top, the mobile table of contents, the anchor scroll offset and the
+ * sidebar toggle position all derive from --sl-nav-height, so overriding it
+ * here keeps them aligned with the real header height.
+ *
+ * Keep these values in sync with the min-height classes in SiteHeader.astro.
+ */
+:root {
+  --sl-nav-height: 68px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --sl-nav-height: 72px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --sl-nav-height: 76px;
+  }
+}
+
+:root[data-theme='dark'] {
+  --sl-color-backdrop-overlay: oklch(0% 0 0 / 0.66);
+}
+
+/*
+ * Starlight forces a light palette on print through print.css. The mapping
+ * above is unlayered so it outranks Starlight's layered defaults, which also
+ * means it outranks that print override; reset the tokens themselves here so
+ * printed documents stay light even when the screen theme is dark. The
+ * [data-theme='dark'] branch is required because it outranks a bare :root.
+ */
+@media print {
+  :root,
+  :root[data-theme='dark'] {
+    --background: #ffffff;
+    --foreground: #1e2826;
+
+    --card: #f6f8f8;
+    --card-foreground: #1e2826;
+    --popover: #f6f8f8;
+    --popover-foreground: #1e2826;
+
+    --primary: #1e6d65;
+    --primary-hover: #175d57;
+    --primary-foreground: #fafcfc;
+
+    --secondary: #f1f4f4;
+    --secondary-foreground: #1e2826;
+    --muted: #f1f4f4;
+    --muted-foreground: #4f5d5b;
+    --subtle-foreground: #6b7674;
+    --accent: #d8eeeb;
+    --accent-foreground: #1e6d65;
+
+    --border: #d9e0df;
+    --input: #d9e0df;
+    --ring: #1e6d65;
+  }
 }
 
 .social-icons {
   font-size: 20px;
-}
-
-main:where(:not(.site-ui *)) strong {
-  color: var(--sl-color-accent);
-}
-
-main:where(:not(.site-ui *)) code:not(:has(div)) {
-  background-color: var(--sl-color-accent-low);
-  border-radius: 3px;
-  color: var(--sl-color-accent-high);
 }
 
 .sidebar-content .top-level li ul li a[aria-current='page'] {

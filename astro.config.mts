@@ -66,10 +66,6 @@ export default defineConfig({
           },
         },
       ],
-      social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/Icemic/moyu' },
-        { icon: 'discord', label: 'Discord', href: 'https://discord.gg/wmTekCNarG' },
-      ],
       sidebar: [
         {
           label: '开始',
@@ -100,15 +96,19 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/DeepSpaceMill/moyu-docs/edit/master/',
       },
-      customCss: ['./src/styles/custom.css', './src/styles/marketing.css'],
+      customCss: [
+        './src/styles/theme-tokens.css',
+        './src/styles/custom.css',
+        './src/styles/marketing.css',
+      ],
       expressiveCode: {
         shiki: {
           langs: [{ ...(sixuGrammar as any), name: 'sixu' }],
         },
       },
       components: {
-        SocialIcons: './src/components/SocialIcons.astro',
         Header: './src/components/site/StarlightHeader.astro',
+        ThemeSelect: './src/components/site/StarlightThemeSelect.astro',
         PageFrame: './src/components/site/StarlightPageFrame.astro',
         ContentPanel: './src/components/site/StarlightContentPanel.astro',
         MarkdownContent: './src/components/site/StarlightMarkdownContent.astro',

@@ -1,10 +1,9 @@
 ---
 import Default from '@astrojs/starlight/components/Footer.astro';
 import { copy } from '../../data/site-copy';
-import { docPath, marketingPageFor, type Locale } from '../../data/site-nav';
+import { docPath, marketingPageFor, toLocale } from '../../data/site-nav';
 const isMarketing = marketingPageFor(Astro.url.pathname) !== undefined;
-const routeLocale = Astro.locals.starlightRoute.locale;
-const locale: Locale = routeLocale === 'en' || routeLocale === 'ja' ? routeLocale : 'zh';
+const locale = toLocale(Astro.locals.starlightRoute.locale);
 const t = copy[locale];
 ---
 {isMarketing ? (
