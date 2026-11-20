@@ -50,8 +50,8 @@
   --sl-color-black: var(--background);
 
   --sl-color-gray-1: var(--foreground);
-  --sl-color-gray-2: var(--muted-foreground);
-  --sl-color-gray-3: var(--subtle-foreground);
+  --sl-color-gray-2: var(--text-secondary);
+  --sl-color-gray-3: var(--text-tertiary);
   /*
    * gray-4 must stay more prominent than gray-5: FileTree uses it for the hover
    * border while gray-5 is the resting border, so mapping both to --border would
@@ -62,9 +62,16 @@
   --sl-color-gray-6: var(--muted);
   --sl-color-gray-7: var(--card);
 
-  --sl-font-mono:
-    SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', 'Microsoft YaHei', 'Source Han Sans',
-    monospace, ui-monospace;
+  /*
+   * Fonts are self-hosted (see fonts.css). The Simplified Chinese cut carries
+   * Latin (its Latin design is Source Sans derived), Fira Code handles code.
+   * fonts.css swaps --body-font to the Japanese cut for :lang(ja).
+   *
+   * The mono chain uses the same --body-font tail so CJK inside code blocks
+   * matches the surrounding prose and never crosses over to the other cut.
+   */
+  --sl-font: var(--body-font);
+  --sl-font-mono: 'Fira Code Variable', var(--body-font), SFMono-Regular, Menlo, Consolas, monospace, ui-monospace;
 }
 
 /*
@@ -121,7 +128,6 @@
     --secondary-foreground: #1e2826;
     --muted: #f1f4f4;
     --muted-foreground: #4f5d5b;
-    --subtle-foreground: #6b7674;
     --accent: #d8eeeb;
     --accent-foreground: #1e6d65;
 

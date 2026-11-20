@@ -24,6 +24,13 @@
 @source '../../src/pages';
 
 @theme inline {
+  /*
+   * Tailwind's font roles resolve to the self-hosted faces declared in
+   * fonts.css, so `font-sans` and `font-mono` utilities match the rest of the
+   * site instead of falling back to the system stack.
+   */
+  --font-sans: var(--body-font);
+  --font-mono: 'Fira Code Variable', var(--body-font);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);

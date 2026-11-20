@@ -24,8 +24,6 @@
   --secondary-foreground: #1e2826;
   --muted: #f1f4f4;
   --muted-foreground: #4f5d5b;
-  /* Dimmer than muted-foreground; used for secondary metadata such as the page TOC. */
-  --subtle-foreground: #6b7674;
   --accent: #d8eeeb;
   --accent-foreground: #1e6d65;
 
@@ -65,7 +63,6 @@
   --secondary-foreground: #ededed;
   --muted: #272727;
   --muted-foreground: #b0b0b0;
-  --subtle-foreground: #8e8e8e;
   --accent: #263b39;
   --accent-foreground: #8ac9c1;
 
@@ -80,4 +77,18 @@
   --ring: #8ac9c1;
 
   --invert: oklch(37% 0.013 285.805);
+}
+
+/*
+ * Two quieter text levels, derived from --foreground so they follow any palette
+ * change instead of being maintained as separate constants.
+ *
+ * secondary lands near the existing muted-foreground value; tertiary is for
+ * metadata that may recede, never for body copy. The 56% mix is the lowest
+ * value that still clears 3:1 against the light background (48% measured 2.9:1);
+ * dark mode has more headroom, so the same value reads comfortably there too.
+ */
+:root {
+  --text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
+  --text-tertiary: color-mix(in srgb, var(--foreground) 56%, transparent);
 }

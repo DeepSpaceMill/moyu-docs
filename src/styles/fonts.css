@@ -1,0 +1,36 @@
+/*
+ * Self-hosted font faces.
+ *
+ * Noto Sans SC covers Simplified Chinese and Latin, Noto Sans JP covers
+ * Japanese. Both packages ship one @font-face per unicode-range slice, so a
+ * page only downloads the slices its own text needs.
+ *
+ * The two cuts exist because their glyph shapes for shared codepoints differ
+ * (for example 直, 骨, 次 are drawn differently), and because kana are spread
+ * thinly across the SC slices: rendering Japanese with the SC cut pulled 41
+ * slices over 2 MB, while the JP cut is organised around kana and han alike.
+ * Which family applies is decided per document language in custom.css.
+ *
+ * Fira Code is the code font.
+ */
+@import '@fontsource-variable/noto-sans-sc/wght.css';
+@import '@fontsource-variable/noto-sans-jp/wght.css';
+@import '@fontsource-variable/fira-code/wght.css';
+
+/*
+ * Body font per document language.
+ *
+ * Only the family matching the document is referenced first, so the other
+ * cut's slices are not requested. Starlight applies the font on <body> only, so
+ * <html> is set here too: any text that resolves against <html> (and form
+ * controls that default to it) would otherwise pull the SC cut on Japanese
+ * pages.
+ */
+:root {
+  --body-font: 'Noto Sans SC Variable', ui-sans-serif, sans-serif;
+  font-family: var(--body-font);
+}
+
+:root:lang(ja) {
+  --body-font: 'Noto Sans JP Variable', 'Noto Sans SC Variable', ui-sans-serif, sans-serif;
+}

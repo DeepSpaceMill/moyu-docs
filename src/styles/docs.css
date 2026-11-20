@@ -28,9 +28,14 @@
  * ------------------------------------------------------------------------ */
 
 @layer starlight.core {
-  /* Every link shares the rounded hit area, so hover and selection agree. */
+  /*
+   * Every link shares the rounded hit area, so hover and selection agree. The
+   * weight matches the article body so navigation and prose read at the same
+   * density; the current page is bumped to 600 further down.
+   */
   .sidebar-content a {
     border-radius: var(--radius);
+    font-weight: 420;
   }
 
   .sidebar-content a:hover,
@@ -45,6 +50,7 @@
   .sidebar-content a[aria-current='page']:focus {
     background-color: var(--sl-color-accent-low);
     color: var(--sl-color-text-accent);
+    font-weight: 600;
   }
 
   /* Group labels read as headings, not links. */
@@ -81,8 +87,8 @@
 
   .right-sidebar-panel ul ul a {
     font-size: var(--sl-text-2xs);
-    font-weight: 400;
-    color: var(--sl-color-gray-3);
+    font-weight: 420;
+    color: var(--text-tertiary);
   }
   .right-sidebar-panel ul ul a:hover {
     color: var(--sl-color-white);
@@ -97,6 +103,22 @@
  * Markdown body
  * ------------------------------------------------------------------------ */
 
+/*
+ * Page title.
+ *
+ * Starlight renders the page title through PageTitle into its own content panel,
+ * outside `.sl-markdown-content`, at 42px from 72rem up. Next to a 28px h2 that
+ * reads as a banner, so it is stepped down to sit one level above h2.
+ */
+@layer starlight.core {
+  main .sl-container > h1 {
+    font-size: 32px;
+    line-height: 1.35;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+}
+
 @layer starlight.content {
   /*
    * Starlight wraps each heading in `.sl-heading-wrapper` so it can position the
@@ -109,25 +131,44 @@
   }
 
   /*
-   * Section spacing.
+   * Heading scale and rhythm.
    *
    * Starlight spaces headings with
    * `.sl-markdown-content :not(...) + :is(.sl-heading-wrapper)` (weight 0,2,0)
-   * and `font-size` on the wrapper, so em/rem values would scale with the
-   * heading level. These rules match that weight plus one class and use px.
+   * and sets `font-size` on the wrapper itself, not on the inner heading.
+   * The anchor icon is sized in em off that wrapper, so the size must be set
+   * here; setting it on the inner h2 would leave the icon at its old scale and
+   * push it out of alignment.
+   *
+   * These rules match Starlight's wrapper weight plus one class and use px,
+   * because em/rem would scale with the heading level.
+   *
+   * Hierarchy comes from size plus asymmetric spacing: a wide gap above each
+   * heading binds it to the section it opens, a tight gap below keeps it
+   * attached to its own content. No divider line is needed.
    */
   .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h2 {
-    margin-top: 40px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--sl-color-hairline);
+    font-size: 28px;
+    margin-top: 48px;
+    margin-bottom: 20px;
+  }
+  /* Reset the inherited wrapper size so the inner heading uses it directly. */
+  .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h2 > h2,
+  .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h3 > h3,
+  .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h4 > h4 {
+    font-size: inherit;
   }
 
   .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h3 {
+    font-size: 24px;
     margin-top: 32px;
+    margin-bottom: 16px;
   }
 
   .sl-markdown-content > .sl-heading-wrapper.sl-heading-wrapper.level-h4 {
+    font-size: 20px;
     margin-top: 24px;
+    margin-bottom: 12px;
   }
 
   /* The first heading in the body should not push away from the page title. */
@@ -136,11 +177,25 @@
   }
 
   /*
-   * Tables: restore a readable first/last column inset, since Starlight removes
-   * the outer padding to align tables with the text column.
+   * Body text sits slightly above the default 400. Noto Sans SC is a variable
+   * font with a 1-step weight axis, so 420 adds presence without looking bold;
+   * the same reason applies to the 450 below for code.
    */
+  .sl-markdown-content,
+  .sl-markdown-content :is(p, li, td, dd, dt) {
+    font-weight: 420;
+  }
+
+  /*
+   * Tables sit one step below the body type so wide spec tables stay scannable.
+   * Rule lines use a translucent tint instead of an opaque colour, which keeps
+   * them from competing with the text in either theme.
+   */
+  .sl-markdown-content table {
+    font-size: var(--sl-text-sm);
+  }
   .sl-markdown-content :is(th, td) {
-    border-bottom: 1px solid var(--sl-color-hairline);
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   }
   .sl-markdown-content :is(th:first-child, td:first-child) {
     padding-inline-start: 0.75rem;
@@ -153,19 +208,46 @@
   }
 
   /*
-   * Inline code reads as a small chip. Starlight already reduces the size to
-   * --sl-text-code-sm, so only the shape is adjusted here; scaling again would
-   * compound the reduction.
+   * Inline code reads as a low-contrast chip: the background stays close to the
+   * page, and the text keeps the body colour so long prose with many inline
+   * identifiers stays calm. Size is left to Starlight, which already steps it
+   * down; the weight matches the code block so both read the same.
    */
   .sl-markdown-content code:not(:where(.not-content *)) {
     border-radius: var(--radius);
     padding: 0.125rem 0.375rem;
+    background-color: color-mix(in srgb, var(--foreground) 7%, transparent);
+    font-weight: 450;
+  }
+
+  /* Fenced blocks and their code share the same weight. */
+  .sl-markdown-content pre,
+  .sl-markdown-content pre code:not(:where(.not-content *)) {
+    font-weight: 450;
+  }
+
+  /*
+   * Expressive Code hard-codes its own weight through a custom property and
+   * resets everything else, so the variable is overridden instead of the
+   * selector. This keeps the highlighted block in step with inline code.
+   */
+  .expressive-code {
+    --ec-codeFontWg: 450;
+  }
+
+  /*
+   * Bold carries emphasis through weight alone. Colour is deliberately not set:
+   * a `strong` inside a link must keep the link colour, otherwise the nested
+   * text looks like body copy sitting on an underlined link.
+   */
+  .sl-markdown-content strong:not(:where(.not-content *)) {
+    font-weight: 600;
   }
 
   /* Blockquotes get the accent edge instead of a gray one. */
   .sl-markdown-content blockquote {
     border-inline-start: 2px solid var(--sl-color-accent-low);
-    color: var(--sl-color-gray-2);
+    color: var(--text-secondary);
   }
 }
 
@@ -232,6 +314,11 @@
   .pagination-links .link-title {
     font-size: var(--sl-text-xl);
     font-weight: 600;
+  }
+
+  /* Edit link and last-updated share the body weight so the footer reads evenly. */
+  footer .meta {
+    font-weight: 420;
   }
 }
 

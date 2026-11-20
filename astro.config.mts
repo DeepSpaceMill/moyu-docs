@@ -97,6 +97,7 @@ export default defineConfig({
         baseUrl: 'https://github.com/DeepSpaceMill/moyu-docs/edit/master/',
       },
       customCss: [
+        './src/styles/fonts.css',
         './src/styles/theme-tokens.css',
         './src/styles/custom.css',
         './src/styles/docs.css',
