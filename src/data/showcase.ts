@@ -3,7 +3,7 @@ import type { Locale } from './site-nav';
 
 import zlzyCover from '../assets/showcase/智利之夜.png';
 import xzysCover from '../assets/showcase/箱中轶事.png';
-import witchCover from '../assets/showcase/往逝魔女之匣.jpg';
+import witchCover from '../assets/showcase/往逝魔女之匣.png';
 import fishberryCover from '../assets/showcase/FISHBERRY.jpg';
 
 export const showcaseCopy = {
