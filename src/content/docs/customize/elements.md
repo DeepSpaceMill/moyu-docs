@@ -210,8 +210,20 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | `printSpeed` | `number` | — | 打印速度（typewriter: 字/秒，printer: 行/秒） |
 | `boxWidth` | `number` | — | 文本框宽度 |
 | `boxHeight` | `number` | — | 文本框高度 |
-| `lineHeight` | `number` | — | 行高倍数 |
-| `indent` | `number` | — | 首行缩进，以字宽为单位（`1` 等于一个汉字宽） |
+| `lineHeight` | `number` | `1.5` | 行高倍数 |
+| `align` | `'start' \| 'center' \| 'end'` | `'start'` | 段落末行对齐；需要设置 `boxWidth` 才生效 |
+| `blockIndent` | `number` | `0` | 所有行的起始缩进，以字宽为单位 |
+| `indent` | `number \| 'auto'` | `0` | 首行缩进，以字宽为单位；写 `'auto'` 时按行长自适应 |
+| `firstLineIndentPolicy` | `{ shortBelowEm, shortEm, longEm }` | `{ shortBelowEm: 14, shortEm: 1, longEm: 2 }` | 自适应策略，仅在 `indent="auto"` 时生效 |
+| `whiteSpace` | `'collapse' \| 'preserve-breaks' \| 'preserve' \| 'break-spaces'` | `'preserve-breaks'` | 源空白处理方式 |
+| `textWrap` | `'wrap' \| 'no-wrap'` | `'wrap'` | 是否允许软换行 |
+| `tabSize` | `number` | `8` | Tab 间距，以空格宽度为倍数 |
+| `writingMode` | `'horizontal-tb' \| 'vertical-rl'` | `'horizontal-tb'` | 书写方向；当前仅记录，竖排尚未参与排版 |
+| `lineLengthGrid` | `boolean` | `true` | 是否把行长向下取整到字号的整数倍 |
+| `lineLengthGridBodyAlignment` | `'default' \| 'start' \| 'center' \| 'end'` | `'default'` | 取整后剩余宽度的摆放方式；`default` 跟随 `align` |
+| `rubyLineHeightMode` | `'per-line' \| 'uniform-paragraph'` | `'per-line'` | 注音放不下时，只加高含注文的行还是整段每一行 |
+| `inlineObjectMinimumClearance` | `number` | `0.1` | 行内对象与相邻行内容之间的最小净空，单位为 em |
+| `emphasisDotGap` | `number` | `0.1` | 着重号与文字之间的净空，单位为 em |
 
 ### 文本效果
 
@@ -308,7 +320,7 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 
 所有标签、属性、转义规则、可用状态和开发中能力见[富文本](/start/rich-text/)。需要把 `<`、`>` 当作普通字符显示时，写成 `<<`、`>>`，或设置 `parseMarkup={false}`。
 
-段落级的空白处理、换行控制、Tab 宽度、行长量化和书写方向等设置，可以通过富文本的 `<br />` 属性逐段指定，见[分段文字](/start/rich-text/#分段文字)。
+上面这些排版参数也可以用富文本的 `<br />` 属性逐段覆盖，见[分段文字](/start/rich-text/#分段文字)。
 
 :::tip[命令控制]
 `<text>` 支持通过 `ref.current?.executeCommand()` 发送命令，例如立即完成打印、设置文本、获取光标位置等。详见[节点命令参考](/engine-api/nodes/#text-节点命令)。
