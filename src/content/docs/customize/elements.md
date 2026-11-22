@@ -211,7 +211,7 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | `boxWidth` | `number` | — | 文本框宽度 |
 | `boxHeight` | `number` | — | 文本框高度 |
 | `lineHeight` | `number` | — | 行高倍数 |
-| `indent` | `number` | — | 段首缩进（像素） |
+| `indent` | `number` | — | 首行缩进，以字宽为单位（`1` 等于一个汉字宽） |
 
 ### 文本效果
 
@@ -307,6 +307,8 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 ```
 
 所有标签、属性、转义规则、可用状态和开发中能力见[富文本](/start/rich-text/)。需要把 `<`、`>` 当作普通字符显示时，写成 `<<`、`>>`，或设置 `parseMarkup={false}`。
+
+段落级的空白处理、换行控制、Tab 宽度、行长量化和书写方向等设置，可以通过富文本的 `<br />` 属性逐段指定，见[分段文字](/start/rich-text/#分段文字)。
 
 :::tip[命令控制]
 `<text>` 支持通过 `ref.current?.executeCommand()` 发送命令，例如立即完成打印、设置文本、获取光标位置等。详见[节点命令参考](/engine-api/nodes/#text-节点命令)。

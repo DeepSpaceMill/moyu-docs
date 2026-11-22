@@ -200,20 +200,38 @@ E = mc<baseline=-8 size=18>2</baseline>
 第一段文字<br />第二段文字
 ```
 
-`<br />` 可以带属性设置下一段的排版，未指定的字段继承上一段：
+`<br />` 可以带属性设置下一段的排版，未指定的字段继承上一段或 `<text>` 节点的设置：
 
 ```text
 这是自动换行的长段落。<br indent=2 align=center lineHeight=54 />下一段使用首行缩进、居中的结束行和更大的行高。
 ```
 
-| 属性 | 说明 |
-| --- | --- |
-| `indent` | 下一段的首行缩进。 |
-| `lineHeight` | 下一段的行高，直接写像素值，与 `<text>` 的 `lineHeight` 倍数写法不同。 |
-| `blockIndent` | 下一段所有行的起始缩进。 |
-| `align` | `start`、`center` 或 `end`。 |
+| 属性 | 取值 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `indent` | 数值或 `auto` | `0` | 首行缩进，数值以字宽为单位（`1` 等于一个汉字宽）。写 `auto` 时按行长自适应。 |
+| `firstLineIndentPolicy` | `shortBelow,short,long` | `14,1,2` | 自适应策略的三个数值：窄行阈值（字）、窄行缩进（字）、宽行缩进（字）。仅在 `indent=auto` 时生效。 |
+| `lineHeight` | 数值 | `<text>` 的 `lineHeight` × 字号（默认 `1.5` 倍） | 行高，直接写像素值，与 `<text>` 的 `lineHeight` 倍数写法不同。 |
+| `blockIndent` | 数值 | `0` | 所有行的起始缩进，单位为字宽。 |
+| `align` | `start`、`center`、`end` | `start` | 段落结束行的对齐方式；文本没有固定宽度时固定为 `start`。 |
+| `writingMode` | `horizontal-tb`、`vertical-rl` | `horizontal-tb` | 书写方向。当前版本只记录该值，竖排尚未参与排版。 |
+| `whiteSpace` | `collapse`、`preserve-breaks`、`preserve`、`break-spaces` | `preserve-breaks` | 源空白的处理方式。 |
+| `textWrap` | `wrap`、`no-wrap` | `wrap` | 是否允许软换行。 |
+| `tabSize` | 数值 | `8` | Tab 的重复间距，以默认字体的空格宽度为倍数。 |
+| `lineLengthGrid` | `true`、`false` | `true` | 是否把行长向下取整到字号的整数倍。 |
+| `lineLengthGridBodyAlignment` | `default`、`start`、`center`、`end` | `default` | 取整后剩余宽度的摆放方式；`default` 跟随 `align`。 |
+| `rubyLineHeightMode` | `per-line`、`uniform-paragraph` | `per-line` | 注音放不下时，只加高含注文的行，还是加高整段每一行。 |
+| `inlineObjectMinimumClearance` | 数值 | `0.1` | 行内对象与相邻行内容之间的最小净空，单位为 em。 |
+| `emphasisDotGap` | 数值 | `0.1` | 着重号与文字之间的净空，单位为 em。 |
 
-连续写多个 `<br />` 会产生空段落，空段落占一行高度但不显示内容。
+表中的默认值是 `LayoutStyle` 的初始值；`<br />` 未写某项时继承上一段，上一段也未设置时使用该值。
+
+需要按行长自动决定首行缩进，或在分段时保留空白时：
+
+```text
+第一段<br indent=auto firstLineIndentPolicy=10,1,2 />第二段<br whiteSpace=preserve-breaks textWrap=no-wrap />第三段
+```
+
+连写多个 `<br />` 会产生空段落，空段落占一行高度但不显示内容。属性值无效时只忽略该属性，保留上一段的设置。
 
 ## 可点击文字
 
@@ -258,6 +276,8 @@ E = mc<baseline=-8 size=18>2</baseline>
 `<tag=value>` 是简写。例如 `<color=red>` 等同于 `<color color=red>`，`<font="Inter">` 等同于 `<font family="Inter">`。
 
 属性名和标签名区分大小写。请使用 `fillColor`、`shadowOffsetX`、`lineThrough` 这样的准确拼写。
+
+枚举类取值统一使用 kebab-case，例如 `textWrap=no-wrap`、`rubyLineHeightMode=uniform-paragraph`。
 
 ### 引号与转义
 
