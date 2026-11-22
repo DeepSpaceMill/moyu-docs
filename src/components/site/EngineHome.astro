@@ -117,13 +117,15 @@ const featureLink = cn(
                 isExpression && 'rounded-lg border-t-0 bg-muted',
               )}
             >
-              <CardHeader className="flex flex-row items-start gap-3 rounded-none px-5 pt-5 pb-0">
-                <Icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+              <CardHeader className="flex flex-row items-start gap-3 rounded-none px-5 pt-5 pb-0 text-[21px] leading-snug">
+                <span class="flex h-lh shrink-0 items-center">
+                  <Icon className="size-5 translate-y-px text-primary" aria-hidden="true" />
+                </span>
                 <CardTitle
                   id={`feature-${feature.id}`}
                   role="heading"
                   aria-level={3}
-                  className="text-[21px] font-semibold leading-snug"
+                  className="text-[length:inherit] leading-[inherit] font-semibold"
                 >
                   {feature.title}
                 </CardTitle>
@@ -152,7 +154,7 @@ const featureLink = cn(
       {h.developerTitle.split('\n').map((line) => <span class="block">{line}</span>)}
     </h2>
     <div>
-      <p class="text-base leading-[1.9] text-muted-foreground whitespace-pre-wrap">{h.developerText}</p><div
+      <p class="text-base px-1 leading-[1.9] text-muted-foreground whitespace-pre-wrap">{h.developerText}</p><div
         class="mt-[25px] flex flex-wrap items-center gap-x-7 gap-y-5"
       >
         <a class={secondaryLink} href={doc('/customize/overview/')}
