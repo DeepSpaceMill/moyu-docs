@@ -203,7 +203,14 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `text` | `string` | `""` | 文本内容 |
-| `fontSize` | `number` | — | 字号 |
+| `fontSize` | `number` | `32` | 字号 |
+| `fontFamilies` | `string[]` | `[]` | 首选字体族列表，按顺序取第一个已配置的字体 |
+| `fontWeight` | `number` | `400` | 字重，范围 `1`–`1000` |
+| `italic` | `boolean` | `false` | 使用字体文件中已有的斜体样式 |
+| `fontSynthesis` | `'none' \| 'weight' \| 'style' \| 'all'` | `'all'` | 字体缺少对应字重或斜体时是否允许补出近似效果 |
+| `baselineShift` | `number` | `0` | 基线偏移，像素；正值向下 |
+| `inlineAttachment` | `'none' \| 'previous'` | `'none'` | 与前一文字边界的归属关系 |
+| `locale` | `string` | `'zh-Hans'` | BCP 47 语言标签，影响断行习惯 |
 | `fillColor` | `string` | — | 文本颜色（CSS 颜色值） |
 | `parseMarkup` | `boolean` | `true` | 是否解析 `<...>` 富文本标签；设为 `false` 时原样显示文本 |
 | `printMode` | `"instant" \| "typewriter" \| "printer"` | `"instant"` | 打印模式 |
@@ -321,6 +328,8 @@ onTouchCancel={(e: TouchEvent) => { ... }}
 所有标签、属性、转义规则、可用状态和开发中能力见[富文本](/start/rich-text/)。需要把 `<`、`>` 当作普通字符显示时，写成 `<<`、`>>`，或设置 `parseMarkup={false}`。
 
 上面这些排版参数也可以用富文本的 `<br />` 属性逐段覆盖，见[分段文字](/start/rich-text/#分段文字)。
+
+`fontFamilies` 只从当前已配置的字体中选择，不会加载新的字体文件，配置方式见[舞台与全局设置](/customize/settings/#可变字体)。
 
 :::tip[命令控制]
 `<text>` 支持通过 `ref.current?.executeCommand()` 发送命令，例如立即完成打印、设置文本、获取光标位置等。详见[节点命令参考](/engine-api/nodes/#text-节点命令)。
